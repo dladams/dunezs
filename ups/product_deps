@@ -1,0 +1,32 @@
+# dunezs/ups/product_deps
+#
+# David Adams
+# November 2015
+
+# The parent line must be the first non-comment line in the file
+# This line defines the product name and version
+parent	dunezs  v00_00_01
+defaultqual	e9
+
+fcldir product_dir job
+
+product         version
+art             v1_17_02
+gcc             v4_9_3
+
+cetbuildtools	v4_15_00	-	only_for_build
+end_product_list
+
+  
+# e6  - with gcc 4.9.1 and -std=c++1y
+qualifier	art     	 gcc	notes
+e9:debug	e9:nu:debug	-nq-
+e9:opt		e9:nu:opt	-nq-
+e9:prof		e9:nu:prof	-nq-
+end_qualifier_list
+
+# Preserve tabs and formatting in emacs and vi / vim:
+
+### Local Variables:
+### tab-width: 8
+### End:
