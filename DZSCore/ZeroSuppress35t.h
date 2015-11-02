@@ -10,9 +10,13 @@
 // DUNE collaboration meeting:
 //   https://indico.fnal.gov/conferenceOtherViews.py?view=standard&confId=10100
 
+#include <string>
 #include <iostream>
+#include <vector>
 
 class ZeroSuppress35t {
+
+public:
 
   typedef unsigned int Index;
   typedef double Signal;

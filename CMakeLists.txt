@@ -56,10 +56,10 @@ include(ArtMake)
 include(BuildPlugins)
 
 # sources
-add_subdirectory(DXSCore)
+add_subdirectory(DZSCore)
 
 # tests
-#add_subdirectory(test)
+add_subdirectory(test)
 
 # ups - table and config files
 add_subdirectory(ups)
