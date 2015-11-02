@@ -42,7 +42,7 @@ int ZeroSuppress35t::filter(SignalArray& sigs) const {
       } else {
         // If we are outside the signal for more than m_nl ticks, and we are
         // not in the tail of an earlier signal, zero tick isig-m_nl.
-        if ( ++nout > m_nl ) {
+        if ( ++nout > m_nl && isig >= m_nl ) {
           unsigned int isigZero = isig - m_nl;
           if ( ! inTail[isigZero] ) sigs[isigZero] = zero();
         }
