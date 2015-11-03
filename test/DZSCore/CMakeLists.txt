@@ -1,4 +1,4 @@
-# dunezs/test/DZSCore/ZeroSuppress35t/CMakeLists.txt
+# dunezs/test/DZSCore/CMakeLists.txt
 #
 # David Adams
 # November 2015

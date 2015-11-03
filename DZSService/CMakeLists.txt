@@ -5,7 +5,7 @@
 #
 # CMake instructions for dunze services.
 
-message("XXXXXXXXXX: " ${DUNEZS})
+#message("XXXXXXXXXX: " ${DUNEZS})
 # Build the library.
 #art_make(NO_PLUGINS LIBRARY_NAME DZSService
 #         LIB_LIBRARIES

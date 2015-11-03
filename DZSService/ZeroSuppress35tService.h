@@ -9,6 +9,9 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 #include <memory>
+#include <string>
+#include <iostream>
+
 namespace fhicl {
 class ParameterSet;
 }
@@ -26,6 +29,10 @@ public:
   // Filter an array of signals.
   // Suppressed signals are replaced with FCL parameter Zero.
   int filter(ZeroSuppress35t::SignalArray& sigs) const;
+
+  // Print the configuration.
+  std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;
+
 
 private:
 

@@ -90,6 +90,7 @@ ostream& ZeroSuppress35t::print(ostream& out, string prefix) const {
   out << prefix << "NL = " << m_nl << endl;
   out << prefix << "ND = " << m_nd << endl;
   out << prefix << "NT = " << m_nt << endl;
+  out << prefix << "Zero = " << m_zero << endl;
   return out;
 }
 
