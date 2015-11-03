@@ -24,12 +24,12 @@ int main() {
   cout << myname << "NDEBUG must be off." << endl;
   abort();
 #endif
-  cout << myname << "Checking zero." << endl;
-  ZeroSuppress35t::Signal zero = 0;
-  assert( ZeroSuppress35t::zero() == zero );
   cout << myname << "Creating suppressor." << endl;
   ZeroSuppress35t zs(10, 3, 5, 5, 6);
   zs.print();
+  cout << myname << "Checking zero." << endl;
+  ZeroSuppress35t::Signal zero = 0;
+  assert( zs.zero() == zero );
   cout << myname << "Suppressing." << endl;
   ZeroSuppress35t::SignalArray indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
                                           6, 12, 21, 17, 12,  7,  5,  2,  1, -1,

@@ -16,14 +16,14 @@ enum SigState { OUT, HIGH, LOW };
 
 //**********************************************************************
 
-Signal ZeroSuppress35t::zero() {
-  return 0.0;
-}
+ZeroSuppress35t::ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt, Signal azero)
+: m_tl(tl), m_td(td), m_nl(nl), m_nd(nd), m_nt(nt), m_zero(azero) { }
 
 //**********************************************************************
 
-ZeroSuppress35t::ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt)
-: m_tl(tl), m_td(td), m_nl(nl), m_nd(nd), m_nt(nt) { }
+Signal ZeroSuppress35t::zero() const {
+  return m_zero;
+}
 
 //**********************************************************************
 

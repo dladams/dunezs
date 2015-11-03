@@ -22,11 +22,11 @@ public:
   typedef double Signal;
   typedef std::vector<Signal> SignalArray;
 
-  // Return the value assigned to suppressed channels.
-  static Signal zero();
-
   // Ctor from the five parameters that characterize the algorithm.
-  ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt);
+  ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt, Signal azero =0);
+
+  // Return the value assigned to suppressed channels.
+  Signal zero() const;
 
   // Apply the ZS filter to an array of signals.
   // Filtered-out signals are replaced with the value zero().
@@ -43,5 +43,6 @@ private:
   Index m_nl;
   Index m_nd;
   Index m_nt;
+  Signal m_zero;
 
 };
