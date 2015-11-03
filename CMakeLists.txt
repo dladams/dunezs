@@ -57,6 +57,7 @@ include(BuildPlugins)
 
 # sources
 add_subdirectory(DZSCore)
+add_subdirectory(DZSService)
 
 # tests
 add_subdirectory(test)
