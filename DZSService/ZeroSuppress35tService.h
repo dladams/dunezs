@@ -26,9 +26,12 @@ public:
   // Ctor.
   ZeroSuppress35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
+  // Filter an array of signals. Result is written to keep.
+  int filter(const ZeroSuppress35t::SignalVector& sigs, ZeroSuppress35t::ResultVector& keep) const;
+
   // Filter an array of signals.
   // Suppressed signals are replaced with FCL parameter Zero.
-  int filter(ZeroSuppress35t::SignalArray& sigs) const;
+  int filter(ZeroSuppress35t::SignalVector& sigs) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;

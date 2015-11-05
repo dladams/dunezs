@@ -50,10 +50,10 @@ int test_ZeroSuppress35tService() {
   pzs->print();
 
   cout << myname << "Suppressing." << endl;
-  ZeroSuppress35t::SignalArray indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
-                                          6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
-                                          2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
-  ZeroSuppress35t::SignalArray outdata(indata);
+  ZeroSuppress35t::SignalVector indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
+                                           6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
+                                           2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
+  ZeroSuppress35t::SignalVector outdata(indata);
   assert( pzs->filter(outdata) == 0 );
   for ( unsigned int idat=0; idat<indata.size(); ++idat ) {
     cout << setw(6) << indata[idat] << setw(6) << outdata[idat] << endl;

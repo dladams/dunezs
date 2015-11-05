@@ -10,9 +10,15 @@ using std::endl;
 using std::vector;
 
 typedef ZeroSuppress35t::Signal Signal;
-typedef ZeroSuppress35t::SignalArray SignalArray;
+typedef ZeroSuppress35t::SignalVector SignalVector;
+typedef ZeroSuppress35t::ResultVector ResultVector;
 
-enum SigState { OUT, HIGH, LOW };
+// Signal state.
+//    OUT - outside the signal (may be in the tail of an earlier signal)
+//   HIGH - Live region of the signal (above TL or after)
+//   DEAD - Dead region of the signal (below TD)
+//    END - End of dead region (followed by tail)
+enum SigState { OUT, HIGH, LOW, END };
 
 //**********************************************************************
 
@@ -27,57 +33,73 @@ Signal ZeroSuppress35t::zero() const {
 
 //**********************************************************************
 
-int ZeroSuppress35t::filter(SignalArray& sigs) const {
-  vector<bool> inTail(sigs.size(), false);
+int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const {
+  unsigned int nsig = sigs.size();
+  keep.clear();
+  keep.resize(nsig, false);
   // Loop over signals.
   SigState state = OUT;
-  unsigned int nout = 0;
   unsigned int nlow = 0;
-  for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
+  for ( unsigned int isig=0; isig<nsig; ++isig ) {
     Signal sig = sigs[isig];
-    if ( state == OUT ) {
+    // Last tick is outside a signal.
+    if ( state == OUT || state == END ) {
+      // If this tick is above TL, we are in the live region of a signal.
+      // Keep the NL preceding signals.
       if ( sig > m_tl ) {
         state = HIGH;
-        nout = 0;
-      } else {
-        // If we are outside the signal for more than m_nl ticks, and we are
-        // not in the tail of an earlier signal, zero tick isig-m_nl.
-        if ( ++nout > m_nl && isig >= m_nl ) {
-          unsigned int isigZero = isig - m_nl;
-          if ( ! inTail[isigZero] ) sigs[isigZero] = zero();
+        unsigned int jsig1 = 0;
+        if ( isig > m_nl ) jsig1 = isig - m_nl;
+        unsigned int jsig2 = isig;
+        for ( unsigned int jsig=jsig1; jsig<jsig2; ++jsig) {
+          keep[jsig] = true;
         }
+      } else {
+        state = OUT;
       }
+    // Last tick is is in the live region of a signal.
     } else if ( state == HIGH ) {
+      // If this tick is below TD, we are in the dead region of a signal.
       if ( sig <= m_td ) {
         state = LOW;
         nlow = 1;
       }
+    // Last tick is is in the dead region of a signal.
     } else if ( state == LOW ) {
+      // If signal is above TD, we are back in the live region.
       if ( sig > m_td ) {
         state = HIGH;
         nlow = 0;
-      } else {
-        // Reach the end of the low (dead) region.
-        if ( ++nlow >= m_nl ) {
-          state = OUT;
-          nlow = 0;
-          // Protect the tail.
-          for ( unsigned int itail=1; itail<=m_nt; ++itail ) {
-            inTail[isig+itail] = true;
-          }
+      // If this is the ND'th consecutive signal in the dead region, we
+      // have reached the end of the signal.
+      // Keep this signal and a tail.
+      } else if ( ++nlow >= m_nd ) {
+        state = END;
+        nlow = 0;
+        // Protect the tail.
+        unsigned int jsig1 = isig + 1;
+        unsigned int jsig2 = jsig1 + m_nt;
+        if ( jsig2 > nsig ) jsig2 = nsig;
+        for ( unsigned int jsig=jsig1; jsig<jsig2; ++jsig) {
+          keep[jsig] = true;
         }
       }
     } else {
       assert(false);
     }
+    if ( state != OUT ) keep[isig] = true;
   }
-  // If we end up outside a signal, then the last m_nl ticks are zeroed.
-  if ( state == OUT ) {
-    unsigned int isig1 = 0;
-    if ( sigs.size() > m_nl ) isig1 = sigs.size() - m_nl;
-    for ( unsigned int isig=isig1; isig<sigs.size(); ++isig ) {
-      if ( ! inTail[isig] ) sigs[isig] = zero();
-    }
+  return 0;
+}
+
+//**********************************************************************
+
+int ZeroSuppress35t::filter(SignalVector& sigs) const {
+  ResultVector keep;
+  int istat = filter(sigs, keep);
+  if (istat ) return istat;
+  for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
+    if ( ! keep[isig] ) sigs[isig] = zero();
   }
   return 0;
 }

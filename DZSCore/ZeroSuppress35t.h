@@ -20,7 +20,8 @@ public:
 
   typedef unsigned int Index;
   typedef double Signal;
-  typedef std::vector<Signal> SignalArray;
+  typedef std::vector<Signal> SignalVector;
+  typedef std::vector<bool> ResultVector;
 
   // Ctor from the five parameters that characterize the algorithm.
   ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt, Signal azero =0);
@@ -28,10 +29,16 @@ public:
   // Return the value assigned to suppressed channels.
   Signal zero() const;
 
-  // Apply the ZS filter to an array of signals.
+  // Apply the ZS filter to a signal vector.
+  // Entries in the result vector indicate whether the correponding
+  // ADC entry should be retained.
+  // Returns nonzero for error.
+  int filter(const SignalVector& sigs, ResultVector& keep) const;
+
+  // Apply the ZS filter to a signal vector.
   // Filtered-out signals are replaced with the value zero().
   // Returns nonzero for error.
-  int filter(SignalArray& sigs) const;
+  int filter(SignalVector& sigs) const;
 
   // Display the signal parameters.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;

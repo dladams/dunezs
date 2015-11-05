@@ -7,7 +7,8 @@ using std::string;
 using std::ostream;
 
 typedef ZeroSuppress35t::Signal Signal;
-typedef ZeroSuppress35t::SignalArray SignalArray;
+typedef ZeroSuppress35t::SignalVector SignalVector;
+typedef ZeroSuppress35t::ResultVector ResultVector;
 typedef ZeroSuppress35t::Index Index;
 
 //**********************************************************************
@@ -31,7 +32,16 @@ ZeroSuppress35tService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) 
   
 //**********************************************************************
 
-int ZeroSuppress35tService::filter(SignalArray& sigs) const {
+int ZeroSuppress35tService::filter(const SignalVector& sigs, ResultVector& keep) const {
+  if ( m_pzs.get() == nullptr ) {
+    throw cet::exception(__FUNCTION__) << "Zero suppression is not configured properly.";
+  }
+  return m_pzs->filter(sigs, keep);
+}
+
+//**********************************************************************
+
+int ZeroSuppress35tService::filter(SignalVector& sigs) const {
   if ( m_pzs.get() == nullptr ) {
     throw cet::exception(__FUNCTION__) << "Zero suppression is not configured properly.";
   }
