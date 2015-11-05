@@ -19,7 +19,7 @@ class ZeroSuppress35t {
 public:
 
   typedef unsigned int Index;
-  typedef double Signal;
+  typedef short Signal;
   typedef std::vector<Signal> SignalVector;
   typedef std::vector<bool> ResultVector;
 
@@ -30,7 +30,7 @@ public:
   Signal zero() const;
 
   // Apply the ZS filter to a signal vector.
-  // Entries in the result vector indicate whether the correponding
+  // Entries in the result vector indicate whether the corresponding
   // ADC entry should be retained.
   // Returns nonzero for error.
   int filter(const SignalVector& sigs, ResultVector& keep) const;
