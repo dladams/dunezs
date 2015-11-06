@@ -20,14 +20,12 @@ ZeroSuppress35tService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) 
   Index nl = 1;
   Index nd = 1;
   Index nt = 1;
-  Signal zero = 1;
-  pset.get_if_present<Signal>("Zero", zero);
   tl = pset.get<Signal>("TL");
   td = pset.get<Signal>("TD");
   nl = pset.get<Index>("NL");
   nd = pset.get<Index>("ND");
   nt = pset.get<Index>("NT");
-  m_pzs.reset(new ZeroSuppress35t(tl, td, nl, nd, nt, zero));
+  m_pzs.reset(new ZeroSuppress35t(tl, td, nl, nd, nt));
 }
   
 //**********************************************************************
@@ -37,15 +35,6 @@ int ZeroSuppress35tService::filter(const SignalVector& sigs, ResultVector& keep)
     throw cet::exception(__FUNCTION__) << "Zero suppression is not configured properly.";
   }
   return m_pzs->filter(sigs, keep);
-}
-
-//**********************************************************************
-
-int ZeroSuppress35tService::filter(SignalVector& sigs) const {
-  if ( m_pzs.get() == nullptr ) {
-    throw cet::exception(__FUNCTION__) << "Zero suppression is not configured properly.";
-  }
-  return m_pzs->filter(sigs);
 }
 
 //**********************************************************************

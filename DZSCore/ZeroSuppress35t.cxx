@@ -22,14 +22,8 @@ enum SigState { OUT, HIGH, LOW, END };
 
 //**********************************************************************
 
-ZeroSuppress35t::ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt, Signal azero)
-: m_tl(tl), m_td(td), m_nl(nl), m_nd(nd), m_nt(nt), m_zero(azero) { }
-
-//**********************************************************************
-
-Signal ZeroSuppress35t::zero() const {
-  return m_zero;
-}
+ZeroSuppress35t::ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt)
+: m_tl(tl), m_td(td), m_nl(nl), m_nd(nd), m_nt(nt) { }
 
 //**********************************************************************
 
@@ -94,25 +88,12 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
 
 //**********************************************************************
 
-int ZeroSuppress35t::filter(SignalVector& sigs) const {
-  ResultVector keep;
-  int istat = filter(sigs, keep);
-  if (istat ) return istat;
-  for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
-    if ( ! keep[isig] ) sigs[isig] = zero();
-  }
-  return 0;
-}
-
-//**********************************************************************
-
 ostream& ZeroSuppress35t::print(ostream& out, string prefix) const {
   out << prefix << "TL = " << m_tl << endl;
   out << prefix << "TD = " << m_td << endl;
   out << prefix << "NL = " << m_nl << endl;
   out << prefix << "ND = " << m_nd << endl;
   out << prefix << "NT = " << m_nt << endl;
-  out << prefix << "Zero = " << m_zero << endl;
   return out;
 }
 

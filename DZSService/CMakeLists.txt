@@ -15,3 +15,4 @@
 
 # Add plugin for each service.
 simple_plugin(ZeroSuppress35tService "service" DZSCore BASENAME_ONLY)
+simple_plugin(CompressReplaceService "service" DZSCore BASENAME_ONLY)

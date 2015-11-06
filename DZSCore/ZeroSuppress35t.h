@@ -24,21 +24,13 @@ public:
   typedef std::vector<bool> ResultVector;
 
   // Ctor from the five parameters that characterize the algorithm.
-  ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt, Signal azero =0);
-
-  // Return the value assigned to suppressed channels.
-  Signal zero() const;
+  ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt);
 
   // Apply the ZS filter to a signal vector.
   // Entries in the result vector indicate whether the corresponding
   // ADC entry should be retained.
   // Returns nonzero for error.
   int filter(const SignalVector& sigs, ResultVector& keep) const;
-
-  // Apply the ZS filter to a signal vector.
-  // Filtered-out signals are replaced with the value zero().
-  // Returns nonzero for error.
-  int filter(SignalVector& sigs) const;
 
   // Display the signal parameters.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;
@@ -50,6 +42,5 @@ private:
   Index m_nl;
   Index m_nd;
   Index m_nt;
-  Signal m_zero;
 
 };
