@@ -9,9 +9,9 @@ using std::ostream;
 using std::endl;
 using std::vector;
 
-typedef ZeroSuppress35t::Signal Signal;
-typedef ZeroSuppress35t::SignalVector SignalVector;
-typedef ZeroSuppress35t::ResultVector ResultVector;
+typedef ZeroSuppressBase::Signal       Signal;
+typedef ZeroSuppressBase::SignalVector SignalVector;
+typedef ZeroSuppressBase::ResultVector ResultVector;
 
 // Signal state.
 //    OUT - outside the signal (may be in the tail of an earlier signal)

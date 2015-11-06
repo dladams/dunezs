@@ -3,13 +3,13 @@
 # David Adams
 # November 2015
 #
-# CMake instructions for dunze services.
+# CMake instructions for dunzs services.
 
-#message("XXXXXXXXXX: " ${DUNEZS})
-# Build the library.
-#art_make(NO_PLUGINS LIBRARY_NAME DZSService
+# Build the library excluding services.
+#art_make(NO_PLUGINS
+#         LIBRARY_NAME DZSService
 #         LIB_LIBRARIES
-#           ZeroSuppression35t_service
+##          ZeroSuppression35t_service
 #           DZSCore
 #        )
 

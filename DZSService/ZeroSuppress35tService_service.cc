@@ -6,25 +6,20 @@
 using std::string;
 using std::ostream;
 
-typedef ZeroSuppress35t::Signal Signal;
-typedef ZeroSuppress35t::SignalVector SignalVector;
-typedef ZeroSuppress35t::ResultVector ResultVector;
-typedef ZeroSuppress35t::Index Index;
+typedef ZeroSuppressBase::Index        Index;
+typedef ZeroSuppressBase::Signal       Signal;
+typedef ZeroSuppressBase::SignalVector SignalVector;
+typedef ZeroSuppressBase::ResultVector ResultVector;
 
 //**********************************************************************
 
 ZeroSuppress35tService::
 ZeroSuppress35tService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
-  Signal tl = 1;
-  Signal td = 1;
-  Index nl = 1;
-  Index nd = 1;
-  Index nt = 1;
-  tl = pset.get<Signal>("TL");
-  td = pset.get<Signal>("TD");
-  nl = pset.get<Index>("NL");
-  nd = pset.get<Index>("ND");
-  nt = pset.get<Index>("NT");
+  Signal tl = pset.get<Signal>("TL");
+  Signal td = pset.get<Signal>("TD");
+  Index nl = pset.get<Index>("NL");
+  Index nd = pset.get<Index>("ND");
+  Index nt = pset.get<Index>("NT");
   m_pzs.reset(new ZeroSuppress35t(tl, td, nl, nd, nt));
 }
   
@@ -48,6 +43,6 @@ ostream& ZeroSuppress35tService::print(ostream& out, string prefix) const {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE(ZeroSuppress35tService)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppress35tService, ZeroSuppressBase)
 
 //**********************************************************************

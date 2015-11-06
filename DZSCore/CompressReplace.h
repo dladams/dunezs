@@ -6,6 +6,9 @@
 // Class to compress a signal array bey replacing filtered out values
 // with a configurable zero value.
 
+#ifndef CompressReplace_H
+#define CompressReplace_H
+
 #include <string>
 #include <iostream>
 #include <vector>
@@ -38,3 +41,5 @@ private:
   Signal m_zero;
 
 };
+
+#endif

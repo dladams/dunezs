@@ -10,18 +10,14 @@
 // DUNE collaboration meeting:
 //   https://indico.fnal.gov/conferenceOtherViews.py?view=standard&confId=10100
 
-#include <string>
-#include <iostream>
-#include <vector>
+#ifndef ZeroSuppress35t_H
+#define ZeroSuppress35t_H
 
-class ZeroSuppress35t {
+#include "DZSCore/ZeroSuppressBase.h"
+
+class ZeroSuppress35t : public ZeroSuppressBase {
 
 public:
-
-  typedef unsigned int Index;
-  typedef short Signal;
-  typedef std::vector<Signal> SignalVector;
-  typedef std::vector<bool> ResultVector;
 
   // Ctor from the five parameters that characterize the algorithm.
   ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt);
@@ -33,7 +29,7 @@ public:
   int filter(const SignalVector& sigs, ResultVector& keep) const;
 
   // Display the signal parameters.
-  std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;
+  std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
 private:
 
@@ -44,3 +40,5 @@ private:
   Index m_nt;
 
 };
+
+#endif

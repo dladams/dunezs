@@ -33,11 +33,14 @@ int test_ZeroSuppress35tService() {
   cout << myname << "Fetch art service helper." << endl;
   ArtServiceHelper& ash = ArtServiceHelper::instance();
 
+  // Add the ZS service.
+  // Note the service is added with it base name while the full type is included
+  // along with its parameters in the configuration.
   cout << myname << line << endl;
   cout << myname << "Add the ZeroSuppress35t service." << endl;
-  scfg = "TL: 10 TD: 3 NL: 5 ND: 5 NT: 6";
+  scfg = "service_provider: \"ZeroSuppress35tService\" TL: 10 TD: 3 NL: 5 ND: 5 NT: 6";
   cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("ZeroSuppress35tService", scfg) == 0 );
+  assert( ash.addService("ZeroSuppressBase", scfg) == 0 );
 
   cout << myname << line << endl;
   cout << myname << "Load the services." << endl;
@@ -47,12 +50,13 @@ int test_ZeroSuppress35tService() {
   cout << myname << line << endl;
   cout << myname << "Get the service." << endl;
   art::ServiceHandle<ZeroSuppress35tService> pzs;
+  //art::ServiceHandle<ZeroSuppressBase> pzs;
   pzs->print();
 
   cout << myname << "Suppressing." << endl;
   ZeroSuppress35t::SignalVector indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
-                                           6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
-                                           2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
+                                           6, 12, 21, 17, 12,  7,   5,  2,  1, -1,
+                                           2,  1,  1, -1, -1, -2,   3,  1,  1, -1 };
   ZeroSuppress35t::ResultVector keep;
   assert( pzs->filter(indata, keep) == 0 );
   for ( unsigned int idat=0; idat<indata.size(); ++idat ) {

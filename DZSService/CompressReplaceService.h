@@ -8,6 +8,9 @@
 // FCL parameters
 //   Zero [0] - replacement value
 
+#ifndef CompressReplaceService_H
+#define CompressReplaceService_J
+
 #include "DZSCore/CompressReplace.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
@@ -44,3 +47,5 @@ private:
 };
 
 DECLARE_ART_SERVICE(CompressReplaceService, LEGACY)
+
+#endif
