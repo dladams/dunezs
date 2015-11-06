@@ -31,6 +31,8 @@ public:
   // Display the signal parameters.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
+  void setDebug(int dbg);
+
 private:
 
   Signal m_tl;
@@ -38,6 +40,7 @@ private:
   Index m_nl;
   Index m_nd;
   Index m_nt;
+  bool m_dbg;
 
 };
 

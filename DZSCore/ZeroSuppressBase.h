@@ -19,7 +19,7 @@ class ZeroSuppressBase {
 public:
 
   typedef unsigned int Index;
-  typedef double Signal;
+  typedef short Signal;
   typedef std::vector<Signal> SignalVector;
   typedef std::vector<bool> ResultVector;
 

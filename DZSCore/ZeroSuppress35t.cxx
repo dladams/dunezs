@@ -3,12 +3,17 @@
 #include "ZeroSuppress35t.h"
 #include <vector>
 #include <cassert>
+#include <iostream>
+#include <iomanip>
 
 using std::string;
 using std::ostream;
+using std::cout;
 using std::endl;
 using std::vector;
+using std::setw;
 
+typedef ZeroSuppressBase::Index        Index;
 typedef ZeroSuppressBase::Signal       Signal;
 typedef ZeroSuppressBase::SignalVector SignalVector;
 typedef ZeroSuppressBase::ResultVector ResultVector;
@@ -20,14 +25,63 @@ typedef ZeroSuppressBase::ResultVector ResultVector;
 //    END - End of dead region (followed by tail)
 enum SigState { OUT, HIGH, LOW, END };
 
+namespace {
+
+// Calculate sum for nsig bins before isig.
+// If skipStuck, the stuck bins do not contribute to sum or count.
+// Bins with sig <= thresh, do not contribute to sum.
+struct RunningSum {
+  RunningSum(const SignalVector& sigs, Index isig, Index ns, Signal thresh, bool skipStuck);
+  Signal sigsum;
+  Index count;
+};
+
+RunningSum::
+RunningSum(const SignalVector& sigs, Index isig, Index nsig, Signal thresh, bool skipStuck) {
+  sigsum = 0;
+  count = 0;
+  Index jsig1 = 0;
+  if ( isig > nsig ) jsig1 = isig - nsig;
+  Index jsig2 = isig;
+  if ( jsig2 > sigs.size() ) jsig2 = sigs.size();
+  for ( Index jsig=jsig1; jsig<jsig2; ++jsig ) {
+    Signal sig = sigs[jsig];
+    if ( skipStuck ) {
+      Index lsb = sig & 0x3f;
+      if ( lsb == 0 ) continue;
+      if ( lsb == 0x3f ) continue;
+    }
+    ++count;
+    if ( abs(sig) > thresh ) {
+      sigsum +=  sig;
+    }
+  }
+}
+
+// Convert sate to string.
+string sstate(SigState state) {
+  if ( state == OUT ) return "OUT";
+  if ( state == HIGH ) return "HIGH";
+  if ( state == LOW ) return "LOW";
+  if ( state == END ) return "END";
+  return "NONE";
+}
+
+}  // End unnamed namespace.
+
 //**********************************************************************
 
 ZeroSuppress35t::ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt)
-: m_tl(tl), m_td(td), m_nl(nl), m_nd(nd), m_nt(nt) { }
+: m_tl(tl), m_td(td), m_nl(nl), m_nd(nd), m_nt(nt), m_dbg(false) { }
 
 //**********************************************************************
 
 int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const {
+  const string myname = "ZeroSuppress35t::filter: ";
+  if ( m_dbg ) cout << "Filtering signal array of size " << sigs.size() << endl;
+  bool m_skipStuck = false;
+  Signal m_ts = 0;
+  Signal m_tt = 5;
   unsigned int nsig = sigs.size();
   keep.clear();
   keep.resize(nsig, false);
@@ -36,11 +90,15 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
   unsigned int nlow = 0;
   for ( unsigned int isig=0; isig<nsig; ++isig ) {
     Signal sig = sigs[isig];
+    RunningSum rs(sigs, isig, m_nl, m_ts, m_skipStuck);
+    if ( m_dbg ) cout << setw(3) << isig << setw(6) << sig << setw(5) << sstate(state);
     // Last tick is outside a signal.
     if ( state == OUT || state == END ) {
       // If this tick is above TL, we are in the live region of a signal.
       // Keep the NL preceding signals.
-      if ( sig > m_tl ) {
+      Signal sumthresh = m_tl*rs.count;
+      if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
+      if ( rs.sigsum > sumthresh ) {
         state = HIGH;
         unsigned int jsig1 = 0;
         if ( isig > m_nl ) jsig1 = isig - m_nl;
@@ -53,6 +111,9 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
       }
     // Last tick is is in the live region of a signal.
     } else if ( state == HIGH ) {
+      RunningSum rs(sigs, isig, m_nl, m_ts, m_skipStuck);
+      Signal sumthresh = m_tt*rs.count;
+      if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
       // If this tick is below TD, we are in the dead region of a signal.
       if ( sig <= m_td ) {
         state = LOW;
@@ -81,6 +142,7 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
     } else {
       assert(false);
     }
+    cout << " --> " << sstate(state) << endl;
     if ( state != OUT ) keep[isig] = true;
   }
   return 0;
@@ -94,7 +156,14 @@ ostream& ZeroSuppress35t::print(ostream& out, string prefix) const {
   out << prefix << "NL = " << m_nl << endl;
   out << prefix << "ND = " << m_nd << endl;
   out << prefix << "NT = " << m_nt << endl;
+  out << prefix << "Debug level: " << m_dbg << endl;
   return out;
+}
+
+//**********************************************************************
+
+void ZeroSuppress35t::setDebug(int dbg) {
+  m_dbg = dbg;
 }
 
 //**********************************************************************
