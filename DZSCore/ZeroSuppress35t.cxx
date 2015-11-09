@@ -21,7 +21,7 @@ typedef ZeroSuppressBase::ResultVector ResultVector;
 // Signal state.
 //    OUT - outside the signal (may be in the tail of an earlier signal)
 //   HIGH - Live region of the signal (above TL or after)
-//   DEAD - Dead region of the signal (below TD)
+//    LOW - Dead region of the signal (below TD)
 //    END - End of dead region (followed by tail)
 enum SigState { OUT, HIGH, LOW, END };
 
@@ -153,8 +153,10 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
 //**********************************************************************
 
 ostream& ZeroSuppress35t::print(ostream& out, string prefix) const {
+  out << prefix << "TS = " << m_ts << endl;
   out << prefix << "TL = " << m_tl << endl;
   out << prefix << "TD = " << m_td << endl;
+  out << prefix << "NS = " << m_ns << endl;
   out << prefix << "NL = " << m_nl << endl;
   out << prefix << "ND = " << m_nd << endl;
   out << prefix << "NT = " << m_nt << endl;

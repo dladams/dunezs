@@ -27,13 +27,13 @@ int test_ZeroSuppress35t(int dbg) {
   abort();
 #endif
   cout << myname << "Creating suppressor." << endl;
-  ZeroSuppress35t zs(1, 10, 3, 4, 5, 5, 6);
+  ZeroSuppress35t zs(1, 10, 5, 4, 6, 5, 2);
   zs.setDebug(dbg);
   zs.print();
   cout << myname << "Suppressing." << endl;
   ZeroSuppress35t::SignalVector indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
-                                           6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
-                                           2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
+                                           6, 12, 21, 17, 12,  7,   5,  2,  1, -1,
+                                           2,  1,  1, -1, -1, -2,   3,  1,  1, -1 };
   ZeroSuppress35t::ResultVector keep;
   cout << myname << "Signals:" << endl;
   assert( zs.filter(indata, keep) == 0 );
@@ -42,9 +42,9 @@ int test_ZeroSuppress35t(int dbg) {
   }
   cout << myname << "Checking suppressing signal." << endl;
   unsigned int isig = 0;
-  for ( isig= 0; isig< 6; ++isig ) { cout << " " << isig; assert( ! keep[isig] ); }
-  for ( isig= 6; isig<28; ++isig ) { cout << " " << isig; assert( keep[isig] );  }
-  for ( isig=28; isig<30; ++isig ) { cout << " " << isig; assert( ! keep[isig] ); }
+  for ( ; isig< 7; ++isig ) { cout << " " << isig; assert( ! keep[isig] ); }
+  for ( ; isig<26; ++isig ) { cout << " " << isig; assert( keep[isig] );  }
+  for ( ; isig<30; ++isig ) { cout << " " << isig; assert( ! keep[isig] ); }
   cout << endl;
   cout << myname << "Done." << endl;
   return 0;

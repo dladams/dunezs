@@ -38,7 +38,7 @@ int test_ZeroSuppress35tService() {
   // along with its parameters in the configuration.
   cout << myname << line << endl;
   cout << myname << "Add the ZeroSuppress35t service." << endl;
-  scfg = "service_provider: \"ZeroSuppress35tService\" TL: 10 TD: 3 NL: 5 ND: 5 NT: 6";
+  scfg = "service_provider: \"ZeroSuppress35tService\" TS: 1 TL: 10 TD: 5 NS: 4 NL: 6 ND: 5 NT: 2";
   cout << myname << "Configuration: " << scfg << endl;
   assert( ash.addService("ZeroSuppressBase", scfg) == 0 );
 
@@ -63,9 +63,9 @@ int test_ZeroSuppress35tService() {
     cout << setw(6) << indata[idat] << setw(6) << keep[idat] << endl;
   }
   unsigned int isig = 0;
-  for ( isig= 0; isig< 6; ++isig ) assert( ! keep[isig] );
-  for ( isig= 6; isig<28; ++isig ) assert( keep[isig] );
-  for ( isig=28; isig<30; ++isig ) assert( ! keep[isig] );
+  for ( ; isig< 7; ++isig ) assert( ! keep[isig] );
+  for ( ; isig<26; ++isig ) assert( keep[isig] );
+  for ( ; isig<30; ++isig ) assert( ! keep[isig] );
   cout << myname << "Done." << endl;
 
   return 0;

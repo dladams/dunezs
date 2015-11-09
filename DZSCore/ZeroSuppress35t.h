@@ -9,6 +9,8 @@
 // The algorithm is that described by James Russell at the September 2015
 // DUNE collaboration meeting:
 //   https://indico.fnal.gov/conferenceOtherViews.py?view=standard&confId=10100
+// and is described with later modifications at
+//   https://cdcvs.fnal.gov/redmine/projects/35ton/wiki/Data_compression_and_zero_suppression
 
 #ifndef ZeroSuppress35t_H
 #define ZeroSuppress35t_H
