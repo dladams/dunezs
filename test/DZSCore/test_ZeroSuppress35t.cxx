@@ -27,7 +27,7 @@ int test_ZeroSuppress35t(int dbg) {
   abort();
 #endif
   cout << myname << "Creating suppressor." << endl;
-  ZeroSuppress35t zs(10, 3, 5, 5, 6);
+  ZeroSuppress35t zs(1, 10, 3, 4, 5, 5, 6);
   zs.setDebug(dbg);
   zs.print();
   cout << myname << "Suppressing." << endl;

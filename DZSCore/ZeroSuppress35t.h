@@ -20,7 +20,7 @@ class ZeroSuppress35t : public ZeroSuppressBase {
 public:
 
   // Ctor from the five parameters that characterize the algorithm.
-  ZeroSuppress35t(Signal tl, Signal td, Index nl, Index nd, Index nt);
+  ZeroSuppress35t(Signal ts, Signal tl, Signal td, Index ns, Index nl, Index nd, Index nt);
 
   // Apply the ZS filter to a signal vector.
   // Entries in the result vector indicate whether the corresponding
@@ -35,8 +35,10 @@ public:
 
 private:
 
+  Signal m_ts;
   Signal m_tl;
   Signal m_td;
+  Index m_ns;
   Index m_nl;
   Index m_nd;
   Index m_nt;

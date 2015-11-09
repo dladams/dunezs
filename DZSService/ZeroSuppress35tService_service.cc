@@ -15,12 +15,14 @@ typedef ZeroSuppressBase::ResultVector ResultVector;
 
 ZeroSuppress35tService::
 ZeroSuppress35tService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
+  Signal ts = pset.get<Signal>("TS");
   Signal tl = pset.get<Signal>("TL");
   Signal td = pset.get<Signal>("TD");
+  Index ns = pset.get<Index>("NS");
   Index nl = pset.get<Index>("NL");
   Index nd = pset.get<Index>("ND");
   Index nt = pset.get<Index>("NT");
-  m_pzs.reset(new ZeroSuppress35t(tl, td, nl, nd, nt));
+  m_pzs.reset(new ZeroSuppress35t(ts, tl, td, ns, nl, nd, nt));
 }
   
 //**********************************************************************
