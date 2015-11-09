@@ -20,10 +20,10 @@ typedef ZeroSuppressBase::ResultVector ResultVector;
 
 // Signal state.
 //    OUT - outside the signal (may be in the tail of an earlier signal)
-//   HIGH - Live region of the signal (above TL or after)
-//    LOW - Dead region of the signal (below TD)
+//   LIVE - Live region of the signal (above TL or after)
+//   DEAD - Dead region of the signal (below TD)
 //    END - End of dead region (followed by tail)
-enum SigState { OUT, HIGH, LOW, END };
+enum SigState { OUT, LIVE, DEAD, END };
 
 namespace {
 
@@ -61,8 +61,8 @@ RunningSum(const SignalVector& sigs, Index isig, Index nsig, Signal thresh, bool
 // Convert sate to string.
 string sstate(SigState state) {
   if ( state == OUT ) return "OUT";
-  if ( state == HIGH ) return "HIGH";
-  if ( state == LOW ) return "LOW";
+  if ( state == LIVE ) return "LIVE";
+  if ( state == DEAD ) return "DEAD";
   if ( state == END ) return "END";
   return "NONE";
 }
@@ -100,7 +100,7 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
       Signal sumthresh = m_tl*rs.count;
       if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
       if ( rs.sigsum > sumthresh ) {
-        state = HIGH;
+        state = LIVE;
         unsigned int jsig1 = 0;
         if ( isig > m_nl ) jsig1 = isig - m_nl;
         unsigned int jsig2 = isig;
@@ -114,17 +114,17 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
       // Last tick is is in the live region of a signal.
       Signal sumthresh = m_td*rs.count;
       if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
-        if ( state == HIGH ) {
+        if ( state == LIVE ) {
         // If this tick is below TD, we are in the dead region of a signal.
         if ( rs.sigsum <= sumthresh ) {
-          state = LOW;
+          state = DEAD;
           nlow = 1;
         }
       // Last tick is is in the dead region of a signal.
-      } else if ( state == LOW ) {
+      } else if ( state == DEAD ) {
         // If signal is above TD, we are back in the live region.
         if ( rs.sigsum > sumthresh ) {
-          state = HIGH;
+          state = LIVE;
           nlow = 0;
         // If this is the ND'th consecutive signal in the dead region, we
         // have reached the end of the signal.
