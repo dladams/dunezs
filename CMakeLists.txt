@@ -48,6 +48,8 @@ cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
 find_ups_product( art v1_17_02 )
+find_ups_product( artextensions v1_00_01 )
+find_ups_product( dunetpc v04_29_01 )
 find_ups_product( cetbuildtools v3_10_00 )
 
 # macros for dictionary and simple_plugin
@@ -58,6 +60,7 @@ include(BuildPlugins)
 # sources
 add_subdirectory(DZSCore)
 add_subdirectory(DZSService)
+add_subdirectory(DZSModule)
 
 # tests
 add_subdirectory(test)
