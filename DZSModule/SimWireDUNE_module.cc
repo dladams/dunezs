@@ -875,6 +875,7 @@ namespace detsim {
 	  else if (view==geo::kV) { tnoise = noise_a_V[i]; }
 	  else                    { tnoise = noise_a_Z[i]; }
           tmpfv = tnoise + fChargeWork_a[i] ;
+          //mf::LogInfo("SimWireDUNE") << "Channel-bin " << chan << "-" << i << ": Signal: " << fChargeWork_a[i] << " ,  Noise: " << tnoise;
 	  if (fSimCombs)  tmpfv += fChargeWorkCollInd_a[i];
 	  //allow for ADC saturation
 	  if ( tmpfv > adcsaturation - ped_mean)
@@ -1006,10 +1007,9 @@ namespace detsim {
       calibrated_integer_pedestal_value = (int) calibrated_pedestal_value;
       
 
-      if(fSimStuckBits)//
-      	{
+      if ( fSimStuckBits ) {
 
-	  for(size_t i = 0; i < adcvec.size(); ++i){
+	  for ( size_t i = 0; i < adcvec.size(); ++i ) {
 
 	    art::ServiceHandle<art::RandomNumberGenerator> rng;
 	    CLHEP::HepRandomEngine &engine = rng->getEngine();
@@ -1035,12 +1035,12 @@ namespace detsim {
 	      adcvec_a[i] += 64; // correct 1st MSB value by adding 64
 	    }
 	    //else adcvec value remains unchanged
-	  }
+	 }
 
-      	}
+      }
       
 
-      if(fNeighboringChannels==0){ // case where neighboring channels are disregarded in zero suppression
+      if ( fNeighboringChannels==0 ) { // case where neighboring channels are disregarded in zero suppression
 
 
 	// compress the adc vector using the desired compression scheme,

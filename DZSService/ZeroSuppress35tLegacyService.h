@@ -1,12 +1,13 @@
-// ZeroSuppress35tService.h
+// ZeroSuppress35tLegacyService.h
 //
 // David Adams
 // November 2015
 //
-// Service wrapper for 35-ton zero suppression.
+// Service wrapper for legacy 35-ton zero suppression.
+// Code taken from run.cxx in dunetpc v04.29.02.
 
-#ifndef ZeroSuppress35tService_H
-#define ZeroSuppress35tService_H
+#ifndef ZeroSuppress35tLegacyService_H
+#define ZeroSuppress35tLegacyService_H
 
 #include "DZSCore/ZeroSuppress35t.h"
 #include "DZSService/ZeroSuppressServiceBase.h"
@@ -23,7 +24,7 @@ namespace art {
 class ActivityRegistry;
 }
 
-class ZeroSuppress35tService : public ZeroSuppressBase {
+class ZeroSuppress35tLegacyService : public ZeroSuppressBase {
 
 public:
 
@@ -39,11 +40,13 @@ public:
 
 private:
 
-  // Pointer to the class that does the work.
-  std::shared_ptr<ZeroSuppress35t> m_pzs;
+  // Parameters.
+  unsigned int  fZeroThreshold;    // Zero suppression threshold
+  int           fNearestNeighbor;  // Maximum distance between hits above threshold before they are separated into different blocks
+
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppress35tService, ZeroSuppressBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppress35tLegacyService, ZeroSuppressBase, LEGACY)
 
 #endif

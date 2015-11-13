@@ -11,7 +11,7 @@ defaultqual	e9
 fcldir product_dir job
 
 product         version
-art             v1_17_02
+art             v1_17_03
 gcc             v4_9_3
 
 cetbuildtools	v4_15_00	-	only_for_build

@@ -28,7 +28,7 @@ public:
   // Entries in the result vector indicate whether the corresponding
   // ADC entry should be retained.
   // Returns nonzero for error.
-  int filter(const SignalVector& sigs, ResultVector& keep) const;
+  int filter(const SignalVector& sigs, Channel chan, Signal ped, ResultVector& keep) const;
 
   // Display the signal parameters.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;

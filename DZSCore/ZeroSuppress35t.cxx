@@ -37,7 +37,7 @@ struct RunningSum {
 };
 
 RunningSum::
-RunningSum(const SignalVector& sigs, Index isig, Index nsig, Signal thresh, bool skipStuck) {
+RunningSum(const SignalVector& sigs, Signal ped, Index isig, Index nsig, Signal thresh, bool skipStuck) {
   sigsum = 0;
   count = 0;
   Index jsig1 = 0;
@@ -45,9 +45,10 @@ RunningSum(const SignalVector& sigs, Index isig, Index nsig, Signal thresh, bool
   Index jsig2 = isig;
   if ( jsig2 > sigs.size() ) jsig2 = sigs.size();
   for ( Index jsig=jsig1; jsig<jsig2; ++jsig ) {
-    Signal sig = sigs[jsig];
+    Signal rawsig = sigs[jsig];
+    Signal sig = rawsig - ped;
     if ( skipStuck ) {
-      Index lsb = sig & 0x3f;
+      Index lsb = rawsig & 0x3f;
       if ( lsb == 0 ) continue;
       if ( lsb == 0x3f ) continue;
     }
@@ -77,7 +78,8 @@ ZeroSuppress35t::ZeroSuppress35t(Signal ts, Signal tl, Signal td,
 
 //**********************************************************************
 
-int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const {
+int ZeroSuppress35t::
+filter(const SignalVector& sigs, Channel chan, Signal ped, ResultVector& keep) const {
   const string myname = "ZeroSuppress35t::filter: ";
   if ( m_dbg ) cout << "Filtering signal array of size " << sigs.size() << endl;
   bool m_skipStuck = false;
@@ -91,7 +93,7 @@ int ZeroSuppress35t::filter(const SignalVector& sigs, ResultVector& keep) const 
   for ( unsigned int isig=0; isig<nsig; ++isig ) {
     Signal sig = sigs[isig];
     // Evaluate a running signal sum of the preceding m_nl signals.
-    RunningSum rs(sigs, isig, m_ns, m_ts, m_skipStuck);
+    RunningSum rs(sigs, ped, isig, m_ns, m_ts, m_skipStuck);
     if ( m_dbg ) cout << setw(3) << isig << setw(6) << sig << setw(5) << sstate(state);
     // Last tick is outside a signal.
     if ( state == OUT || state == END ) {
