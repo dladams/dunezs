@@ -30,7 +30,7 @@ public:
 
   // Return if |pedsig| < SuppressedSignalMax.
   // Returns true if SuppressedSignalMax <= 0.
-  bool isSmall(Signal sig, FloatSignal ped);
+  bool isSmall(Signal sig, FloatSignal ped =0.0);
 
   // Convert a float signal to an integer signal.
   Signal intSignal(FloatSignal fsig) const;

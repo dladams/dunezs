@@ -1,14 +1,17 @@
 // ZeroSuppress35tLegacyService.cxx
 
 #include "DZSService/ZeroSuppress35tLegacyService.h"
+#include <cmath>
 #include "fhiclcpp/ParameterSet.h"
 #include "DZSCore/AdcCodeHelper.h"
 
 using std::string;
 using std::ostream;
+using std::endl;
 
 typedef ZeroSuppressBase::Index        Index;
 typedef ZeroSuppressBase::Signal       Signal;
+typedef AdcCodeHelper::FloatSignal     FloatSignal;
 typedef ZeroSuppressBase::SignalVector SignalVector;
 typedef ZeroSuppressBase::ResultVector ResultVector;
 
@@ -16,35 +19,41 @@ typedef ZeroSuppressBase::ResultVector ResultVector;
 
 ZeroSuppress35tLegacyService::
 ZeroSuppress35tLegacyService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
-  m_ZeroThreshold = p.get<unsigned int>("ZeroThreshold");
-  m_NearestNeighbor = pset.get<int>("NearestNeighbor");
+  m_AdcThreshold       = pset.get<float>("AdcThreshold");
+  m_TickRange          = pset.get<unsigned int>("TickRange");
   m_SuppressStickyBits = pset.get<bool>("SuppressStickyBits");
-  m_pzs.reset(new ZeroSuppress35t(ts, tl, td, ns, nl, nd, nt));
 }
   
 //**********************************************************************
 
-int ZeroSuppressLegacy35tService::
-filter(const SignalVector& sigs, Channel, Pedestal& ped, ResultVector& keep) const {
-  const int nsig = sigs.size();
-  const int zerothresholdsigned = m_ZeroThreshold;
+ZeroSuppress35tLegacyService::
+ZeroSuppress35tLegacyService(float aAdcThreshold, unsigned int aTickRange, bool aSuppressStickyBits)
+: m_AdcThreshold(aAdcThreshold),
+  m_TickRange(aTickRange),
+  m_SuppressStickyBits(aSuppressStickyBits) { }
+
+//**********************************************************************
+
+int ZeroSuppress35tLegacyService::
+filter(const SignalVector& sigs, Channel, FloatSignal& ped, ResultVector& keep) const {
+  const unsigned int nsig = sigs.size();
   keep.clear();
   keep.resize(nsig, false);
-  std::vector<short> zerosuppressed(adcsize);
-  AdcCodehelper ach(0, 64);
-  for ( int isig=0; isig<nsig; ++isig ) {
+  AdcCodeHelper ach(64);
+  for ( unsigned int isig=0; isig<nsig; ++isig ) {
     Signal rawsig = sigs[isig];
-    Signal pedsig = ach.subtract(ped, sig);
-    bool skip = false;
+    FloatSignal pedsig = ach.subtract(ped, rawsig);
     if ( m_SuppressStickyBits ) {
-      skip = ach.hasStickyBits(sig) && ach.isSmall(pedisg);
+      if ( ach.hasStickyBits(rawsig) && ach.isSmall(pedsig) ) {
+        pedsig = 0.0;
+      }
     }
-    if ( !skip && pedsig > m_ZeroThreshold ) {
+    if ( fabs(pedsig) > m_AdcThreshold ) {
       Index isig1 = 0;
-      if ( m_NearestNeighbor < isig ) isig1 = isig - m_NearestNeighbor;
-      Index isig2 = isig + m_NearestNeighbor;
+      if ( m_TickRange < isig ) isig1 = isig - m_TickRange;
+      Index isig2 = isig + m_TickRange;
       if ( isig2 > nsig ) isig2 = nsig;
-      for ( Index jsig=isig1; jsig<isig2; ++jsig ) keep[jsig] = true;
+      for ( Index jsig=isig1; jsig<=isig2; ++jsig ) keep[jsig] = true;
     }
   }
   return 0;
@@ -53,10 +62,11 @@ filter(const SignalVector& sigs, Channel, Pedestal& ped, ResultVector& keep) con
 //**********************************************************************
 
 ostream& ZeroSuppress35tLegacyService::print(ostream& out, string prefix) const {
-  if ( m_pzs.get() == nullptr ) {
-    throw cet::exception(__FUNCTION__) << "Zero suppression is not configured properly.";
-  }
-  return m_pzs->print(out, prefix);
+  out << prefix << "ZeroSuppress35tLegacyService:"               << endl;
+  out << prefix << "       AdcThreshold" << m_AdcThreshold       << endl;
+  out << prefix << "          TickRange" << m_TickRange          << endl;
+  out << prefix << " SuppressStickyBits" << m_SuppressStickyBits << endl;
+  return out;
 }
 
 //**********************************************************************

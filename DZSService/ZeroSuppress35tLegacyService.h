@@ -5,11 +5,18 @@
 //
 // Service wrapper for legacy 35-ton zero suppression.
 // Code taken from run.cxx in dunetpc v04.29.02.
+// Parameters:
+//   AdcThreshold - threshold
+//   TickRange - range
+//   SuppressStickyBits - treat sticky bits as below threhold
+// If a tick I has pedestal-corrected ADC > AdcThreshold, ticks
+// [i-TickRange, i+TickRange] are retained.
+// If tick I has sticky bits and has pedestal-corrected ADC < 64,
+// it is treated as though its pedstal-corrected ADC is zero.
 
 #ifndef ZeroSuppress35tLegacyService_H
 #define ZeroSuppress35tLegacyService_H
 
-#include "DZSCore/ZeroSuppress35t.h"
 #include "DZSService/ZeroSuppressServiceBase.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
@@ -28,8 +35,11 @@ class ZeroSuppress35tLegacyService : public ZeroSuppressBase {
 
 public:
 
-  // Ctor.
-  ZeroSuppress35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
+  // Ctor from fcl.
+  ZeroSuppress35tLegacyService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
+
+  // Ctor from direct params.
+  ZeroSuppress35tLegacyService(float aAdcThreshold, unsigned int aTickRange, bool aSuppressStickyBits);
 
   // Filter an array of signals. Result is written to keep.
   int filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const;
@@ -41,8 +51,9 @@ public:
 private:
 
   // Parameters.
-  unsigned int  fZeroThreshold;    // Zero suppression threshold
-  int           fNearestNeighbor;  // Maximum distance between hits above threshold before they are separated into different blocks
+  float         m_AdcThreshold;
+  unsigned int  m_TickRange;
+  bool          m_SuppressStickyBits;
 
 
 };
