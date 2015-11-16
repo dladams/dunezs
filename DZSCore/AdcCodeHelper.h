@@ -25,13 +25,13 @@ public:
   typedef float FloatSignal;
 
   // Ctor.
-  AdcCodeHelper(Signal aSupresssedValue =0, Signal aSignalMax =64);
+  AdcCodeHelper(Signal aSupresssedValue =0, Signal aSuppressedSignalMax =64);
 
   // Return if the sticky bits are set.
   bool hasStickyBits(Signal sig);
 
   // Return if |pedsig| < SuppressedSignalMax.
-  bool isSmall(FloatSignal pedsig);
+  bool isSmall(Signal sig, FloatSignal ped);
 
   // Convert a float signal to an integer signal.
   Signal intSignal(FloatSignal fsig) const;
@@ -46,7 +46,7 @@ private:
 
   // Properties.
   Signal m_SupresssedValue;
-  Float m_SupressedSignalMax;
+  FloatSignal m_SuppressedSignalMax;
 
 };
   

@@ -27,11 +27,12 @@ ZeroSuppress35tService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) 
   
 //**********************************************************************
 
-int ZeroSuppress35tService::filter(const SignalVector& sigs, Channel chan, Signal ped, ResultVector& keep) const {
+int ZeroSuppress35tService::
+filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const {
   if ( m_pzs.get() == nullptr ) {
     throw cet::exception(__FUNCTION__) << "Zero suppression is not configured properly.";
   }
-  return m_pzs->filter(sigs, chen, ped, keep);
+  return m_pzs->filter(sigs, chan, ped, keep);
 }
 
 //**********************************************************************

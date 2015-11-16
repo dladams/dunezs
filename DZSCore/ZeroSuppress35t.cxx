@@ -31,13 +31,13 @@ namespace {
 // If skipStuck, the stuck bins do not contribute to sum or count.
 // Bins with sig <= thresh, do not contribute to sum.
 struct RunningSum {
-  RunningSum(const SignalVector& sigs, Index isig, Index ns, Signal thresh, bool skipStuck);
+  RunningSum(const SignalVector& sigs, Signal iped, Index isig, Index ns, Signal thresh, bool skipStuck);
   Signal sigsum;
   Index count;
 };
 
 RunningSum::
-RunningSum(const SignalVector& sigs, Signal ped, Index isig, Index nsig, Signal thresh, bool skipStuck) {
+RunningSum(const SignalVector& sigs, Signal iped, Index isig, Index nsig, Signal thresh, bool skipStuck) {
   sigsum = 0;
   count = 0;
   Index jsig1 = 0;
@@ -46,7 +46,7 @@ RunningSum(const SignalVector& sigs, Signal ped, Index isig, Index nsig, Signal 
   if ( jsig2 > sigs.size() ) jsig2 = sigs.size();
   for ( Index jsig=jsig1; jsig<jsig2; ++jsig ) {
     Signal rawsig = sigs[jsig];
-    Signal sig = rawsig - ped;
+    Signal sig = rawsig - iped;
     if ( skipStuck ) {
       Index lsb = rawsig & 0x3f;
       if ( lsb == 0 ) continue;
@@ -79,7 +79,7 @@ ZeroSuppress35t::ZeroSuppress35t(Signal ts, Signal tl, Signal td,
 //**********************************************************************
 
 int ZeroSuppress35t::
-filter(const SignalVector& sigs, Channel chan, Signal ped, ResultVector& keep) const {
+filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const {
   const string myname = "ZeroSuppress35t::filter: ";
   if ( m_dbg ) cout << "Filtering signal array of size " << sigs.size() << endl;
   bool m_skipStuck = false;

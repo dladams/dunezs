@@ -25,7 +25,7 @@ ZeroSuppress35tLegacyService(const fhicl::ParameterSet& pset, art::ActivityRegis
 //**********************************************************************
 
 int ZeroSuppressLegacy35tService::
-filter(const SignalVector& sigs, Channel, Signal ped, ResultVector& keep) const {
+filter(const SignalVector& sigs, Channel, Pedestal& ped, ResultVector& keep) const {
   const int nsig = sigs.size();
   const int zerothresholdsigned = m_ZeroThreshold;
   keep.clear();

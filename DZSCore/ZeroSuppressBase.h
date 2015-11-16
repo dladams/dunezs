@@ -36,7 +36,7 @@ public:
   //    ped - Pedestal for the channel
   //   keep - Reult vector
   // Returns nonzero for error.
-  virtual int filter(const SignalVector& sigs, Channel chan, Signal ped, ResultVector& keep) const =0;
+  virtual int filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const =0;
 
   // Print a description of the algorithm, e.g. name and parameter names and values.
   //     out - the stream where the descrption is written

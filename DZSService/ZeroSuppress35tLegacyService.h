@@ -32,7 +32,7 @@ public:
   ZeroSuppress35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
   // Filter an array of signals. Result is written to keep.
-  int filter(const SignalVector& sigs, Channel chan, Signal ped, ResultVector& keep) const;
+  int filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
