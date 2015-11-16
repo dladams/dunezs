@@ -5,13 +5,11 @@
 //
 // Utility class to help interprete ADC signals.
 // Parameters:
-//   SuppressedValue - value to return when a signal is suppressed
 //   SupressedSignalMax - Signals with |sig-ped| >= this are not suppressed.
 //                        If 0, all are suppressed
 //
 // Legacy behavior, i.e. that for ADCStickyCodeCheck in
-// dunetpc v04.29.02 is recovered with parameter values
-//   SupresssedValue = 0
+// dunetpc v04.29.02 is recovered with parameter value
 //   SuppressedSignalMax = 64
 
 #ifndef AdcCodeHelper_H
@@ -25,12 +23,13 @@ public:
   typedef float FloatSignal;
 
   // Ctor.
-  AdcCodeHelper(Signal aSupresssedValue =0, Signal aSuppressedSignalMax =64);
+  AdcCodeHelper(Signal aSuppressedSignalMax =0);
 
   // Return if the sticky bits are set.
   bool hasStickyBits(Signal sig);
 
   // Return if |pedsig| < SuppressedSignalMax.
+  // Returns true if SuppressedSignalMax <= 0.
   bool isSmall(Signal sig, FloatSignal ped);
 
   // Convert a float signal to an integer signal.

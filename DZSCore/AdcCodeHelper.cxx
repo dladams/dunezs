@@ -8,9 +8,8 @@ typedef AdcCodeHelper::FloatSignal FloatSignal;
 
 //**********************************************************************
 
-AdcCodeHelper::AdcCodeHelper(Signal aSupresssedValue, Signal aSuppressedSignalMax)
-: m_SupresssedValue(aSupresssedValue),
-  m_SuppressedSignalMax(aSuppressedSignalMax) { }
+AdcCodeHelper::AdcCodeHelper(Signal aSuppressedSignalMax)
+: m_SuppressedSignalMax(aSuppressedSignalMax) { }
 
 //**********************************************************************
 
