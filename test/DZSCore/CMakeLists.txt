@@ -3,6 +3,10 @@
 # David Adams
 # November 2015
 
+cet_test(test_AdcCodeHelper SOURCES test_AdcCodeHelper.cxx
+  LIBRARIES DZSCore
+)
+
 cet_test(test_ZeroSuppress35t SOURCES test_ZeroSuppress35t.cxx
   LIBRARIES DZSCore
 )
