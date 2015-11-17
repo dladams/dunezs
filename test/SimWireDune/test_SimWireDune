@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# David Adams
+# November 2015
+#
+# Script to test the raw data simulation module SimWireDune.
+
+if [ "$1" = clean -o "$1" = "-c" ]; then
+  echo Cleaning
+  rm -f *.root
+  rm -f *.log
+  rm -f *.fcldump
+  if [ "$1" = clean ]; then exit 0; fi
+fi
+
+# Generate reference event data.
+if [ ! -r mu35told_event.root ]; then
+  rm -f mu35toldperf.root
+  echo
+  echo Generating reference event data.
+  echo " Start: "`date`
+  lar -n 5 -c mu35told.fcl -T mu35told_hist.root -o mu35told_event.root 2>&1 > mu35told.log
+  STAT=$?
+  echo Finish: `date`
+  if [ $STAT -ne 0 -o ! -r mu35told_event.root ]; then
+    echo Reference event generation failed.
+    exit 1
+  fi
+  fcldump mu35told.fcl 10 > mu35told.fcldump
+fi
+
+# Generate reference histograms.
+if [ ! -r mu35toldperf.root ]; then
+  echo
+  echo Generating reference histograms.
+  echo " Start: "`date`
+  lar -c perf35t.fcl -s mu35told_event.root -T mu35toldperf.root 2>&1 > mu35toldperf.log
+  STAT=$?
+  echo Finish: `date`
+  if [ $STAT -ne 0 -o ! -r mu35toldperf.root ]; then
+    echo Test histogram generation failed.
+    exit 1
+  fi
+fi
+
+# Generate test event data.
+if [ ! -r mu35tnew_event.root ]; then
+  rm -f mu35tnewperf.root
+  echo
+  echo Generating test event data.
+  echo " Start: "`date`
+  lar -n 5 -c mu35tnew.fcl -T mu35tnew_hist.root -o mu35tnew_event.root 2>&1 > mu35tnew.log
+  STAT=$?
+  echo Finish: `date`
+  if [ $STAT -ne 0 -o ! -r mu35tnew_event.root ]; then
+    echo Reference event generation failed.
+    exit 1
+  fi
+  fcldump mu35tnew.fcl 10 > mu35tnew.fcldump
+fi
+
+# Generate test histograms.
+if [ ! -r mu35tnewperf.root ]; then
+  echo
+  echo Generating test histograms.
+  echo " Start: "`date`
+  lar -c perf35t.fcl -s mu35tnew_event.root -T mu35tnewperf.root 2>&1 > mu35tnewperf.log
+  STAT=$?
+  echo Finish: `date`
+  if [ $STAT -ne 0 -o ! -r mu35tnewperf.root ]; then
+    echo Test histogram generation failed.
+    exit 1
+  fi
+fi
+ln -sf mu35tnewperf.root perf.root
+
+# Compare histograms.
+echo
+echo Comparing histograms.
+dxroot compareHists.C 2>&1 | tee compare.log
+STAT=$?
+if [ $STAT -ne 0 ]; then
+  Histogram comparison failed.
+  exit 1
+fi
+
+echo
+echo Done

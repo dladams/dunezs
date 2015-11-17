@@ -1,0 +1,6 @@
+*.log
+*.root
+*.fcldump
+*.png
+rootlogon.C
+.aclic

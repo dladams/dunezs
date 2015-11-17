@@ -1,0 +1,15 @@
+# perf35t.fcl
+#
+# David Adams
+# November 2015
+#
+# Use DXDisplay to generate raw data histograms.
+#
+# Usage example:
+
+#include "DXDisplay.fcl"
+
+physics.analyzers.DXDisplay.DebugLevel:            6
+physics.analyzers.DXDisplay.TdcTickMax:         2800    # 1 drift is about 2780 ticks
+physics.analyzers.DXDisplay.DoRawSignalHists:   true
+

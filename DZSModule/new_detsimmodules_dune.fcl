@@ -1,0 +1,32 @@
+# new_detsimmodules_dune.fcl
+#
+# David Adams
+# November 2015
+#
+# Default configuration for SimWireDUNE.
+
+# Start with the 10kt configuration (for now).
+#include "detsimmodules_dune.fcl"
+
+BEGIN_PROLOG
+
+# Update settings for the old module.
+
+dune35t_simwire.NeighboringChannels: 0
+dune35t_simwire.NearestNeighbor: 10
+dune35t_simwire.ZeroThreshold: 10
+
+# Start with the setting for the old module.
+dune35tnew_simwire: @local::dune35t_simwire
+
+# Change the module name.
+dune35tnew_simwire.module_type: "SimWireDUNE"
+
+# Add the Calib pedestal info in case these are not yet
+# present in the current release.
+dune35tnew_simwire.CollectionCalibPed:     500
+dune35tnew_simwire.CollectionCalibPedRMS:    0.01
+dune35tnew_simwire.InductionCalibPed:     1800
+dune35tnew_simwire.InductionCalibPedRMS:     0.01
+
+END_PROLOG
