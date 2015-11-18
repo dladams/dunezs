@@ -23,11 +23,20 @@ dune35tnew_simwire.CollectionCalibPedRMS:    0.01
 dune35tnew_simwire.InductionCalibPed:     1800
 dune35tnew_simwire.InductionCalibPedRMS:     0.01
 
+zsnone: {
+  service_provider: ZeroSuppressFixedService
+}
+
 zslegacy: {
   service_provider: ZeroSuppress35tLegacyService
   AdcThreshold: 10.0
   TickRange: 10
+  MinTickGap: 2
   SuppressStickyBits: true
+}
+
+zsonline: {
+  service_provider: ZeroSuppress35tService
 }
 
 END_PROLOG

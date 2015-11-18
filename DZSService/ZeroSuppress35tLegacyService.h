@@ -13,6 +13,9 @@
 // [i-TickRange, i+TickRange] are retained.
 // If tick I has sticky bits and has pedestal-corrected ADC < 64,
 // it is treated as though its pedstal-corrected ADC is zero.
+// If the gap between unsuppressed blocks is less that MinTickGap,
+// then the bins in that gap are not suppressed. Edges (bins
+// outside the tick range are treated as unsupressed.
 
 #ifndef ZeroSuppress35tLegacyService_H
 #define ZeroSuppress35tLegacyService_H
@@ -39,7 +42,10 @@ public:
   ZeroSuppress35tLegacyService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
   // Ctor from direct params.
-  ZeroSuppress35tLegacyService(float aAdcThreshold, unsigned int aTickRange, bool aSuppressStickyBits);
+  ZeroSuppress35tLegacyService(float aAdcThreshold,
+                               unsigned int aTickRange,
+                               unsigned int aMinTickGap,
+                               bool aSuppressStickyBits);
 
   // Filter an array of signals. Result is written to keep.
   int filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const;
@@ -53,6 +59,7 @@ private:
   // Parameters.
   float         m_AdcThreshold;
   unsigned int  m_TickRange;
+  unsigned int  m_MinTickGap;
   bool          m_SuppressStickyBits;
 
 

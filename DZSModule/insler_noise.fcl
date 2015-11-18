@@ -1,0 +1,12 @@
+# New nose defaults from Jonathan 18nov2015.
+
+dune35t_simwire.NoiseModel:     1
+dune35t_simwire.NoiseWidthU:  2000  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseWidthV:  2000  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseWidthZ:  2000  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactU:   0.05  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactV:   0.05 # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.NoiseFactZ:   0.05  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.LowCutoffU:    7.5  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.LowCutoffV:    7.5  # If turn NoiseModel to 1 use these numbers..
+dune35t_simwire.LowCutoffZ:    7.5  # If turn NoiseModel to 1 use these numbers.. 
