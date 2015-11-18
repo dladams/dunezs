@@ -55,6 +55,9 @@ extern "C" {
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGaussQ.h"
 
+#include "DZSService/ZeroSuppressServiceBase.h"
+#include "DZSService/CompressReplaceService.h"
+
 ///Detector simulation of raw signals on wires 
 namespace detsim {
 
@@ -185,6 +188,10 @@ namespace detsim {
     double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
     double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
 
+    // New properties.
+    art::ServiceHandle<ZeroSuppressBase> m_pzs;
+    art::ServiceHandle<CompressReplaceService> m_pcmp;
+
   }; // class SimWireDUNE35t
 
   DEFINE_ART_MODULE(SimWireDUNE35t)
@@ -289,6 +296,9 @@ namespace detsim {
     fFractVertGapUCollect   = p.get< float >("FractVertGapUCollect");
     fFractHorizGapVCollect  = p.get< float >("FractHorizGapVCollect");
     fFractVertGapVCollect   = p.get< float >("FractVertGapVCollect");
+
+    m_pzs->print();
+    m_pcmp->print();
 
     return;
   }
@@ -961,7 +971,7 @@ namespace detsim {
 
       float calibrated_pedestal_value = 0; // Estimated calibrated value of pedestal to be passed to RawDigits collection
       float calibrated_pedestal_rms_value = 0; // Estimated calibrated value of pedestal RMS to be passed to RawDigits collection
-      int calibrated_integer_pedestal_value = 0; // Estimated calibrated value of pedestal to be passed to data compression
+      //dla int calibrated_integer_pedestal_value = 0; // Estimated calibrated value of pedestal to be passed to data compression
 
       // add pedestal values
       if(fPedestalOn)
@@ -1004,7 +1014,7 @@ namespace detsim {
 
       }
       
-      calibrated_integer_pedestal_value = (int) calibrated_pedestal_value;
+      //dla calibrated_integer_pedestal_value = (int) calibrated_pedestal_value;
       
 
       if ( fSimStuckBits ) {
@@ -1039,35 +1049,22 @@ namespace detsim {
 
       }
       
+      // Zero suppress and compress.
+      ZeroSuppressBase::ResultVector keep;
+      m_pzs->filter(adcvec, chan, calibrated_pedestal_value, keep);
+      int nkeep = 0;
+      for ( bool kept : keep ) if ( kept ) ++nkeep;
+      m_pcmp->compress(adcvec, keep);
+      raw::Compress_t myCompression = raw::kNone;
 
-      if ( fNeighboringChannels==0 ) { // case where neighboring channels are disregarded in zero suppression
-
-
-	// compress the adc vector using the desired compression scheme,
-	// if raw::kNone is selected nothing happens to adcvec
-	// This shrinks adcvec, if fCompression is not kNone.
-	
-	if(!fPedestalOn){
-	  raw::Compress(adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
-	}
-	else{
-	  raw::Compress(adcvec, fCompression, fZeroThreshold, calibrated_integer_pedestal_value, fNearestNeighbor, fSimStuckBits);
-	}
-	  
-
-	raw::RawDigit rd(chan, fNSamplesReadout, adcvec, fCompression);
-	rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
+      // Create and store raw digit.
+      raw::RawDigit rd(chan, fNSamplesReadout, adcvec, myCompression);
+      rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
+      adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
+      if ( fSaveEmptyChannel || nkeep>0 )
+      digcol->push_back(rd);            // add this digit to the collection
 
 
-	adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
-	if(fSaveEmptyChannel || adcvec[1]>0)
-	  digcol->push_back(rd);            // add this digit to the collection
-	
-	
-      } else {
-	throw cet::exception("SimWireDUNE35t  processing") << "Neighbor channels no longer supported.\n";
-      }
-    
       adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
  
       if(chan==fLastChannelsInPlane.at(plane_number))

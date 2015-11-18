@@ -10,12 +10,6 @@
 
 BEGIN_PROLOG
 
-# Update settings for the old module.
-
-dune35t_simwire.NeighboringChannels: 0
-dune35t_simwire.NearestNeighbor: 10
-dune35t_simwire.ZeroThreshold: 10
-
 # Start with the setting for the old module.
 dune35tnew_simwire: @local::dune35t_simwire
 
@@ -28,5 +22,12 @@ dune35tnew_simwire.CollectionCalibPed:     500
 dune35tnew_simwire.CollectionCalibPedRMS:    0.01
 dune35tnew_simwire.InductionCalibPed:     1800
 dune35tnew_simwire.InductionCalibPedRMS:     0.01
+
+zslegacy: {
+  service_provider: ZeroSuppress35tLegacyService
+  AdcThreshold: 10.0
+  TickRange: 10
+  SuppressStickyBits: true
+}
 
 END_PROLOG

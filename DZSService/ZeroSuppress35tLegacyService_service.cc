@@ -15,6 +15,15 @@ typedef AdcCodeHelper::FloatSignal     FloatSignal;
 typedef ZeroSuppressBase::SignalVector SignalVector;
 typedef ZeroSuppressBase::ResultVector ResultVector;
 
+namespace {
+
+string sbool(bool arg) {
+  if ( arg ) return "true";
+  return "false";
+}
+
+}  // end unnamed namespace.
+
 //**********************************************************************
 
 ZeroSuppress35tLegacyService::
@@ -63,9 +72,9 @@ filter(const SignalVector& sigs, Channel, FloatSignal& ped, ResultVector& keep) 
 
 ostream& ZeroSuppress35tLegacyService::print(ostream& out, string prefix) const {
   out << prefix << "ZeroSuppress35tLegacyService:"               << endl;
-  out << prefix << "       AdcThreshold" << m_AdcThreshold       << endl;
-  out << prefix << "          TickRange" << m_TickRange          << endl;
-  out << prefix << " SuppressStickyBits" << m_SuppressStickyBits << endl;
+  out << prefix << "       AdcThreshold: " << m_AdcThreshold       << endl;
+  out << prefix << "          TickRange: " << m_TickRange          << endl;
+  out << prefix << " SuppressStickyBits: " << sbool(m_SuppressStickyBits) << endl;
   return out;
 }
 

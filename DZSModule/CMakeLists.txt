@@ -11,6 +11,8 @@ art_make( BASENAME_ONLY
 	                Utilities
 			Filters
 			RawData
+                        DZSCore
+                        CompressReplaceService_service
 			TimeService_service
                         SignalShapingServiceDUNE10kt_service
 			SignalShapingServiceDUNE35t_service

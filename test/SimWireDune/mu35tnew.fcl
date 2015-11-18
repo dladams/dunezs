@@ -89,3 +89,13 @@ services.user.SeedService.daq:       1005
 physics.producers.daq.NoiseWidthU:            62.4
 physics.producers.daq.NoiseWidthV:            62.4
 physics.producers.daq.NoiseWidthZ:            62.4
+
+#services.user.ZeroSuppressBase: {
+#  service_provider: ZeroSuppress35tLegacyService
+#  AdcThreshold: 10.0
+#  TickRange: 10
+  SuppressStickyBits: true
+#}
+services.user.ZeroSuppressBase: @local::zslegacy
+
+services.user.CompressReplaceService: { Zero: 0 }
