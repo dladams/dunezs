@@ -10,6 +10,20 @@
 
 BEGIN_PROLOG
 
+# Change the noise model. Higher freq.
+# Twice mplitude proposed by J. Inser 18nov2015.
+
+dune35t_simwire.NoiseModel:     1
+dune35t_simwire.NoiseWidthU:  2000
+dune35t_simwire.NoiseWidthV:  2000
+dune35t_simwire.NoiseWidthZ:  2000
+dune35t_simwire.NoiseFactU:   0.10
+dune35t_simwire.NoiseFactV:   0.10
+dune35t_simwire.NoiseFactZ:   0.10
+dune35t_simwire.LowCutoffU:    7.5
+dune35t_simwire.LowCutoffV:    7.5
+dune35t_simwire.LowCutoffZ:    7.5
+
 # Start with the setting for the old module.
 dune35tnew_simwire: @local::dune35t_simwire
 
@@ -37,6 +51,13 @@ zslegacy: {
 
 zsonline: {
   service_provider: ZeroSuppress35tService
+  NS:  3
+  NL:  8
+  ND:  5
+  NT:  8
+  TS:  5
+  TL: 20
+  TD: 10
 }
 
 END_PROLOG

@@ -85,11 +85,6 @@ services.user.SeedService.generator: 1001
 services.user.SeedService.largeant:  1003
 services.user.SeedService.daq:       1005
 
-# Fix the noise widths.
-physics.producers.daq.NoiseWidthU:            62.4
-physics.producers.daq.NoiseWidthV:            62.4
-physics.producers.daq.NoiseWidthZ:            62.4
-
 # Change ZS configuration
 physics.producers.daq.NeighboringChannels: 0
 physics.producers.daq.NearestNeighbor: 10
