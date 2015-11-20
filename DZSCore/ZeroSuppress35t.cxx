@@ -1,10 +1,11 @@
 // ZeroSuppress35t.cxx
 
-#include "ZeroSuppress35t.h"
+#include "DZSCore/ZeroSuppress35t.h"
 #include <vector>
 #include <cassert>
 #include <iostream>
 #include <iomanip>
+#include "DZSCore/SignalTypeConverter.h"
 
 using std::string;
 using std::ostream;
@@ -15,6 +16,7 @@ using std::setw;
 
 typedef ZeroSuppressBase::Index        Index;
 typedef ZeroSuppressBase::Signal       Signal;
+typedef ZeroSuppressBase::Pedestal     Pedestal;
 typedef ZeroSuppressBase::SignalVector SignalVector;
 typedef ZeroSuppressBase::ResultVector ResultVector;
 
@@ -31,13 +33,14 @@ namespace {
 // If skipStuck, the stuck bins do not contribute to sum or count.
 // Bins with sig <= thresh, do not contribute to sum.
 struct RunningSum {
-  RunningSum(const SignalVector& sigs, Signal iped, Index isig, Index ns, Signal thresh, bool skipStuck);
+  RunningSum(const SignalVector& sigs, Pedestal ped, Index isig, Index ns, Signal thresh, bool skipStuck);
   Signal sigsum;
   Index count;
+  SignalTypeConverter sigcon;
 };
 
 RunningSum::
-RunningSum(const SignalVector& sigs, Signal iped, Index isig, Index nsig, Signal thresh, bool skipStuck) {
+RunningSum(const SignalVector& sigs, Pedestal ped, Index isig, Index nsig, Signal thresh, bool skipStuck) {
   sigsum = 0;
   count = 0;
   Index jsig1 = 0;
@@ -46,7 +49,7 @@ RunningSum(const SignalVector& sigs, Signal iped, Index isig, Index nsig, Signal
   if ( jsig2 > sigs.size() ) jsig2 = sigs.size();
   for ( Index jsig=jsig1; jsig<jsig2; ++jsig ) {
     Signal rawsig = sigs[jsig];
-    Signal sig = rawsig - iped;
+    Signal sig = sigcon.convert<Signal>(rawsig - ped);
     if ( skipStuck ) {
       Index lsb = rawsig & 0x3f;
       if ( lsb == 0 ) continue;
