@@ -38,7 +38,11 @@ int test_ZeroSuppress35tLegacyService() {
   // along with its parameters in the configuration.
   cout << myname << line << endl;
   cout << myname << "Add the ZeroSuppress35tLegacy service." << endl;
-  scfg = "service_provider: \"ZeroSuppress35tLegacyService\" AdcThreshold: 5.0 TickRange: 3 SuppressStickyBits: true";
+  scfg = "service_provider: \"ZeroSuppress35tLegacyService\"";
+  scfg += " AdcThreshold: 5.0";
+  scfg += " TickRange: 3";
+  scfg += " SuppressStickyBits: true";
+  scfg += " MinTickGap: 2";
   cout << myname << "Configuration: " << scfg << endl;
   assert( ash.addService("ZeroSuppressBase", scfg) == 0 );
 
