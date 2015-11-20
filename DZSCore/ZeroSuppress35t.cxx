@@ -149,7 +149,6 @@ filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep
         assert(false);
       }
     }
-    cout << " --> " << sstate(state) << endl;
     if ( state != OUT ) keep[isig] = true;
   }
   return 0;
