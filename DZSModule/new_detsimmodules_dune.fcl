@@ -50,12 +50,12 @@ zslegacy: {
 
 zsonline: {
   service_provider: ZeroSuppress35tService
-  NS:  3
+  NS:  5
   NL: 15
   ND:  5
-  NT:  0
+  NT:  3
   TS:  3
-  TL: 10
+  TL:  7
   TD:  5
 }
 

@@ -62,7 +62,7 @@ RunningSum(const SignalVector& sigs, Pedestal ped, Index isig, Index nsig, Signa
   }
 }
 
-// Convert sate to string.
+// Convert state to string.
 string sstate(SigState state) {
   if ( state == OUT ) return "OUT";
   if ( state == LIVE ) return "LIVE";
@@ -97,6 +97,7 @@ filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep
     Signal sig = sigs[isig];
     // Evaluate a running signal sum of the preceding m_nl signals.
     RunningSum rs(sigs, ped, isig, m_ns, m_ts, m_skipStuck);
+    Signal asigsum = std::abs(rs.sigsum);
     if ( m_dbg ) cout << setw(3) << isig << setw(6) << sig << setw(5) << sstate(state);
     // Last tick is outside a signal.
     if ( state == OUT || state == END ) {
@@ -104,7 +105,7 @@ filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep
       // Keep the NL preceding signals.
       Signal sumthresh = m_tl*rs.count;
       if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
-      if ( rs.sigsum > sumthresh ) {
+      if ( asigsum > sumthresh ) {
         state = LIVE;
         unsigned int jsig1 = 0;
         if ( isig > m_nl ) jsig1 = isig - m_nl;
@@ -121,14 +122,14 @@ filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep
       if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
         if ( state == LIVE ) {
         // If this tick is below TD, we are in the dead region of a signal.
-        if ( rs.sigsum <= sumthresh ) {
+        if ( asigsum <= sumthresh ) {
           state = DEAD;
           nlow = 1;
         }
       // Last tick is is in the dead region of a signal.
       } else if ( state == DEAD ) {
         // If signal is above TD, we are back in the live region.
-        if ( rs.sigsum > sumthresh ) {
+        if ( asigsum > sumthresh ) {
           state = LIVE;
           nlow = 0;
         // If this is the ND'th consecutive signal in the dead region, we
