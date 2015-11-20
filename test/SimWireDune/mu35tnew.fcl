@@ -87,7 +87,8 @@ services.user.SeedService.daq:       1005
 
 # Specify the zero suppression service.
 #services.user.ZeroSuppressBase: @local::zsnone
-services.user.ZeroSuppressBase: @local::zslegacy
+#services.user.ZeroSuppressBase: @local::zslegacy
+services.user.ZeroSuppressBase: @local::zsonline
 
 # Specify the compression service.
 services.user.CompressReplaceService: { Zero: 0 }
