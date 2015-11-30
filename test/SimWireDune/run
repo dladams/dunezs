@@ -1,0 +1,61 @@
+#!/bin/sh
+#
+# run
+#
+# David Adams
+# November 2015
+# Generate a sample
+
+HELP=
+CLEAN=
+DBG=
+while getopts hcd: OPT; do
+  case $OPT in
+  h) HELP=true;;
+  c) CLEAN=true;;
+  d) DBG=$OPTARG;;
+  esac
+done
+shift $(( OPTIND-1 ))
+SAMPLE=$1
+
+if [ -n "$CLEAN" ]; then
+  rm -f ${SAMPLE}_hist.root ${SAMPLE}_event.root ${SAMPLE}.log
+  rm -f ${SAMPLE}perf.root ${SAMPLE}perf.log
+fi
+
+if [ ! -r ${SAMPLE}.fcl ]; then
+  echo Unable to find input file ${SAMPLE}.fcl
+  exit 1
+fi
+
+# Generate reference event data.
+if [ ! -r ${SAMPLE}_event.root ]; then
+  rm -f ${SAMPLE}perf.root
+  echo
+  echo Generating reference event data.
+  echo " Start: "`date`
+  lar -n 5 -c ${SAMPLE}.fcl -T ${SAMPLE}_hist.root -o ${SAMPLE}_event.root 2>&1 > ${SAMPLE}.log
+  STAT=$?
+  echo Finish: `date`
+  if [ $STAT -ne 0 -o ! -r ${SAMPLE}_event.root ]; then
+    echo Reference event generation failed.
+    exit 1
+  fi
+  fcldump ${SAMPLE}.fcl 10 > ${SAMPLE}.fcldump
+fi
+
+# Generate reference histograms.
+if [ ! -r ${SAMPLE}perf.root ]; then
+  echo
+  echo Generating reference histograms.
+  echo " Start: "`date`
+  lar -c perf35t.fcl -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root 2>&1 > ${SAMPLE}perf.log
+  STAT=$?
+  echo Finish: `date`
+  if [ $STAT -ne 0 -o ! -r ${SAMPLE}perf.root ]; then
+    echo Test histogram generation failed.
+    exit 1
+  fi
+fi
+

@@ -3,4 +3,5 @@
 *.fcldump
 *.png
 rootlogon.C
+*.C
 .aclic
