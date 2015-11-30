@@ -4,8 +4,6 @@
 # November 2015
 #
 # Script to generate reference raw data.
-#
-# Uses new simulation (SimWireDUNE) with low noise and new ZS.
 
 #include "services_dune.fcl"
 #include "singles_dune.fcl"
@@ -76,7 +74,7 @@ outputs:
 physics.producers.generator.PadOutVectors: true          # So all arrays don't have to be the same size
 physics.producers.generator.PDG:      [ 13]
 physics.producers.generator.P0:       [4.0]    # Momentum [GeV]
-physics.producers.generator.X0:       [100]    # cm; large TPC are (-1.5, 222.5)
+physics.producers.generator.X0:       [215]    # cm; large TPC are (-1.5, 222.5)
 physics.producers.generator.Z0:       [ 10]    # cm; 35t boundaries are (-2, 51, 103, 157)
 physics.producers.generator.Theta0XZ: [  0]    # degrees
 
@@ -88,9 +86,14 @@ services.user.SeedService.largeant:  1003
 services.user.SeedService.daq:       1005
 
 # Specify the zero suppression service.
-#services.user.ZeroSuppressBase: @local::zsnone
+services.user.ZeroSuppressBase: @local::zsnone
 #services.user.ZeroSuppressBase: @local::zslegacy
-services.user.ZeroSuppressBase: @local::zsonline
+#services.user.ZeroSuppressBase: @local::zsonline
 
 # Specify the compression service.
 services.user.CompressReplaceService: { Zero: 0 }
+
+# Increase noise level.
+physics.producers.daq.NoiseFactU: 0.10
+physics.producers.daq.NoiseFactV: 0.10
+physics.producers.daq.NoiseFactZ: 0.10

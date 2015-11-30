@@ -59,4 +59,26 @@ zsonline: {
   TD:  5
 }
 
+zsonline_nhi: {
+  service_provider: ZeroSuppress35tService
+  NS:  5
+  NL: 15
+  ND:  5
+  NT:  3
+  TS:  6
+  TL: 14
+  TD: 10
+}
+
+zsonline_nhi2: {
+  service_provider: ZeroSuppress35tService
+  NS:  5
+  NL: 15
+  ND:  5
+  NT:  3
+  TS:  6
+  TL: 10
+  TD: 10
+}
+
 END_PROLOG
