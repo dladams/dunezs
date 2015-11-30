@@ -50,7 +50,9 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   echo
   echo Generating reference histograms.
   echo " Start: "`date`
-  lar -c perf35t.fcl -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root 2>&1 > ${SAMPLE}perf.log
+  COM="lar -c perf35t.fcl -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root"
+  echo $COM
+  $COM 2>&1 >${SAMPLE}perf.log
   STAT=$?
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}perf.root ]; then
