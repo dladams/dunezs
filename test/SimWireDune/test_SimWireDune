@@ -7,7 +7,7 @@
 
 HELP=
 CLEAN=
-DBG=
+DBG=0
 while getopts hcd: OPT; do
   case $OPT in
   h) HELP=true;;
@@ -16,9 +16,17 @@ while getopts hcd: OPT; do
   esac
 done
 shift $(( OPTIND-1 ))
+SAM1=$1
+SAM2=$2
+if [ -z "$SAM1" ]; then
+  SAM1=mu35tnew
+fi
+if [ -z "$SAM2" ]; then
+  SAM2=mu35tnewref
+fi
 
 if [ -n "$HELP" ]; then
-  echo "Usage: $0 [-h] [-c] [-d VAL]"
+  echo "Usage: $0 [-h] [-c] [-d VAL] [TEST_SAMPLE] [REF_SAMPLE]"
   echo   "-h: This message"
   echo   "-c: Remove old output before running"
   echo   "-d: Run comparison at debug level VAL"
@@ -34,71 +42,10 @@ if [ "$1" = clean -o -n "$CLEAN" ]; then
   if [ "$1" = clean ]; then exit 0; fi
 fi
 
-# Generate reference event data.
-if [ ! -r mu35told_event.root ]; then
-  rm -f mu35toldperf.root
-  echo
-  echo Generating reference event data.
-  echo " Start: "`date`
-  lar -n 5 -c mu35told.fcl -T mu35told_hist.root -o mu35told_event.root 2>&1 > mu35told.log
-  STAT=$?
-  echo Finish: `date`
-  if [ $STAT -ne 0 -o ! -r mu35told_event.root ]; then
-    echo Reference event generation failed.
-    exit 1
-  fi
-  fcldump mu35told.fcl 10 > mu35told.fcldump
-fi
-
-# Generate reference histograms.
-if [ ! -r mu35toldperf.root ]; then
-  echo
-  echo Generating reference histograms.
-  echo " Start: "`date`
-  lar -c perf35t.fcl -s mu35told_event.root -T mu35toldperf.root 2>&1 > mu35toldperf.log
-  STAT=$?
-  echo Finish: `date`
-  if [ $STAT -ne 0 -o ! -r mu35toldperf.root ]; then
-    echo Test histogram generation failed.
-    exit 1
-  fi
-fi
-
-# Generate test event data.
-if [ ! -r mu35tnew_event.root ]; then
-  rm -f mu35tnewperf.root
-  echo
-  echo Generating test event data.
-  echo " Start: "`date`
-  lar -n 5 -c mu35tnew.fcl -T mu35tnew_hist.root -o mu35tnew_event.root 2>&1 > mu35tnew.log
-  STAT=$?
-  echo Finish: `date`
-  if [ $STAT -ne 0 -o ! -r mu35tnew_event.root ]; then
-    echo Reference event generation failed.
-    exit 1
-  fi
-  fcldump mu35tnew.fcl 10 > mu35tnew.fcldump
-fi
-
-# Generate test histograms.
-if [ ! -r mu35tnewperf.root ]; then
-  echo
-  echo Generating test histograms.
-  echo " Start: "`date`
-  lar -c perf35t.fcl -s mu35tnew_event.root -T mu35tnewperf.root 2>&1 > mu35tnewperf.log
-  STAT=$?
-  echo Finish: `date`
-  if [ $STAT -ne 0 -o ! -r mu35tnewperf.root ]; then
-    echo Test histogram generation failed.
-    exit 1
-  fi
-fi
-ln -sf mu35tnewperf.root perf.root
-
 # Compare histograms.
 echo
 echo Comparing histograms.
-dxroot compareHists.C'('$DBG')' 2>&1 | tee compare.log
+dxroot compareHists.C'("'$SAM1'","'$SAM2'",'$DBG')' 2>&1 | tee compare.log
 STAT=$?
 if [ $STAT -ne 0 ]; then
   Histogram comparison failed.

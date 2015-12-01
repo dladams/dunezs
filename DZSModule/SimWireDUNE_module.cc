@@ -1,13 +1,11 @@
-////////////////////////////////////////////////////////////////////////
+// SimWireDUNE_module.cc
+//
+// David Adams
+// December 2015
 //
 // SimWireDUNE class designed to simulate signal on a wire in the TPC
 //
-//
-// jti3@fnal.gov
-// - Revised to use sim::RawDigit instead of rawdata::RawDigit, and to
-// - save the electron clusters associated with each digit.
-//
-////////////////////////////////////////////////////////////////////////
+// Developed from  SimWireDUNE35t_module.cc.
 
 #include <vector>
 #include <string>
@@ -87,7 +85,6 @@ namespace detsim {
     void         GenNoise(std::vector<float>& array);
 
     std::string            fDriftEModuleLabel;///< module making the ionization electrons
-    raw::Compress_t        fCompression;      ///< compression type to use
     unsigned int           fNoiseOn;          ///< noise turned on or off for debugging; default is on
     unsigned int           fNoiseModel;          ///< noise model>
     float                  fNoiseFact;        ///< noise scale factor
@@ -203,11 +200,6 @@ namespace detsim {
     this->reconfigure(pset);
 
     produces< std::vector<raw::RawDigit>   >();
-
-    fCompression = raw::kNone;
-    TString compression(pset.get< std::string >("CompressionType"));
-    if(compression.Contains("Huffman",TString::kIgnoreCase)) fCompression = raw::kHuffman;    
-    if(compression.Contains("ZeroSuppression",TString::kIgnoreCase)) fCompression = raw::kZeroSuppression;
 
 // create a default random engine; obtain the random seed from SeedService,
 // unless overridden in configuration with key "Seed"
