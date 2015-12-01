@@ -99,9 +99,6 @@ namespace detsim {
     float                  fNoiseFactV;        ///< noise scale factor   for V plane
     float                  fNoiseWidthV;       ///< exponential noise width (kHz)   for V plane
     float                  fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
-    unsigned int           fZeroThreshold;    ///< Zero suppression threshold
-    int                    fNearestNeighbor;  ///< Maximum distance between hits above threshold before they are separated into different blocks
-    unsigned int           fNeighboringChannels; ///< Number of neighboring channels on either side allowed to influence zero suppression
     int                    fNTicks;           ///< number of ticks of the clock
     double                 fSampleRate;       ///< sampling rate in ns
     unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
@@ -240,9 +237,6 @@ namespace detsim {
     fNoiseFactV        = p.get< double              >("NoiseFactV");
     fNoiseWidthV       = p.get< double              >("NoiseWidthV");
     fLowCutoffV        = p.get< double              >("LowCutoffV");
-    fZeroThreshold    = p.get< unsigned int         >("ZeroThreshold");
-    fNearestNeighbor         = p.get< int           >("NearestNeighbor");
-    fNeighboringChannels   = p.get< unsigned int    >("NeighboringChannels");
     fNoiseArrayPoints = p.get< unsigned int         >("NoiseArrayPoints");
     fNoiseOn           = p.get< unsigned int        >("NoiseOn");
     fNoiseModel           = p.get< unsigned int     >("NoiseModel");
@@ -640,10 +634,6 @@ namespace detsim {
 
     std::map<int,double>::iterator mapIter;      
 
-
-    // make ring buffer to hold neighboring channels in order to enable nearest neighbor-influenced zero suppression
-
-    boost::circular_buffer<std::vector<short>> adcvec_neighbors(fNeighboringChannels*2+1); 
 
     // make vector of adc vectors to hold first channels in induction plane in order to wrap around to the start for nearest neighbor-influenced zero suppression
 
