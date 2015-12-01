@@ -94,3 +94,4 @@ services.user.ZeroSuppressBase: @local::zsonline
 
 # Specify the compression service.
 services.user.CompressReplaceService: { Zero: 0 }
+services.user.SimChannelExtractServiceBase: @local::scxall

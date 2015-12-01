@@ -55,6 +55,7 @@ extern "C" {
 
 #include "DZSInterface/ZeroSuppressServiceBase.h"
 #include "DZSService/CompressReplaceService.h"
+#include "DZSInterface/SimChannelExtractServiceBase.h"
 
 ///Detector simulation of raw signals on wires 
 namespace detsim {
@@ -136,7 +137,6 @@ namespace detsim {
 
     // input fcl parameters
 
-    bool                   fSimCombs;          ///< switch for simulation of the combs
     bool                   fSimStuckBits;      ///< switch for simulation of stuck bits
 
     std::string            fStuckBitsProbabilitiesFname; ///< file holding ADC stuck code overflow and underflow probabilities 
@@ -151,24 +151,20 @@ namespace detsim {
     // New properties.
     art::ServiceHandle<ZeroSuppressBase> m_pzs;
     art::ServiceHandle<CompressReplaceService> m_pcmp;
+    art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
 
   }; // class SimWireDUNE
 
   DEFINE_ART_MODULE(SimWireDUNE)
 
   //-------------------------------------------------
-  SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset)
-  {
 
+  SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset) {
     this->reconfigure(pset);
-
     produces< std::vector<raw::RawDigit>   >();
-
-// create a default random engine; obtain the random seed from SeedService,
-// unless overridden in configuration with key "Seed"
-    art::ServiceHandle<artext::SeedService>()
-      ->createEngine(*this, pset, "Seed");
-
+    // create a default random engine; obtain the random seed from SeedService,
+    // unless overridden in configuration with key "Seed"
+    art::ServiceHandle<artext::SeedService>()->createEngine(*this, pset, "Seed");
   }
 
   //-------------------------------------------------
@@ -220,7 +216,6 @@ namespace detsim {
     fNSamplesReadout  = detprop->ReadOutWindowSize();
     fNTimeSamples  = detprop->NumberTimeSamples();
     
-    fSimCombs            = p.get< bool >("SimCombs");  
     fSimStuckBits        = p.get< bool >("SimStuckBits"); 
 
     fStuckBitsProbabilitiesFname = p.get< std::string         >("StuckBitsProbabilitiesFname");
@@ -436,26 +431,20 @@ namespace detsim {
  
       fChargeWork.clear();    
       fChargeWork.resize(fNTimeSamples, 0.);    
-      if (fSimCombs)
-        {
-          fChargeWorkCollInd.clear();
-          fChargeWorkCollInd.resize(fNTimeSamples, 0.);
-        }
 
       // get the sim::SimChannel for this channel
-      const sim::SimChannel* sc = channels[chan];
+      const sim::SimChannel* psc = channels[chan];
       const geo::View_t view = geo->View(chan);
 
 
-      if ( sc ) {      
-        // loop over the ticks and grab the number of electrons for each
-        if ( fSimCombs ) {
-          throw cet::exception("SimWireDUNE") << "Add call to 35t SC extractor" <<"\n";
-        } else {
-          for ( size_t t=0; t<fChargeWork.size(); ++t ) {
-            fChargeWork[t] = sc->Charge(t);
-          }
+      bool SimCombs = false;
+      if ( psc ) {      
+        fChargeWorkCollInd.clear();
+        if ( m_pscx->extract(*psc, fChargeWork, fChargeWorkCollInd) ) {
+          throw cet::exception("SimWireDUNE") << "Error calling SC extractor" <<"\n";
         }
+        SimCombs = fChargeWorkCollInd.size() > 0;
+      
 
         // Convolve charge with appropriate response function 
         fChargeWork.resize(fNTicks,0);
@@ -464,7 +453,7 @@ namespace detsim {
         fChargeWorkCollInd.resize(fNTicks,0);
         sss->Convolute(fFirstCollectionChannel,fChargeWorkCollInd); 
 
-      }  // end if sc
+      }  // end if psc
 
       float ped_mean = fCollectionPed;
       float ped_rms = fCollectionPedRMS;
@@ -518,7 +507,7 @@ namespace detsim {
           else                    { tnoise = noise_a_Z[i]; }
           tmpfv = tnoise + fChargeWork_a[i] ;
           //mf::LogInfo("SimWireDUNE") << "Channel-bin " << chan << "-" << i << ": Signal: " << fChargeWork_a[i] << " ,  Noise: " << tnoise;
-          if (fSimCombs)  tmpfv += fChargeWorkCollInd_a[i];
+          if (SimCombs)  tmpfv += fChargeWorkCollInd_a[i];
           //allow for ADC saturation
           if ( tmpfv > adcsaturation - ped_mean)
             tmpfv = adcsaturation- ped_mean;
@@ -572,7 +561,7 @@ namespace detsim {
           else if (view==geo::kV) { tnoise = rGauss_Ind.fire(); }
           else                    { tnoise = rGauss_Col.fire(); }
           tmpfv = tnoise + fChargeWork_a[i] ;
-          if (fSimCombs)  tmpfv += fChargeWorkCollInd_a[i];
+          if (SimCombs)  tmpfv += fChargeWorkCollInd_a[i];
           //allow for ADC saturation
           if ( tmpfv > adcsaturation - ped_mean)
             tmpfv = adcsaturation- ped_mean;
@@ -584,7 +573,7 @@ namespace detsim {
       }else {   // no noise, so just round the values to nearest short ints and store them
         for(unsigned int i = 0; i < signalSize; ++i){
           tmpfv = fChargeWork_a[i];
-          if (fSimCombs) tmpfv += fChargeWorkCollInd_a[i] ;
+          if (SimCombs) tmpfv += fChargeWorkCollInd_a[i] ;
           //allow for ADC saturation
           if ( tmpfv > adcsaturation - ped_mean)
             tmpfv = adcsaturation- ped_mean;

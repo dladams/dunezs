@@ -96,3 +96,4 @@ services.user.ZeroSuppressBase: @local::zsonline
 services.user.CompressReplaceService: { Zero: 0 }
 
 physics.producers.daq.SimCombs: true
+services.user.SimChannelExtractServiceBase: @local::scx35t

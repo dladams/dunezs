@@ -81,4 +81,32 @@ zsonline_nhi2: {
   TD: 10
 }
 
+scxall: {
+  service_provider: SimChannelExtractAllService
+}
+
+scx35t: {
+  service_provider: SimChannelExtract35tService
+  FractHorizGapUCollect: 0.1
+  FractHorizGapUMiss: 0.8
+  FractHorizGapVCollect: 0.1
+  FractHorizGapVMiss: 0.8
+  FractHorizGapZMiss: 0.8
+  FractUUCollect: 0.5
+  FractUUMiss: 0.2
+  FractUVCollect: 0.1
+  FractUVMiss: 0.2
+  FractVUCollect: 0.5
+  FractVUMiss: 0.2
+  FractVVCollect: 0.1
+  FractVVMiss: 0.2
+  FractVertGapUCollect: 0.1
+  FractVertGapUMiss: 0.8
+  FractVertGapVCollect: 0.1
+  FractVertGapVMiss: 0.8
+  FractVertGapZMiss: 0.8
+  FractZUMiss: 0.2
+  FractZVMiss: 0.2
+}
+
 END_PROLOG

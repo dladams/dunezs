@@ -42,6 +42,8 @@ extract(const sim::SimChannel& sc, Charge& fChargeWork, Charge& fChargeWorkCollI
   art::ServiceHandle<geo::Geometry> geo;
   unsigned int chan = sc.Channel();
   const geo::View_t view = geo->View(chan);
+  fChargeWorkCollInd.clear();
+  fChargeWorkCollInd.resize(fChargeWork.size(), 0.);
   for ( size_t t=0; t<fChargeWork.size(); ++t ) {
     const std::vector<sim::IDE> ides = sc.TrackIDsAndEnergies(t,t);
     for ( auto const &ide : ides ) {
@@ -495,3 +497,9 @@ SimChannelExtract35tService::combtest35t(double x, double y, double z) const {
 
 
 */
+
+//**********************************************************************
+
+DEFINE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtract35tService, SimChannelExtractServiceBase)
+
+//**********************************************************************
