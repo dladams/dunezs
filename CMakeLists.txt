@@ -59,6 +59,7 @@ include(BuildPlugins)
 
 # sources
 add_subdirectory(DZSCore)
+add_subdirectory(DZSInterface)
 add_subdirectory(DZSService)
 add_subdirectory(DZSModule)
 

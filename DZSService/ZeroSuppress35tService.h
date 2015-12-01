@@ -9,7 +9,7 @@
 #define ZeroSuppress35tService_H
 
 #include "DZSCore/ZeroSuppress35t.h"
-#include "DZSService/ZeroSuppressServiceBase.h"
+#include "DZSInterface/ZeroSuppressServiceBase.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 #include <memory>

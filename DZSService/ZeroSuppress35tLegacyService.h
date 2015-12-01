@@ -20,7 +20,7 @@
 #ifndef ZeroSuppress35tLegacyService_H
 #define ZeroSuppress35tLegacyService_H
 
-#include "DZSService/ZeroSuppressServiceBase.h"
+#include "DZSInterface/ZeroSuppressServiceBase.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 #include <memory>
