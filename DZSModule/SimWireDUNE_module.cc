@@ -304,11 +304,11 @@ namespace detsim {
 
     if ( fNTicks%2 != 0 ) 
       LOG_DEBUG("SimWireDUNE35t") << "Warning: FFTSize not a power of 2. "
-				  << "May cause issues in (de)convolution.\n";
+                                  << "May cause issues in (de)convolution.\n";
 
     if ( (int)fNSamplesReadout > fNTicks ) 
       mf::LogError("SimWireDUNE35t") << "Cannot have number of readout samples "
-				     << "greater than FFTSize!";
+                                     << "greater than FFTSize!";
 
     fChargeWork.resize(fNTicks, 0.);
     art::ServiceHandle<geo::Geometry> geo;
@@ -321,32 +321,32 @@ namespace detsim {
     for (uint32_t ichan=0;ichan<geo->Nchannels();ichan++)
       {
 
-	if(!foundfirstcollectionchannel)
-	  {
-	    const geo::View_t view = geo->View(ichan);
-	    if (view == geo::kZ)
-	      {
-		foundfirstcollectionchannel = true;
-		fFirstCollectionChannel = ichan;
-		//break;
-	      }
-	  }
+        if(!foundfirstcollectionchannel)
+          {
+            const geo::View_t view = geo->View(ichan);
+            if (view == geo::kZ)
+              {
+                foundfirstcollectionchannel = true;
+                fFirstCollectionChannel = ichan;
+                //break;
+              }
+          }
 
-	const unsigned int thisPlaneNumber = geo->ChannelToWire(ichan).at(0).Plane;
-	const unsigned int thisTPCNumber = geo->ChannelToWire(ichan).at(0).TPC;
-		
-	if(thisPlaneNumber != currentPlaneNumber || (thisPlaneNumber == geo::kZ && thisTPCNumber != currentTPCNumber))
-	  {
-	    fLastChannelsInPlane.push_back(ichan-1);
-	    fFirstChannelsInPlane.push_back(ichan); 
-	    currentPlaneNumber = thisPlaneNumber;
-	    currentTPCNumber = thisTPCNumber;
-	  }
+        const unsigned int thisPlaneNumber = geo->ChannelToWire(ichan).at(0).Plane;
+        const unsigned int thisTPCNumber = geo->ChannelToWire(ichan).at(0).TPC;
+                
+        if(thisPlaneNumber != currentPlaneNumber || (thisPlaneNumber == geo::kZ && thisTPCNumber != currentTPCNumber))
+          {
+            fLastChannelsInPlane.push_back(ichan-1);
+            fFirstChannelsInPlane.push_back(ichan); 
+            currentPlaneNumber = thisPlaneNumber;
+            currentTPCNumber = thisTPCNumber;
+          }
 
       } 
     if (!foundfirstcollectionchannel)
       {
-	throw  cet::exception("SimWireDUNE35t  BeginJob") << " Could not find any collection channels\n";
+        throw  cet::exception("SimWireDUNE35t  BeginJob") << " Could not find any collection channels\n";
       }
     
     fLastChannelsInPlane.push_back(geo->Nchannels()-1);
@@ -373,33 +373,33 @@ namespace detsim {
       // fNoise vector to fNoiseArrayPoints long.
       
       for(unsigned int p = 0; p < fNoiseArrayPoints; ++p){
-	
-	fNoiseFact = fNoiseFactZ;
-	fNoiseWidth = fNoiseWidthZ;
-	fLowCutoff = fLowCutoffZ;
+        
+        fNoiseFact = fNoiseFactZ;
+        fNoiseWidth = fNoiseWidthZ;
+        fLowCutoff = fLowCutoffZ;
 
-	GenNoise(fNoiseZ[p]);
-	for(int i = 0; i < fNTicks; ++i)
-	  fNoiseDist->Fill(fNoiseZ[p][i]);
-	
-	fNoiseFact = fNoiseFactU;
-	fNoiseWidth = fNoiseWidthU;
-	fLowCutoff = fLowCutoffU;
+        GenNoise(fNoiseZ[p]);
+        for(int i = 0; i < fNTicks; ++i)
+          fNoiseDist->Fill(fNoiseZ[p][i]);
+        
+        fNoiseFact = fNoiseFactU;
+        fNoiseWidth = fNoiseWidthU;
+        fLowCutoff = fLowCutoffU;
 
-	GenNoise(fNoiseU[p]);
-	for(int i = 0; i < fNTicks; ++i)	 
-	  fNoiseDist->Fill(fNoiseU[p][i]);
+        GenNoise(fNoiseU[p]);
+        for(int i = 0; i < fNTicks; ++i)         
+          fNoiseDist->Fill(fNoiseU[p][i]);
 
 
-	fNoiseFact = fNoiseFactV;
-	fNoiseWidth = fNoiseWidthV;
-	fLowCutoff = fLowCutoffV;
+        fNoiseFact = fNoiseFactV;
+        fNoiseWidth = fNoiseWidthV;
+        fLowCutoff = fLowCutoffV;
  
     
-	GenNoise(fNoiseV[p]);
-	for(int i = 0; i < fNTicks; ++i)
-	  fNoiseDist->Fill(fNoiseV[p][i]);
-	
+        GenNoise(fNoiseV[p]);
+        for(int i = 0; i < fNTicks; ++i)
+          fNoiseDist->Fill(fNoiseV[p][i]);
+        
       }// end loop over wires
     } 
 
@@ -575,8 +575,8 @@ namespace detsim {
 
 
       for(unsigned int cellnumber=0; cellnumber < 64; ++cellnumber){
-	fOverflowProbs[cellnumber] = overflowtemp->GetBinContent(cellnumber+1);
-	fUnderflowProbs[cellnumber] = underflowtemp->GetBinContent(cellnumber+1);
+        fOverflowProbs[cellnumber] = overflowtemp->GetBinContent(cellnumber+1);
+        fUnderflowProbs[cellnumber] = underflowtemp->GetBinContent(cellnumber+1);
       }
     
       fin->Close();
@@ -598,7 +598,7 @@ namespace detsim {
     unsigned int signalSize = fNTicks;
 
     // vectors for working
-    std::vector<short>    adcvec(signalSize, 0);	
+    std::vector<short>    adcvec(signalSize, 0);        
     std::vector<const sim::SimChannel*> chanHandle;
     evt.getView(fDriftEModuleLabel,chanHandle);
 
@@ -617,11 +617,11 @@ namespace detsim {
     // make an unique_ptr of sim::SimDigits that allows ownership of the produced
     // digits to be transferred to the art::Event after the put statement below
     std::unique_ptr< std::vector<raw::RawDigit>   >  digcol(new std::vector<raw::RawDigit>);
-	  
+          
     unsigned int chan = 0; 
     fChargeWork.clear();
     fChargeWork.resize(fNTicks, 0.);
-	  
+          
  
     std::vector<double> fChargeWorkCollInd;
 
@@ -635,197 +635,130 @@ namespace detsim {
     std::map<int,double>::iterator mapIter;      
 
 
-    // make vector of adc vectors to hold first channels in induction plane in order to wrap around to the start for nearest neighbor-influenced zero suppression
-
-    std::vector<std::vector<short>> adcvec_inductionplanestart; 
-
     unsigned int plane_number = 0;
 
-    for(chan = 0; chan < geo->Nchannels(); chan++) {    
-      
+    for ( chan = 0; chan<geo->Nchannels(); ++chan ) {    
  
       fChargeWork.clear();    
-      //      fChargeWork.resize(fNTicks, 0.);    
       fChargeWork.resize(fNTimeSamples, 0.);    
       if (fSimCombs)
-	{
-	  fChargeWorkCollInd.clear();
-	  fChargeWorkCollInd.resize(fNTimeSamples, 0.);
-	}
+        {
+          fChargeWorkCollInd.clear();
+          fChargeWorkCollInd.resize(fNTimeSamples, 0.);
+        }
 
       // get the sim::SimChannel for this channel
       const sim::SimChannel* sc = channels[chan];
       const geo::View_t view = geo->View(chan);
 
 
-      if( sc ){      
-	// loop over the tdcs and grab the number of electrons for each
-	for(size_t t = 0; t < fChargeWork.size(); ++t) 
-	  if (fSimCombs)
-	    {
-	      const std::vector<sim::IDE> ides = sc->TrackIDsAndEnergies(t,t);
-	      for (auto const &ide : ides)
-		{
-		  GapType_t gaptype = combtest35t(ide.x,ide.y,ide.z);
-		  switch (gaptype)
-		    {
-		    case ACTIVE:
-		      {
-			fChargeWork[t] += ide.numElectrons;
-			break;
-		      }
-		    case UCOMB:
-		      {
-			switch (view)
-			  {
-			  case geo::kU:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractUUCollect-fFractUUMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractUUCollect;
-			      break;
-			    }
-			  case geo::kV:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractVUMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVUCollect;
-			      break;
-			    }
-			  case geo::kZ:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractZUMiss);
-			      break;
-			    }
-			  default:
-			    {
-			      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
-			    }
-			  }
-			break;
-		      }
-		    case VCOMB:
-		      {
-			switch (view)
-			  {
-			  case geo::kU:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractUVMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractUVCollect;
-			      break;
-			    }
-			  case geo::kV:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractVVCollect-fFractVVMiss);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVVCollect;
-			      break;
-			    }
-			  case geo::kZ:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect-fFractUVCollect-fFractZVMiss);
-			      break;
-			    }
-			  default:
-			    {
-			      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
-			    }
-			  }
-			break;
-		      }
-		    case HORIZGAP:
-		      {
-			switch (view)
-			  {
-			  case geo::kU:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapUMiss-fFractHorizGapUCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapUCollect;
-			      break;
-			    }
-			  case geo::kV:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapVMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapVCollect;
-			      break;
-			    }
-			  case geo::kZ:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapZMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
-			      break;
-			    }
-			  default:
-			    {
-			      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
-			    }
-			  }
-			break;
-		      }
-		    case VERTGAP:
-		      {
-			switch (view)
-			  {
-			  case geo::kU:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapUMiss-fFractVertGapUCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapUCollect;
-			      break;
-			    }
-			  case geo::kV:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapVMiss-fFractVertGapUCollect-fFractVertGapVCollect);
-			      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapVCollect;
-			      break;
-			    }
-			  case geo::kZ:
-			    {
-			      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapZMiss-fFractVertGapUCollect-fFractVertGapVCollect);
-			      break;
-			    }
-			  default:
-			    {
-			      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
-			    }
-			  }
-			break;
-		      }
-		    case NONACTIVE: 
-		      { 
-			break;
-		      }
-		    }		  
-		}
-	      // the line all this replaced.
-	      // fChargeWork[t] = sc->Charge(t); 
-	    }
-	  else
-	    {
-	      fChargeWork[t] = sc->Charge(t);
-	      //if (chan == 180 ) std::cout << "Xin1: " << t << " " << fChargeWork[t] << std::endl;
-	    }      
+      if ( sc ) {      
+        // loop over the ticks and grab the number of electrons for each
+        for ( size_t t=0; t<fChargeWork.size(); ++t ) {
+          if ( fSimCombs ) {
+            const std::vector<sim::IDE> ides = sc->TrackIDsAndEnergies(t,t);
+            for ( auto const &ide : ides ) {
+              GapType_t gaptype = combtest35t(ide.x,ide.y,ide.z);
+              switch ( gaptype ) {
+                case ACTIVE:
+                  fChargeWork[t] += ide.numElectrons;
+                  break;
+                case UCOMB:
+                  switch (view) {
+                    case geo::kU:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractUUCollect-fFractUUMiss);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractUUCollect;
+                      break;
+                    case geo::kV:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractVUMiss);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractVUCollect;
+                      break;
+                    case geo::kZ:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractVUCollect-fFractUUCollect-fFractZUMiss);
+                      break;
+                    default:
+                      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
+                  }
+                  break;
+                case VCOMB:
+                  switch (view) {
+                    case geo::kU:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractUVMiss);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractUVCollect;
+                      break;
+                    case geo::kV:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractUVCollect-fFractVVCollect-fFractVVMiss);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractVVCollect;
+                      break;
+                    case geo::kZ:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractVVCollect-fFractUVCollect-fFractZVMiss);
+                      break;
+                    default:
+                      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
+                  }
+                  break;
+                case HORIZGAP:
+                  switch (view) {
+                    case geo::kU:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapUMiss-fFractHorizGapUCollect);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapUCollect;
+                      break;
+                    case geo::kV:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapVMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractHorizGapVCollect;
+                      break;
+                    case geo::kZ:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractHorizGapZMiss-fFractHorizGapUCollect-fFractHorizGapVCollect);
+                      break;
+                    default:
+                      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
+                  }
+                  break;
+                case VERTGAP:
+                  switch (view) {
+                    case geo::kU:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapUMiss-fFractVertGapUCollect);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapUCollect;
+                      break;
+                    case geo::kV:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapVMiss-fFractVertGapUCollect-fFractVertGapVCollect);
+                      fChargeWorkCollInd[t] += ide.numElectrons * fFractVertGapVCollect;
+                      break;
+                    case geo::kZ:
+                      fChargeWork[t] += ide.numElectrons * (1.0-fFractVertGapZMiss-fFractVertGapUCollect-fFractVertGapVCollect);
+                      break;
+                    default:
+                      throw cet::exception("SimWireDUNE35t") << "ILLEGAL VIEW Type: " << view <<"\n";
+                  }
+                  break;
+                case NONACTIVE: 
+                  break;
+              }  // end switch gaptype
+            }  // end loop over ides
+          } else {
+            fChargeWork[t] = sc->Charge(t);
+          }      
+        } //  end loop over ticks
 
         // Convolve charge with appropriate response function 
+        fChargeWork.resize(fNTicks,0);
+        sss->Convolute(chan,fChargeWork);
 
-	fChargeWork.resize(fNTicks,0);
-	sss->Convolute(chan,fChargeWork);
-	// if (chan == 180 ) {
-	//   for(size_t t = 0; t < fChargeWork.size(); ++t) {
-	//     std::cout << "Xin2: " << t << " " << fChargeWork[t] << std::endl;
-	//   }
-	// }
-
-	fChargeWorkCollInd.resize(fNTicks,0);
+        fChargeWorkCollInd.resize(fNTicks,0);
         sss->Convolute(fFirstCollectionChannel,fChargeWorkCollInd); 
 
-      }
+      }  // end if sc
 
       float ped_mean = fCollectionPed;
       float ped_rms = fCollectionPedRMS;
       geo::SigType_t sigtype = geo->SignalType(chan);
       if (sigtype == geo::kInduction){
         ped_mean = fInductionPed;
-	ped_rms = fInductionPedRMS;
+        ped_rms = fInductionPedRMS;
       }
       else if (sigtype == geo::kCollection){
         ped_mean = fCollectionPed;
-	ped_rms = fCollectionPedRMS;
+        ped_rms = fCollectionPedRMS;
       }
 
       // noise was already generated for each wire in the event
@@ -843,106 +776,106 @@ namespace detsim {
       float *noise_a_V=0;
       float *noise_a_Z=0;
 
-      if (signalSize>0)	{
-	fChargeWork_a = fChargeWork.data();
-	fChargeWorkCollInd_a = fChargeWorkCollInd.data();
-	adcvec_a = adcvec.data();
-	if (fNoiseOn && fNoiseModel==1) {
+      if (signalSize>0)        {
+        fChargeWork_a = fChargeWork.data();
+        fChargeWorkCollInd_a = fChargeWorkCollInd.data();
+        adcvec_a = adcvec.data();
+        if (fNoiseOn && fNoiseModel==1) {
           noise_a_U=(fNoiseU[noisechan]).data();
-	  noise_a_V=(fNoiseV[noisechan]).data();
-	  noise_a_Z=(fNoiseZ[noisechan]).data();
-	}
+          noise_a_V=(fNoiseV[noisechan]).data();
+          noise_a_Z=(fNoiseZ[noisechan]).data();
+        }
       }
 
       float tmpfv=0;  // this is here so we do our own rounding from floats to short ints (saves CPU time)
       float tnoise=0;
 
       if (view != geo::kU && view != geo::kV && view != geo::kZ) {
-	mf::LogError("SimWireDUNE35t") << "ERROR: CHANNEL NUMBER " << chan << " OUTSIDE OF PLANE";
+        mf::LogError("SimWireDUNE35t") << "ERROR: CHANNEL NUMBER " << chan << " OUTSIDE OF PLANE";
       }
 
-      if(fNoiseOn && fNoiseModel==1) {	      
-	for(unsigned int i = 0; i < signalSize; ++i){
-	  if(view==geo::kU)       { tnoise = noise_a_U[i]; }
-	  else if (view==geo::kV) { tnoise = noise_a_V[i]; }
-	  else                    { tnoise = noise_a_Z[i]; }
+      if(fNoiseOn && fNoiseModel==1) {              
+        for(unsigned int i = 0; i < signalSize; ++i){
+          if(view==geo::kU)       { tnoise = noise_a_U[i]; }
+          else if (view==geo::kV) { tnoise = noise_a_V[i]; }
+          else                    { tnoise = noise_a_Z[i]; }
           tmpfv = tnoise + fChargeWork_a[i] ;
           //mf::LogInfo("SimWireDUNE") << "Channel-bin " << chan << "-" << i << ": Signal: " << fChargeWork_a[i] << " ,  Noise: " << tnoise;
-	  if (fSimCombs)  tmpfv += fChargeWorkCollInd_a[i];
-	  //allow for ADC saturation
-	  if ( tmpfv > adcsaturation - ped_mean)
-	    tmpfv = adcsaturation- ped_mean;
-	  //don't allow for "negative" saturation
-	  if ( tmpfv < 0 - ped_mean)
-	    tmpfv = 0- ped_mean;
+          if (fSimCombs)  tmpfv += fChargeWorkCollInd_a[i];
+          //allow for ADC saturation
+          if ( tmpfv > adcsaturation - ped_mean)
+            tmpfv = adcsaturation- ped_mean;
+          //don't allow for "negative" saturation
+          if ( tmpfv < 0 - ped_mean)
+            tmpfv = 0- ped_mean;
 
-	  adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
-	}
+          adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
+        }
       }else if (fNoiseOn && fNoiseModel==2){
 
-	float fASICGain      = sss->GetASICGain(chan);  
-	
-	double fShapingTime   = sss->GetShapingTime(chan);
-	std::map< double, int > fShapingTimeOrder;
-	fShapingTimeOrder = { {0.5, 0}, {1.0, 1}, {2.0, 2}, {3.0, 3} };
-	DoubleVec              fNoiseFactVec;
+        float fASICGain      = sss->GetASICGain(chan);  
+        
+        double fShapingTime   = sss->GetShapingTime(chan);
+        std::map< double, int > fShapingTimeOrder;
+        fShapingTimeOrder = { {0.5, 0}, {1.0, 1}, {2.0, 2}, {3.0, 3} };
+        DoubleVec              fNoiseFactVec;
 
-	//
+        //
 
-	auto tempNoiseVec = sss->GetNoiseFactVec();
+        auto tempNoiseVec = sss->GetNoiseFactVec();
 
-	if ( fShapingTimeOrder.find( fShapingTime ) != fShapingTimeOrder.end() ){
-	  size_t i = 0;
-	  fNoiseFactVec.resize(2);
-	  for (auto& item : tempNoiseVec) {
-	    fNoiseFactVec[i]   = item.at( fShapingTimeOrder.find( fShapingTime )->second );
-	    fNoiseFactVec[i] *= fASICGain/4.7;
-	    ++i;
-	  }
-	}
-	else {//Throw exception...
-	  throw cet::exception("SimWireDUNE35t")
-	    << "\033[93m"
-	    << "Shaping Time received from signalservices_dune.fcl is not one of allowed values"
-	    << std::endl
-	    << "Allowed values: 0.5, 1.0, 2.0, 3.0 usec"
-	    << "\033[00m"
-	    << std::endl;
-	}
-	//std::cout << "Xin " << fASICGain << " " << fShapingTime << " " << fNoiseFactVec[0] << " " << fNoiseFactVec[1] << std::endl;
+        if ( fShapingTimeOrder.find( fShapingTime ) != fShapingTimeOrder.end() ){
+          size_t i = 0;
+          fNoiseFactVec.resize(2);
+          for (auto& item : tempNoiseVec) {
+            fNoiseFactVec[i]   = item.at( fShapingTimeOrder.find( fShapingTime )->second );
+            fNoiseFactVec[i] *= fASICGain/4.7;
+            ++i;
+          }
+        }
+        else {//Throw exception...
+          throw cet::exception("SimWireDUNE35t")
+            << "\033[93m"
+            << "Shaping Time received from signalservices_dune.fcl is not one of allowed values"
+            << std::endl
+            << "Allowed values: 0.5, 1.0, 2.0, 3.0 usec"
+            << "\033[00m"
+            << std::endl;
+        }
+        //std::cout << "Xin " << fASICGain << " " << fShapingTime << " " << fNoiseFactVec[0] << " " << fNoiseFactVec[1] << std::endl;
 
-	art::ServiceHandle<art::RandomNumberGenerator> rng;
-	CLHEP::HepRandomEngine &engine = rng->getEngine();
-	CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
-	CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
+        art::ServiceHandle<art::RandomNumberGenerator> rng;
+        CLHEP::HepRandomEngine &engine = rng->getEngine();
+        CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
+        CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
 
 
-	for(unsigned int i = 0; i < signalSize; ++i){
-	  if(view==geo::kU)       { tnoise = rGauss_Ind.fire(); }
-	  else if (view==geo::kV) { tnoise = rGauss_Ind.fire(); }
-	  else                    { tnoise = rGauss_Col.fire(); }
+        for(unsigned int i = 0; i < signalSize; ++i){
+          if(view==geo::kU)       { tnoise = rGauss_Ind.fire(); }
+          else if (view==geo::kV) { tnoise = rGauss_Ind.fire(); }
+          else                    { tnoise = rGauss_Col.fire(); }
           tmpfv = tnoise + fChargeWork_a[i] ;
-	  if (fSimCombs)  tmpfv += fChargeWorkCollInd_a[i];
-	  //allow for ADC saturation
-	  if ( tmpfv > adcsaturation - ped_mean)
-	    tmpfv = adcsaturation- ped_mean;
-	  //don't allow for "negative" saturation
-	  if ( tmpfv < 0 - ped_mean)
-	    tmpfv = 0- ped_mean;
-	  adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
-	}
+          if (fSimCombs)  tmpfv += fChargeWorkCollInd_a[i];
+          //allow for ADC saturation
+          if ( tmpfv > adcsaturation - ped_mean)
+            tmpfv = adcsaturation- ped_mean;
+          //don't allow for "negative" saturation
+          if ( tmpfv < 0 - ped_mean)
+            tmpfv = 0- ped_mean;
+          adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
+        }
       }else {   // no noise, so just round the values to nearest short ints and store them
-	for(unsigned int i = 0; i < signalSize; ++i){
-	  tmpfv = fChargeWork_a[i];
-	  if (fSimCombs) tmpfv += fChargeWorkCollInd_a[i] ;
-	  //allow for ADC saturation
-	  if ( tmpfv > adcsaturation - ped_mean)
-	    tmpfv = adcsaturation- ped_mean;
-	  //don't allow for "negative" saturation
-	  if ( tmpfv < 0 - ped_mean)
-	    tmpfv = 0- ped_mean;
-	  adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
-	}
+        for(unsigned int i = 0; i < signalSize; ++i){
+          tmpfv = fChargeWork_a[i];
+          if (fSimCombs) tmpfv += fChargeWorkCollInd_a[i] ;
+          //allow for ADC saturation
+          if ( tmpfv > adcsaturation - ped_mean)
+            tmpfv = adcsaturation- ped_mean;
+          //don't allow for "negative" saturation
+          if ( tmpfv < 0 - ped_mean)
+            tmpfv = 0- ped_mean;
+          adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
+        }
       }
 
       // resize the adcvec to be the correct number of time samples, 
@@ -957,42 +890,42 @@ namespace detsim {
 
       // add pedestal values
       if(fPedestalOn)
-	{
-	  if(ped_rms>0){
-	    art::ServiceHandle<art::RandomNumberGenerator> rng;
-	    CLHEP::HepRandomEngine &engine = rng->getEngine();
-	    CLHEP::RandGaussQ rGauss_Ped(engine, 0.0, ped_rms);
-	    for(unsigned int i = 0; i < signalSize; ++i){
-	      float ped_variation = rGauss_Ped.fire();
-	      tmpfv = adcvec_a[i] + ped_mean + ped_variation;
-	      
-	      adcvec_a[i] = (short) tmpfv; 
-	      
-	    }
-	  }
-	  else{
-	    for(unsigned int i = 0; i < signalSize; ++i){
-	      tmpfv = adcvec_a[i] + ped_mean;
-	      adcvec_a[i] = (short) tmpfv; 
-	    }
+        {
+          if(ped_rms>0){
+            art::ServiceHandle<art::RandomNumberGenerator> rng;
+            CLHEP::HepRandomEngine &engine = rng->getEngine();
+            CLHEP::RandGaussQ rGauss_Ped(engine, 0.0, ped_rms);
+            for(unsigned int i = 0; i < signalSize; ++i){
+              float ped_variation = rGauss_Ped.fire();
+              tmpfv = adcvec_a[i] + ped_mean + ped_variation;
+              
+              adcvec_a[i] = (short) tmpfv; 
+              
+            }
+          }
+          else{
+            for(unsigned int i = 0; i < signalSize; ++i){
+              tmpfv = adcvec_a[i] + ped_mean;
+              adcvec_a[i] = (short) tmpfv; 
+            }
 
-	  }
-	  
+          }
+          
 
 
-	  if (sigtype == geo::kInduction){
-	    calibrated_pedestal_value = fInductionCalibPed;
-	    calibrated_pedestal_rms_value = fInductionCalibPedRMS;
-	  }
-	  else if (sigtype == geo::kCollection){
-	    calibrated_pedestal_value = fCollectionCalibPed;
-	    calibrated_pedestal_rms_value = fCollectionCalibPedRMS;
-	  }
-	  
-	}
+          if (sigtype == geo::kInduction){
+            calibrated_pedestal_value = fInductionCalibPed;
+            calibrated_pedestal_rms_value = fInductionCalibPedRMS;
+          }
+          else if (sigtype == geo::kCollection){
+            calibrated_pedestal_value = fCollectionCalibPed;
+            calibrated_pedestal_rms_value = fCollectionCalibPedRMS;
+          }
+          
+        }
       else{
-	calibrated_pedestal_value = 0;
-	calibrated_pedestal_rms_value = 0;
+        calibrated_pedestal_value = 0;
+        calibrated_pedestal_rms_value = 0;
 
       }
       
@@ -1001,33 +934,33 @@ namespace detsim {
 
       if ( fSimStuckBits ) {
 
-	  for ( size_t i = 0; i < adcvec.size(); ++i ) {
+          for ( size_t i = 0; i < adcvec.size(); ++i ) {
 
-	    art::ServiceHandle<art::RandomNumberGenerator> rng;
-	    CLHEP::HepRandomEngine &engine = rng->getEngine();
-	    CLHEP::RandFlat flat(engine);
-	    
-	    
-	    double rnd = flat.fire(0,1);
-	   
+            art::ServiceHandle<art::RandomNumberGenerator> rng;
+            CLHEP::HepRandomEngine &engine = rng->getEngine();
+            CLHEP::RandFlat flat(engine);
+            
+            
+            double rnd = flat.fire(0,1);
+           
 
-	    unsigned int zeromask = 0xffc0;
-	    unsigned int onemask = 0x003f;
+            unsigned int zeromask = 0xffc0;
+            unsigned int onemask = 0x003f;
 
-	    unsigned int sixlsbs = adcvec_a[i] & onemask;
+            unsigned int sixlsbs = adcvec_a[i] & onemask;
 
-	    int probability_index = (int)sixlsbs;
+            int probability_index = (int)sixlsbs;
 
-	    if(rnd < fUnderflowProbs[probability_index]){
-	      adcvec_a[i] = adcvec_a[i] | onemask; // 6 LSBs are stuck at 3F
-	      adcvec_a[i] -= 64; // correct 1st MSB value by subtracting 64
-	    }
-	    else if(rnd > fUnderflowProbs[probability_index] && rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index]){
-	      adcvec_a[i] = adcvec_a[i] & zeromask; // 6 LSBs are stuck at 0
-	      adcvec_a[i] += 64; // correct 1st MSB value by adding 64
-	    }
-	    //else adcvec value remains unchanged
-	 }
+            if(rnd < fUnderflowProbs[probability_index]){
+              adcvec_a[i] = adcvec_a[i] | onemask; // 6 LSBs are stuck at 3F
+              adcvec_a[i] -= 64; // correct 1st MSB value by subtracting 64
+            }
+            else if(rnd > fUnderflowProbs[probability_index] && rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index]){
+              adcvec_a[i] = adcvec_a[i] & zeromask; // 6 LSBs are stuck at 0
+              adcvec_a[i] += 64; // correct 1st MSB value by adding 64
+            }
+            //else adcvec value remains unchanged
+         }
 
       }
       
@@ -1050,7 +983,7 @@ namespace detsim {
       adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
  
       if(chan==fLastChannelsInPlane.at(plane_number))
-	++plane_number;
+        ++plane_number;
 
     }// end loop over channels      
 
@@ -1124,13 +1057,13 @@ namespace detsim {
     if (z<zcomb3) return VCOMB;  // over V comb
     if (z<zcomb4) 
       {
-	if (y<ycomb1) return HORIZGAP; // below the bottom
-	if (y<ycomb2) return UCOMB; // over U comb
-	if (y<ycomb3) return VCOMB; // over V comb
-	if (y<ycomb4) return ACTIVE; // active volume
-	if (y<ycomb5) return VCOMB; // over V comb
-	if (y<ycomb6) return UCOMB; // over U comb
-	return HORIZGAP; // outside top edge
+        if (y<ycomb1) return HORIZGAP; // below the bottom
+        if (y<ycomb2) return UCOMB; // over U comb
+        if (y<ycomb3) return VCOMB; // over V comb
+        if (y<ycomb4) return ACTIVE; // active volume
+        if (y<ycomb5) return VCOMB; // over V comb
+        if (y<ycomb6) return UCOMB; // over U comb
+        return HORIZGAP; // outside top edge
 
       }
     if (z<zcomb5) return VCOMB;  // over V comb
@@ -1141,19 +1074,19 @@ namespace detsim {
     if (z<zcomb9) return VCOMB; // over V comb
     if (z<zcomb10) 
       {
-	if (y<ycomb7) return HORIZGAP; // off the bottom
-	if (y<ycomb8) return UCOMB; // over U comb
-	if (y<ycomb9) return VCOMB; // over V comb
-	if (y<ycomb10) return ACTIVE; // active
-	if (y<ycomb11) return VCOMB; // over V comb
-	if (y<ycomb12) return UCOMB; // over U comb
-	if (y<ycomb13) return HORIZGAP; // over gap
-	if (y<ycomb14) return UCOMB; // over U comb
-	if (y<ycomb15) return VCOMB; // over V comb
-	if (y<ycomb16) return ACTIVE; // active volume
-	if (y<ycomb17) return VCOMB; // over V comb
-	if (y<ycomb18) return UCOMB; // over U comb
-	return HORIZGAP;  // above the top edge
+        if (y<ycomb7) return HORIZGAP; // off the bottom
+        if (y<ycomb8) return UCOMB; // over U comb
+        if (y<ycomb9) return VCOMB; // over V comb
+        if (y<ycomb10) return ACTIVE; // active
+        if (y<ycomb11) return VCOMB; // over V comb
+        if (y<ycomb12) return UCOMB; // over U comb
+        if (y<ycomb13) return HORIZGAP; // over gap
+        if (y<ycomb14) return UCOMB; // over U comb
+        if (y<ycomb15) return VCOMB; // over V comb
+        if (y<ycomb16) return ACTIVE; // active volume
+        if (y<ycomb17) return VCOMB; // over V comb
+        if (y<ycomb18) return UCOMB; // over U comb
+        return HORIZGAP;  // above the top edge
       }
     if (z<zcomb11) return VCOMB;  // over V comb
     if (z<zcomb12) return UCOMB;  // over U comb
@@ -1163,13 +1096,13 @@ namespace detsim {
     if (z<zcomb15) return VCOMB;  // over V comb
     if (z<zcomb16) 
       {
-	if (y<ycomb1) return HORIZGAP; // below the bottom
-	if (y<ycomb2) return UCOMB; // over U comb
-	if (y<ycomb3) return VCOMB; // over V comb
-	if (y<ycomb4) return ACTIVE; // active volume
-	if (y<ycomb5) return VCOMB; // over V comb
-	if (y<ycomb6) return UCOMB; // over U comb
-	return HORIZGAP; // outside top edge
+        if (y<ycomb1) return HORIZGAP; // below the bottom
+        if (y<ycomb2) return UCOMB; // over U comb
+        if (y<ycomb3) return VCOMB; // over V comb
+        if (y<ycomb4) return ACTIVE; // active volume
+        if (y<ycomb5) return VCOMB; // over V comb
+        if (y<ycomb6) return UCOMB; // over U comb
+        return HORIZGAP; // outside top edge
       }
     if (z<zcomb17) return VCOMB;  // over V comb
     if (z<zcomb18) return UCOMB;  // over U comb

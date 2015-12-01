@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# test_SimWireDune
+
 # David Adams
 # November 2015
 #
@@ -9,24 +11,20 @@ HELP=
 CLEAN=
 DBG=0
 SAMTEST=mu35tnew
-SAMREF=mu35tnewref
+SAMREF=
 while getopts hct:r:d: OPT; do
   case $OPT in
   h) HELP=true;;
   c) CLEAN=true;;
   t) SAMTEST=$OPTARG;;
-  r) SAMREFS=$OPTARG;;
+  r) SAMREF=$OPTARG;;
   d) DBG=$OPTARG;;
   esac
 done
 shift $(( OPTIND-1 ))
 
-# If the test sample is not given, then use mu35tnew.
-if [ -z "$SAMTEST" ]; then
-  SAM1=mu35tnew
-fi
-if [ -z "$SAM2" ]; then
-  SAM2=mu35tnewref
+if [ -z "$SAMREF" ]; then
+  SAMREF=${SAMTEST}ref
 fi
 
 # Generate test sample.
@@ -55,7 +53,7 @@ fi
 # Compare histograms.
 echo
 echo Comparing histograms.
-dxroot compareHists.C'("'$SAM1'","'$SAM2'",'$DBG')' 2>&1 | tee compare.log
+dxroot compareHists.C'("'$SAMTEST'","'$SAMREF'",'$DBG')' 2>&1 | tee compare.log
 STAT=$?
 if [ $STAT -ne 0 ]; then
   Histogram comparison failed.
