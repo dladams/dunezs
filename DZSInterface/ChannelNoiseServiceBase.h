@@ -16,11 +16,11 @@ class ChannelNoiseServiceBase {
 public:
 
   typedef unsigned int Channel;
-  typedef std::vector<double> SignalVector;
+  typedef std::vector<float> SignalVector;
 
   virtual ~ChannelNoiseServiceBase();
 
-  virtual int addNoise(Channel chan, SignalVector& sigs) =0;
+  virtual int addNoise(Channel chan, SignalVector& sigs) const =0;
 
 };
 

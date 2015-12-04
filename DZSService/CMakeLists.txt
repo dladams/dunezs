@@ -36,3 +36,11 @@ simple_plugin(SimChannelExtractAllService   "service"
                 Simulation
                 ${ROOT_BASIC_LIB_LIST} BASENAME_ONLY
              )
+simple_plugin(ExponentialChannelNoiseService   "service"
+                DZSInterface
+                art_Framework_Services_Optional_RandomNumberGenerator_service
+                ${ART_FRAMEWORK_CORE}
+                ${ART_UTILITIES}
+                ${CLHEP}
+                ${ROOT_BASIC_LIB_LIST}
+             )

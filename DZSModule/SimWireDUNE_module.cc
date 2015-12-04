@@ -60,6 +60,8 @@ extern "C" {
 #include "CalibrationDBI/Interface/IDetPedestalService.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
 
+#define OLDNOISE1
+
 ///Detector simulation of raw signals on wires 
 namespace detsim {
 
@@ -90,6 +92,7 @@ namespace detsim {
     std::string            fDriftEModuleLabel;///< module making the ionization electrons
     unsigned int           fNoiseOn;          ///< noise turned on or off for debugging; default is on
     unsigned int           fNoiseModel;          ///< noise model>
+#ifdef OLDNOISE1
     float                  fNoiseFact;        ///< noise scale factor
     float                  fNoiseWidth;       ///< exponential noise width (kHz)
     float                  fLowCutoff;        ///< low frequency filter cutoff (kHz)
@@ -102,16 +105,21 @@ namespace detsim {
     float                  fNoiseFactV;        ///< noise scale factor   for V plane
     float                  fNoiseWidthV;       ///< exponential noise width (kHz)   for V plane
     float                  fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
+    unsigned int           fNoiseArrayPoints; ///< number of  points in randomly generated noise array
+#endif
     int                    fNTicks;           ///< number of ticks of the clock
+#ifdef OLDNOISE1
     double                 fSampleRate;       ///< sampling rate in ns
+#endif
     unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
     unsigned int           fNTimeSamples;     ///< number of ADC readout samples in all readout frames (per event)
-    unsigned int           fNoiseArrayPoints; ///< number of  points in randomly generated noise array
   
     std::vector<double>    fChargeWork;
+#ifdef OLDNOISE1
     std::vector< std::vector<float> > fNoiseZ;///< noise on each channel for each time for Z (collection) plane
     std::vector< std::vector<float> > fNoiseU;///< noise on each channel for each time for U plane
     std::vector< std::vector<float> > fNoiseV;///< noise on each channel for each time for V plane
+#endif
     
     TH1*                fNoiseDist;          ///< distribution of noise counts
     TH1*                fNoiseChanDist;      ///< distribution of noise channels
@@ -191,19 +199,20 @@ namespace detsim {
 
     fChargeWork.clear();
  
+#ifdef OLDNOISE1
     for(unsigned int i = 0; i < fNoiseZ.size(); ++i) fNoiseZ[i].clear();
     fNoiseZ.clear();
-   
     for(unsigned int i = 0; i < fNoiseU.size(); ++i) fNoiseU[i].clear();
     fNoiseU.clear();
-   
     for(unsigned int i = 0; i < fNoiseV.size(); ++i) fNoiseV[i].clear();
     fNoiseV.clear();
+#endif
   }
 
   //-------------------------------------------------
   void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
     fDriftEModuleLabel= p.get< std::string         >("DriftEModuleLabel");
+#ifdef OLDNOISE1
     fNoiseFactZ        = p.get< double              >("NoiseFactZ");
     fNoiseWidthZ       = p.get< double              >("NoiseWidthZ");
     fLowCutoffZ        = p.get< double              >("LowCutoffZ");
@@ -214,6 +223,7 @@ namespace detsim {
     fNoiseWidthV       = p.get< double              >("NoiseWidthV");
     fLowCutoffV        = p.get< double              >("LowCutoffV");
     fNoiseArrayPoints = p.get< unsigned int         >("NoiseArrayPoints");
+#endif
     fNoiseOn           = p.get< unsigned int        >("NoiseOn");
     fNoiseModel           = p.get< unsigned int     >("NoiseModel");
     fCollectionPed    = p.get< float                >("CollectionPed");
@@ -307,9 +317,9 @@ namespace detsim {
     fLastChannelsInPlane.push_back(geo->Nchannels()-1);
 
      
+#ifdef OLDNOISE1
     //Generate noise if selected to be on
     if(fNoiseOn && fNoiseModel==1){
-
       //fNoise.resize(geo->Nchannels());
       fNoiseZ.resize(fNoiseArrayPoints);
       fNoiseU.resize(fNoiseArrayPoints);
@@ -348,6 +358,7 @@ namespace detsim {
         
       }// end loop over wires
     } 
+#endif
 
     if(fSimStuckBits){
   
@@ -622,6 +633,7 @@ namespace detsim {
     return;
   }
 
+#ifdef OLDNOISE1
   //-------------------------------------------------
   void SimWireDUNE::GenNoise(std::vector<float>& noise) {
     art::ServiceHandle<art::RandomNumberGenerator> rng;
@@ -670,3 +682,4 @@ namespace detsim {
 
     return;
   }
+#endif
