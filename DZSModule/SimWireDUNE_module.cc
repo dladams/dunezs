@@ -187,8 +187,7 @@ namespace detsim {
   }
 
   //-------------------------------------------------
-  SimWireDUNE::~SimWireDUNE()
-  {
+  SimWireDUNE::~SimWireDUNE() {
 
     fChargeWork.clear();
  
@@ -200,15 +199,11 @@ namespace detsim {
    
     for(unsigned int i = 0; i < fNoiseV.size(); ++i) fNoiseV[i].clear();
     fNoiseV.clear();
-
   }
 
   //-------------------------------------------------
-  void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) 
-  {
+  void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
     fDriftEModuleLabel= p.get< std::string         >("DriftEModuleLabel");
-
-
     fNoiseFactZ        = p.get< double              >("NoiseFactZ");
     fNoiseWidthZ       = p.get< double              >("NoiseWidthZ");
     fLowCutoffZ        = p.get< double              >("LowCutoffZ");
@@ -458,6 +453,7 @@ namespace detsim {
         mf::LogError("SimWireDUNE") << "ERROR: CHANNEL NUMBER " << chan << " OUTSIDE OF PLANE";
       }
 
+      // Use the SimChannel to assign signal charge to each tick in the channel.
       if ( psc ) {      
         // Use the SimChannel extraction service to find the charge seen by each channel.
         // If extra charge is collected, it is stored in fChargeWorkCollInd and should
@@ -482,11 +478,11 @@ namespace detsim {
 
       }  // end if psc
 
-      // Add noise to signal.
+      // Add noise to each tick in the channel.
       if ( fNoiseOn && fNoiseModel==1 ) {              
-        // noise was already generated for each wire in the event
+        // Noise was already generated for each wire in the event
         // raw digit vec is already in channel order
-        // pick a new "noise channel" for every channel  - this makes sure    
+        // pick a new "noise channel" for every channel -- this makes sure    
         // the noise has the right coherent characteristics to be on one channel
         CLHEP::HepRandomEngine& engine = rng->getEngine("SimWireDUNENoise");
         CLHEP::RandFlat flat(engine);
@@ -543,7 +539,7 @@ namespace detsim {
       float calibrated_pedestal_value     = 0.0; // Estimated calibrated value of pedestal to be passed to RawDigits collection
       float calibrated_pedestal_rms_value = 0.0; // Estimated calibrated value of pedestal RMS to be passed to RawDigits collection
 
-      // add pedestals
+      // Add pedestal including variation to each tick in the channel.
       if ( fPedestalOn ) {
         // Fetch the pedestal for this channel.
         float ped_mean = pedestalProvider.PedMean(chan);
@@ -578,35 +574,24 @@ namespace detsim {
       
       // Add stuck bits.
       if ( fSimStuckBits ) {
-
-          for ( size_t i = 0; i < adcvec.size(); ++i ) {
-
-            art::ServiceHandle<art::RandomNumberGenerator> rng;
-            CLHEP::HepRandomEngine& stuck_engine = rng->getEngine("SimWireDUNEStuck");
-            CLHEP::RandFlat stuck_flat(stuck_engine);
-            
-            
-            double rnd = stuck_flat.fire(0,1);
-           
-
-            unsigned int zeromask = 0xffc0;
-            unsigned int onemask = 0x003f;
-
-            unsigned int sixlsbs = adcvec[i] & onemask;
-
-            int probability_index = (int)sixlsbs;
-
-            if(rnd < fUnderflowProbs[probability_index]){
-              adcvec[i] = adcvec[i] | onemask; // 6 LSBs are stuck at 3F
-              adcvec[i] -= 64; // correct 1st MSB value by subtracting 64
-            }
-            else if(rnd > fUnderflowProbs[probability_index] && rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index]){
-              adcvec[i] = adcvec[i] & zeromask; // 6 LSBs are stuck at 0
-              adcvec[i] += 64; // correct 1st MSB value by adding 64
-            }
-            //else adcvec value remains unchanged
-         }
-
+        for ( size_t i = 0; i < adcvec.size(); ++i ) {
+          art::ServiceHandle<art::RandomNumberGenerator> rng;
+          CLHEP::HepRandomEngine& stuck_engine = rng->getEngine("SimWireDUNEStuck");
+          CLHEP::RandFlat stuck_flat(stuck_engine);
+          double rnd = stuck_flat.fire(0,1);
+          unsigned int zeromask = 0xffc0;
+          unsigned int onemask = 0x003f;
+          unsigned int sixlsbs = adcvec[i] & onemask;
+          int probability_index = (int)sixlsbs;
+          if ( rnd < fUnderflowProbs[probability_index] ) {
+            adcvec[i] = adcvec[i] | onemask; // 6 LSBs are stuck at 3F
+            adcvec[i] -= 64; // correct 1st MSB value by subtracting 64
+          } else if ( rnd > fUnderflowProbs[probability_index] &&
+                    rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index] ) {
+            adcvec[i] = adcvec[i] & zeromask; // 6 LSBs are stuck at 0
+            adcvec[i] += 64; // correct 1st MSB value by adding 64
+          }
+        }
       }
       
       // Zero suppress and compress.
