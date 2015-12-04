@@ -109,4 +109,27 @@ scx35t: {
   FractZVMiss: 0.2
 }
 
+dbretrieval: {
+  AlgName: "DatabaseRetrievalAlg"
+  DBFolderName:  ""
+  DBUrl: ""
+  DBTag: ""
+}
+
+pedfixed: {
+  service_provider: SIOVDetPedestalService
+  DetPedestalRetrievalAlg: {
+    AlgName:            "DetPedestalRetrievalAlg"
+    DatabaseRetrievalAlg: @local::dbretrieval
+    UseDB: false
+    UseFile: false
+    DefaultCollMean:  500.0
+    DefaultCollRms:     0.01
+    DefaultIndMean:  1800.0
+    DefaultIndRms:      0.01
+    DefaultMeanErr:     0.0
+    DefaultRmsErr:      0.0
+  }
+}
+
 END_PROLOG

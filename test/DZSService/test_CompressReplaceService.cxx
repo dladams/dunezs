@@ -56,15 +56,16 @@ int test_CompressReplaceService() {
   CompressReplace::SignalVector outdata(indata);
   CompressReplace::FilterVector keep(30, false);
   unsigned int isig = 0;
+  float offset = 20.0;
   for ( isig= 6; isig<28; ++isig ) keep[isig] = true;
-  assert( pcr->compress(outdata, keep) == 0 );
+  assert( pcr->compress(outdata, keep, offset) == 0 );
   for ( unsigned int idat=0; idat<indata.size(); ++idat ) {
     cout << setw(6) << indata[idat] << setw(6) << outdata[idat] << endl;
   }
   CompressReplace::Signal zero = 0;
-  for ( isig= 0; isig< 6; ++isig ) assert( outdata[isig] == zero );
+  for ( isig= 0; isig< 6; ++isig ) assert( outdata[isig] == zero+offset );
   for ( isig= 6; isig<28; ++isig ) assert( outdata[isig] == indata[isig] );
-  for ( isig=28; isig<30; ++isig ) assert( outdata[isig] == zero );
+  for ( isig=28; isig<30; ++isig ) assert( outdata[isig] == zero+offset );
   cout << myname << "Done." << endl;
 
   return 0;

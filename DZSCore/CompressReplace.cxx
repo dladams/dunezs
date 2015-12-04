@@ -26,9 +26,10 @@ Signal CompressReplace::zero() const {
 
 //**********************************************************************
 
-int CompressReplace::compress(SignalVector& sigs, const FilterVector& keep) const {
+int CompressReplace::
+compress(SignalVector& sigs, const FilterVector& keep, Signal offset) const {
   for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
-    if ( ! keep[isig] ) sigs[isig] = zero();
+    if ( ! keep[isig] ) sigs[isig] = zero() + offset;
   }
   return 0;
 }

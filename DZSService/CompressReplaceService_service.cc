@@ -17,16 +17,17 @@ CompressReplaceService::
 CompressReplaceService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
   Signal zero = 0;
   pset.get_if_present<Signal>("Zero", zero);
+  pset.get_if_present<Signal>("Option", zero);
   m_pact.reset(new CompressReplace(zero));
 }
   
 //**********************************************************************
 
-int CompressReplaceService::compress(SignalVector& sigs, const FilterVector& keep) const {
+int CompressReplaceService::compress(SignalVector& sigs, const FilterVector& keep, Signal offset) const {
   if ( m_pact.get() == nullptr ) {
     throw cet::exception(__FUNCTION__) << "Compression is not configured properly.";
   }
-  return m_pact->compress(sigs, keep);
+  return m_pact->compress(sigs, keep, offset);
 }
 
 //**********************************************************************

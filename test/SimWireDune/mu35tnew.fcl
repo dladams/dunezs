@@ -85,7 +85,15 @@ physics.producers.generator.Theta0XZ: [  0]    # degrees
 services.user.SeedService.policy:    "preDefinedSeed"       # So random number sequence is always the same
 services.user.SeedService.generator: 1001
 services.user.SeedService.largeant:  1003
-services.user.SeedService.daq:       1005
+#services.user.SeedService.daq:       1005
+services.user.SeedService.daq: {
+  SimWireDUNENoise:    1005
+  SimWireDUNEPedestal: 1007
+  SimWireDUNEStuck:    1009
+}
+#services.user.SeedService.SimWireDUNENoise:    1005
+#services.user.SeedService.SimWireDUNEPedestal: 1007
+#services.user.SeedService.SimWireDUNEStuck:    1009
 
 # Specify the zero suppression service.
 #services.user.ZeroSuppressBase: @local::zsnone
@@ -95,3 +103,10 @@ services.user.ZeroSuppressBase: @local::zsonline
 # Specify the compression service.
 services.user.CompressReplaceService: { Zero: 0 }
 services.user.SimChannelExtractServiceBase: @local::scxall
+services.user.IDetPedestalService: @local::pedfixed
+#services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean: 2400
+
+#services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
+#services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0
+
+physics.producers.daq.PedestalOn: true

@@ -39,14 +39,15 @@ int main() {
   unsigned int isig = 0;
   for ( isig= 6; isig<28; ++isig ) keep[isig] = true;
   cout << myname << "Compressing." << endl;
-  assert( zs.compress(outdata, keep) == 0 );
+  float offset = 20.0;
+  assert( zs.compress(outdata, keep, offset) == 0 );
   for ( isig=0; isig<indata.size(); ++isig ) {
     cout << setw(3) << isig << ":" << setw(6) << indata[isig] << setw(6) << outdata[isig] << endl;
   }
   cout << myname << "Checking suppressing signal." << endl;
-  for ( isig= 0; isig< 6; ++isig ) { cout << " " << isig; assert( outdata[isig] == zero ); }
+  for ( isig= 0; isig< 6; ++isig ) { cout << " " << isig; assert( outdata[isig] == zero + offset ); }
   for ( isig= 6; isig<28; ++isig ) { cout << " " << isig; assert( outdata[isig] == indata[isig] );  }
-  for ( isig=28; isig<30; ++isig ) { cout << " " << isig; assert( outdata[isig] == zero ); }
+  for ( isig=28; isig<30; ++isig ) { cout << " " << isig; assert( outdata[isig] == zero + offset ); }
   cout << endl;
   cout << myname << "Done." << endl;
   return 0;

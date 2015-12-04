@@ -35,7 +35,9 @@ if [ ! -r ${SAMPLE}_event.root ]; then
   echo
   echo Generating reference event data.
   echo " Start: "`date`
-  lar -n 5 -c ${SAMPLE}.fcl -T ${SAMPLE}_hist.root -o ${SAMPLE}_event.root 2>&1 > ${SAMPLE}.log
+  COM="lar -n 5 -c ${SAMPLE}.fcl -T ${SAMPLE}_hist.root -o ${SAMPLE}_event.root"
+  echo $COM >${SAMPLE}.log
+  $COM 2>&1 >> ${SAMPLE}.log
   STAT=$?
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}_event.root ]; then

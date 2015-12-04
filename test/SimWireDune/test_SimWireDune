@@ -12,7 +12,7 @@ CLEAN=
 DBG=0
 SAMTEST=mu35tnew
 SAMREF=
-while getopts hct:r:d: OPT; do
+while getopts hct:r:d:v OPT; do
   case $OPT in
   h) HELP=true;;
   c) CLEAN=true;;

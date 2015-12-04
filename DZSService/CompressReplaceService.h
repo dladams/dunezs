@@ -32,9 +32,11 @@ public:
   // Ctor.
   CompressReplaceService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
-  // Compress avector of signals.
-  // Suppressed signals are replaced with the value of FCL parameter Zero.
-  int compress(CompressReplace::SignalVector& sigs, const CompressReplace::FilterVector& keep) const;
+  // Compress a vector of signals.
+  // Suppressed signals are replaced with the value of offset + (FCL parameter) Zero.
+  int compress(CompressReplace::SignalVector& sigs,
+               const CompressReplace::FilterVector& keep,
+               CompressReplace::Signal offset) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;

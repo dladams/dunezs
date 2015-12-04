@@ -57,6 +57,9 @@ extern "C" {
 #include "DZSService/CompressReplaceService.h"
 #include "DZSInterface/SimChannelExtractServiceBase.h"
 
+#include "CalibrationDBI/Interface/IDetPedestalService.h"
+#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+
 ///Detector simulation of raw signals on wires 
 namespace detsim {
 
@@ -110,7 +113,9 @@ namespace detsim {
     std::vector< std::vector<float> > fNoiseU;///< noise on each channel for each time for U plane
     std::vector< std::vector<float> > fNoiseV;///< noise on each channel for each time for V plane
     
-    TH1D*                fNoiseDist;          ///< distribution of noise counts
+    TH1*                fNoiseDist;          ///< distribution of noise counts
+    TH1*                fNoiseChanDist;      ///< distribution of noise channels
+    TH1*                fPedNoiseDist;       ///< distribution of pedestal noise counts
     
 
     // variables for simulating the charge deposition in gaps and charge drifting over the comb materials.
@@ -161,10 +166,24 @@ namespace detsim {
 
   SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset) {
     this->reconfigure(pset);
-    produces< std::vector<raw::RawDigit>   >();
+    produces< std::vector<raw::RawDigit> >();
     // create a default random engine; obtain the random seed from SeedService,
     // unless overridden in configuration with key "Seed"
-    art::ServiceHandle<artext::SeedService>()->createEngine(*this, pset, "Seed");
+    //seedSvc->createEngine(*this, pset, "SimWireDUNENoise");
+    // Create other services with local seeds. SeedService will not create two engines.
+    int seedNoise = 2001;
+    int seedPedestal = 2003;
+    int seedStuck = 2005;
+    bool useSeedSvc = true;
+    if ( useSeedSvc ) {
+      art::ServiceHandle<artext::SeedService> seedSvc;
+      seedNoise    = seedSvc->getSeed("SimWireDUNENoise");
+      seedPedestal = seedSvc->getSeed("SimWireDUNEPedestal");
+      seedStuck    = seedSvc->getSeed("SimWireDUNEStuck");
+    }
+    createEngine(seedNoise,    "HepJamesRandom", "SimWireDUNENoise");
+    createEngine(seedPedestal, "HepJamesRandom", "SimWireDUNEPedestal");
+    createEngine(seedStuck,    "HepJamesRandom", "SimWireDUNEStuck");
   }
 
   //-------------------------------------------------
@@ -236,7 +255,9 @@ namespace detsim {
     // get access to the TFile service
     art::ServiceHandle<art::TFileService> tfs;
 
-    fNoiseDist  = tfs->make<TH1D>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
+    fNoiseDist     = tfs->make<TH1F>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
+    fNoiseChanDist = tfs->make<TH1F>("NoiseChan", ";Noise channel;", fNoiseArrayPoints, 0, fNoiseArrayPoints);
+    fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
 
 
     art::ServiceHandle<util::LArFFT> fFFT;
@@ -291,15 +312,6 @@ namespace detsim {
     fLastChannelsInPlane.push_back(geo->Nchannels()-1);
 
      
-    // //Check starting and ending channels for each wire plane
-    // for(size_t ip = 0; ip < fFirstChannelsInPlane.size(); ++ip){
-    //   std::cout << "First channel in plane " << ip << " is " << fFirstChannelsInPlane.at(ip) << std::endl;
-    // }
-
-    // for(size_t ip = 0; ip < fLastChannelsInPlane.size(); ++ip){
-    //   std::cout << "Last channel in plane " << ip << " is " << fLastChannelsInPlane.at(ip) << std::endl;
-    // }
-
     //Generate noise if selected to be on
     if(fNoiseOn && fNoiseModel==1){
 
@@ -383,9 +395,15 @@ namespace detsim {
 
   //-------------------------------------------------
   void SimWireDUNE::produce(art::Event& evt) {
-    // get the geometry to be able to figure out signal types and chan -> plane mappings
+
+    // Get the geometry.
     art::ServiceHandle<geo::Geometry> geo;
     unsigned int signalSize = fNTicks;
+
+    // Get the pedestal retriever.
+    const lariov::IDetPedestalProvider& pedestalProvider
+      = art::ServiceHandle<lariov::IDetPedestalService>()->GetPedestalProvider();
+    mf::LogInfo("SimWireDUNE") << "Pedestal for channel 0: " << pedestalProvider.PedMean(0);
 
     // vectors for working
     std::vector<short>    adcvec(signalSize, 0);        
@@ -410,7 +428,7 @@ namespace detsim {
           
     unsigned int chan = 0; 
     fChargeWork.clear();
-    fChargeWork.resize(fNTicks, 0.);
+    fChargeWork.resize(signalSize, 0.);
           
  
     std::vector<double> fChargeWorkCollInd;
@@ -419,8 +437,9 @@ namespace detsim {
 
     // Add all channels  
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine();
-    CLHEP::RandFlat flat(engine);
+    //CLHEP::HepRandomEngine& noise_engine = rng->getEngine();
+    CLHEP::HepRandomEngine& noise_engine = rng->getEngine("SimWireDUNENoise");
+    CLHEP::RandFlat noise_flat(noise_engine);
 
     std::map<int,double>::iterator mapIter;      
 
@@ -435,101 +454,62 @@ namespace detsim {
       // get the sim::SimChannel for this channel
       const sim::SimChannel* psc = channels[chan];
       const geo::View_t view = geo->View(chan);
-
-
-      bool SimCombs = false;
-      if ( psc ) {      
-        fChargeWorkCollInd.clear();
-        if ( m_pscx->extract(*psc, fChargeWork, fChargeWorkCollInd) ) {
-          throw cet::exception("SimWireDUNE") << "Error calling SC extractor" <<"\n";
-        }
-        SimCombs = fChargeWorkCollInd.size() > 0;
-      
-
-        // Convolve charge with appropriate response function 
-        fChargeWork.resize(fNTicks,0);
-        sss->Convolute(chan,fChargeWork);
-
-        fChargeWorkCollInd.resize(fNTicks,0);
-        sss->Convolute(fFirstCollectionChannel,fChargeWorkCollInd); 
-
-      }  // end if psc
-
-      float ped_mean = fCollectionPed;
-      float ped_rms = fCollectionPedRMS;
-      geo::SigType_t sigtype = geo->SignalType(chan);
-      if (sigtype == geo::kInduction){
-        ped_mean = fInductionPed;
-        ped_rms = fInductionPedRMS;
-      }
-      else if (sigtype == geo::kCollection){
-        ped_mean = fCollectionPed;
-        ped_rms = fCollectionPedRMS;
-      }
-
-      // noise was already generated for each wire in the event
-      // raw digit vec is already in channel order
-      // pick a new "noise channel" for every channel  - this makes sure    
-      // the noise has the right coherent characteristics to be on one channel
-
-      int noisechan = nearbyint(flat.fire()*(1.*(fNoiseArrayPoints-1)+0.1));
-      // optimize for speed -- access vectors as arrays 
-
-      double *fChargeWork_a=0;
-      double *fChargeWorkCollInd_a=0;
-      short *adcvec_a=0;
-      float *noise_a_U=0;
-      float *noise_a_V=0;
-      float *noise_a_Z=0;
-
-      if (signalSize>0)        {
-        fChargeWork_a = fChargeWork.data();
-        fChargeWorkCollInd_a = fChargeWorkCollInd.data();
-        adcvec_a = adcvec.data();
-        if (fNoiseOn && fNoiseModel==1) {
-          noise_a_U=(fNoiseU[noisechan]).data();
-          noise_a_V=(fNoiseV[noisechan]).data();
-          noise_a_Z=(fNoiseZ[noisechan]).data();
-        }
-      }
-
-      float tmpfv=0;  // this is here so we do our own rounding from floats to short ints (saves CPU time)
-      float tnoise=0;
-
       if (view != geo::kU && view != geo::kV && view != geo::kZ) {
         mf::LogError("SimWireDUNE") << "ERROR: CHANNEL NUMBER " << chan << " OUTSIDE OF PLANE";
       }
 
-      if(fNoiseOn && fNoiseModel==1) {              
-        for(unsigned int i = 0; i < signalSize; ++i){
-          if(view==geo::kU)       { tnoise = noise_a_U[i]; }
-          else if (view==geo::kV) { tnoise = noise_a_V[i]; }
-          else                    { tnoise = noise_a_Z[i]; }
-          tmpfv = tnoise + fChargeWork_a[i] ;
-          //mf::LogInfo("SimWireDUNE") << "Channel-bin " << chan << "-" << i << ": Signal: " << fChargeWork_a[i] << " ,  Noise: " << tnoise;
-          if (SimCombs)  tmpfv += fChargeWorkCollInd_a[i];
-          //allow for ADC saturation
-          if ( tmpfv > adcsaturation - ped_mean)
-            tmpfv = adcsaturation- ped_mean;
-          //don't allow for "negative" saturation
-          if ( tmpfv < 0 - ped_mean)
-            tmpfv = 0- ped_mean;
-
-          adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
+      if ( psc ) {      
+        // Use the SimChannel extraction service to find the charge seen by each channel.
+        // If extra charge is collected, it is stored in fChargeWorkCollInd and should
+        // be shaped for collection even if this is an induction channel.
+        fChargeWorkCollInd.clear();
+        if ( m_pscx->extract(*psc, fChargeWork, fChargeWorkCollInd) ) {
+          throw cet::exception("SimWireDUNE") << "Error calling SC extractor" <<"\n";
         }
-      }else if (fNoiseOn && fNoiseModel==2){
 
+        // Convolve charge with appropriate response function 
+        fChargeWork.resize(signalSize, 0);
+        sss->Convolute(chan,fChargeWork);
+
+        // If there is extra charge, convolve it and add it to the working charge.
+        if ( fChargeWorkCollInd.size() > 0 ) {
+          fChargeWorkCollInd.resize(signalSize, 0);
+          sss->Convolute(fFirstCollectionChannel, fChargeWorkCollInd); 
+          for ( unsigned int itck=0; itck<signalSize; ++itck ) {
+            fChargeWork[itck] += fChargeWorkCollInd[itck];
+          }
+        }
+
+      }  // end if psc
+
+      // Add noise to signal.
+      if ( fNoiseOn && fNoiseModel==1 ) {              
+        // noise was already generated for each wire in the event
+        // raw digit vec is already in channel order
+        // pick a new "noise channel" for every channel  - this makes sure    
+        // the noise has the right coherent characteristics to be on one channel
+        CLHEP::HepRandomEngine& engine = rng->getEngine("SimWireDUNENoise");
+        CLHEP::RandFlat flat(engine);
+        //unsigned int noisechan = flat.fire()*fNoiseArrayPoints;
+        //if ( noisechan == fNoiseArrayPoints ) --noisechan;
+        // Keep this strange way of choosing noise channel to be consistent with old results.
+        // The relative weights of the first and last channels are 0.5 and 0.6.
+        unsigned int noisechan = nearbyint(flat.fire()*(1.*(fNoiseArrayPoints-1)+0.1));
+        fNoiseChanDist->Fill(noisechan);
+        for ( unsigned int itck=0; itck<signalSize; ++itck ) {
+          double tnoise = 0.0;
+          if      ( view==geo::kU ) tnoise = fNoiseU[noisechan][itck];
+          else if ( view==geo::kV ) tnoise = fNoiseV[noisechan][itck];
+          else                      tnoise = fNoiseZ[noisechan][itck];
+          fChargeWork[itck] += tnoise;
+        }
+      } else if ( fNoiseOn && fNoiseModel==2 ) {
         float fASICGain      = sss->GetASICGain(chan);  
-        
         double fShapingTime   = sss->GetShapingTime(chan);
         std::map< double, int > fShapingTimeOrder;
         fShapingTimeOrder = { {0.5, 0}, {1.0, 1}, {2.0, 2}, {3.0, 3} };
         DoubleVec              fNoiseFactVec;
-
-        //
-
         auto tempNoiseVec = sss->GetNoiseFactVec();
-
         if ( fShapingTimeOrder.find( fShapingTime ) != fShapingTimeOrder.end() ){
           size_t i = 0;
           fNoiseFactVec.resize(2);
@@ -538,8 +518,7 @@ namespace detsim {
             fNoiseFactVec[i] *= fASICGain/4.7;
             ++i;
           }
-        }
-        else {//Throw exception...
+        } else {
           throw cet::exception("SimWireDUNE")
             << "\033[93m"
             << "Shaping Time received from signalservices_dune.fcl is not one of allowed values"
@@ -548,122 +527,82 @@ namespace detsim {
             << "\033[00m"
             << std::endl;
         }
-        //std::cout << "Xin " << fASICGain << " " << fShapingTime << " " << fNoiseFactVec[0] << " " << fNoiseFactVec[1] << std::endl;
-
         art::ServiceHandle<art::RandomNumberGenerator> rng;
-        CLHEP::HepRandomEngine &engine = rng->getEngine();
+        CLHEP::HepRandomEngine &engine = rng->getEngine("SimWireDUNENoise");
         CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
         CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
-
-
-        for(unsigned int i = 0; i < signalSize; ++i){
-          if(view==geo::kU)       { tnoise = rGauss_Ind.fire(); }
-          else if (view==geo::kV) { tnoise = rGauss_Ind.fire(); }
-          else                    { tnoise = rGauss_Col.fire(); }
-          tmpfv = tnoise + fChargeWork_a[i] ;
-          if (SimCombs)  tmpfv += fChargeWorkCollInd_a[i];
-          //allow for ADC saturation
-          if ( tmpfv > adcsaturation - ped_mean)
-            tmpfv = adcsaturation- ped_mean;
-          //don't allow for "negative" saturation
-          if ( tmpfv < 0 - ped_mean)
-            tmpfv = 0- ped_mean;
-          adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
-        }
-      }else {   // no noise, so just round the values to nearest short ints and store them
-        for(unsigned int i = 0; i < signalSize; ++i){
-          tmpfv = fChargeWork_a[i];
-          if (SimCombs) tmpfv += fChargeWorkCollInd_a[i] ;
-          //allow for ADC saturation
-          if ( tmpfv > adcsaturation - ped_mean)
-            tmpfv = adcsaturation- ped_mean;
-          //don't allow for "negative" saturation
-          if ( tmpfv < 0 - ped_mean)
-            tmpfv = 0- ped_mean;
-          adcvec_a[i] = (tmpfv >=0) ? (short) (tmpfv+0.5) : (short) (tmpfv-0.5); 
+        for ( unsigned int itck = 0; itck<signalSize; ++itck){
+          double tnoise = 0.0;
+          if      ( view==geo::kU ) tnoise = rGauss_Ind.fire();
+          else if ( view==geo::kV ) tnoise = rGauss_Ind.fire();
+          else                      tnoise = rGauss_Col.fire();
+          fChargeWork[itck] += tnoise;
         }
       }
 
-      // resize the adcvec to be the correct number of time samples, 
-      // just drop the extra samples
+      float calibrated_pedestal_value     = 0.0; // Estimated calibrated value of pedestal to be passed to RawDigits collection
+      float calibrated_pedestal_rms_value = 0.0; // Estimated calibrated value of pedestal RMS to be passed to RawDigits collection
 
+      // add pedestals
+      if ( fPedestalOn ) {
+        // Fetch the pedestal for this channel.
+        float ped_mean = pedestalProvider.PedMean(chan);
+        float ped_rms =  pedestalProvider.PedRms(chan);
+        for ( unsigned int itck=0; itck<signalSize; ++itck ) {
+          fChargeWork[itck] += ped_mean;
+        }
+        if ( ped_rms > 0 ) {
+          art::ServiceHandle<art::RandomNumberGenerator> rng;
+          CLHEP::HepRandomEngine &ped_engine = rng->getEngine("SimWireDUNEPedestal");
+          CLHEP::RandGaussQ rGauss_Ped(ped_engine, 0.0, ped_rms);
+          for ( unsigned int itck=0; itck<signalSize; ++itck ) {
+            double ped_variation = rGauss_Ped.fire();
+            fPedNoiseDist->Fill(ped_variation);
+            fChargeWork[itck] += ped_variation;
+          }
+        }
+        calibrated_pedestal_value = ped_mean;
+        calibrated_pedestal_rms_value = ped_rms;
+      }
 
+      // Convert floating ADC to count in ADC range.
+      for ( unsigned int itck=0; itck<signalSize; ++itck ) {
+        double chg = fChargeWork[itck];
+        short adc = (chg >=0) ? (short) (chg+0.5) : (short) (chg-0.5);
+        if ( adc > adcsaturation ) adc = adcsaturation;
+        if ( adc < 0 ) adc = 0;
+        adcvec[itck] = adc;
+      }
+      // Resize to the correct number of time samples, dropping extra samples.
       adcvec.resize(fNSamplesReadout);
-
-      float calibrated_pedestal_value = 0; // Estimated calibrated value of pedestal to be passed to RawDigits collection
-      float calibrated_pedestal_rms_value = 0; // Estimated calibrated value of pedestal RMS to be passed to RawDigits collection
-      //dla int calibrated_integer_pedestal_value = 0; // Estimated calibrated value of pedestal to be passed to data compression
-
-      // add pedestal values
-      if(fPedestalOn)
-        {
-          if(ped_rms>0){
-            art::ServiceHandle<art::RandomNumberGenerator> rng;
-            CLHEP::HepRandomEngine &engine = rng->getEngine();
-            CLHEP::RandGaussQ rGauss_Ped(engine, 0.0, ped_rms);
-            for(unsigned int i = 0; i < signalSize; ++i){
-              float ped_variation = rGauss_Ped.fire();
-              tmpfv = adcvec_a[i] + ped_mean + ped_variation;
-              
-              adcvec_a[i] = (short) tmpfv; 
-              
-            }
-          }
-          else{
-            for(unsigned int i = 0; i < signalSize; ++i){
-              tmpfv = adcvec_a[i] + ped_mean;
-              adcvec_a[i] = (short) tmpfv; 
-            }
-
-          }
-          
-
-
-          if (sigtype == geo::kInduction){
-            calibrated_pedestal_value = fInductionCalibPed;
-            calibrated_pedestal_rms_value = fInductionCalibPedRMS;
-          }
-          else if (sigtype == geo::kCollection){
-            calibrated_pedestal_value = fCollectionCalibPed;
-            calibrated_pedestal_rms_value = fCollectionCalibPedRMS;
-          }
-          
-        }
-      else{
-        calibrated_pedestal_value = 0;
-        calibrated_pedestal_rms_value = 0;
-
-      }
       
-      //dla calibrated_integer_pedestal_value = (int) calibrated_pedestal_value;
-      
-
+      // Add stuck bits.
       if ( fSimStuckBits ) {
 
           for ( size_t i = 0; i < adcvec.size(); ++i ) {
 
             art::ServiceHandle<art::RandomNumberGenerator> rng;
-            CLHEP::HepRandomEngine &engine = rng->getEngine();
-            CLHEP::RandFlat flat(engine);
+            CLHEP::HepRandomEngine& stuck_engine = rng->getEngine("SimWireDUNEStuck");
+            CLHEP::RandFlat stuck_flat(stuck_engine);
             
             
-            double rnd = flat.fire(0,1);
+            double rnd = stuck_flat.fire(0,1);
            
 
             unsigned int zeromask = 0xffc0;
             unsigned int onemask = 0x003f;
 
-            unsigned int sixlsbs = adcvec_a[i] & onemask;
+            unsigned int sixlsbs = adcvec[i] & onemask;
 
             int probability_index = (int)sixlsbs;
 
             if(rnd < fUnderflowProbs[probability_index]){
-              adcvec_a[i] = adcvec_a[i] | onemask; // 6 LSBs are stuck at 3F
-              adcvec_a[i] -= 64; // correct 1st MSB value by subtracting 64
+              adcvec[i] = adcvec[i] | onemask; // 6 LSBs are stuck at 3F
+              adcvec[i] -= 64; // correct 1st MSB value by subtracting 64
             }
             else if(rnd > fUnderflowProbs[probability_index] && rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index]){
-              adcvec_a[i] = adcvec_a[i] & zeromask; // 6 LSBs are stuck at 0
-              adcvec_a[i] += 64; // correct 1st MSB value by adding 64
+              adcvec[i] = adcvec[i] & zeromask; // 6 LSBs are stuck at 0
+              adcvec[i] += 64; // correct 1st MSB value by adding 64
             }
             //else adcvec value remains unchanged
          }
@@ -675,7 +614,7 @@ namespace detsim {
       m_pzs->filter(adcvec, chan, calibrated_pedestal_value, keep);
       int nkeep = 0;
       for ( bool kept : keep ) if ( kept ) ++nkeep;
-      m_pcmp->compress(adcvec, keep);
+      m_pcmp->compress(adcvec, keep, calibrated_pedestal_value);
       raw::Compress_t myCompression = raw::kNone;
 
       // Create and store raw digit.
@@ -701,7 +640,8 @@ namespace detsim {
   //-------------------------------------------------
   void SimWireDUNE::GenNoise(std::vector<float>& noise) {
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine();
+    //CLHEP::HepRandomEngine &engine = rng->getEngine();
+    CLHEP::HepRandomEngine &engine = rng->getEngine("SimWireDUNENoise");
     CLHEP::RandFlat flat(engine);
 
     noise.clear();
