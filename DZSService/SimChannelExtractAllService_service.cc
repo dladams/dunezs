@@ -16,9 +16,9 @@ SimChannelExtractAllService(const fhicl::ParameterSet&, art::ActivityRegistry&) 
 //**********************************************************************
 
 int SimChannelExtractAllService::
-extract(const sim::SimChannel& sc, Charge& fChargeWork, Charge&) const {
-  for ( size_t t=0; t<fChargeWork.size(); ++t ) {
-    fChargeWork[t] = sc.Charge(t);
+extract(const sim::SimChannel& sc, AdcSignalVector& sig, AdcSignalVector&) const {
+  for ( size_t itck=0; itck<sig.size(); ++itck ) {
+    sig[itck] = sc.Charge(itck);
   }
   return 0;
 }

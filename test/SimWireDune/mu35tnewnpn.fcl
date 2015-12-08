@@ -1,11 +1,13 @@
-# mu35told.fcl
+# mu35tnewnpn.fcl
 #
 # David Adams
-# November 2015
+# December 2015
 #
 # Script to generate reference raw data.
 #
 # Uses new simulation (SimWireDUNE) with low noise and new ZS.
+# 
+# Pedestal variations are not used.
 
 #include "services_dune.fcl"
 #include "singles_dune.fcl"
@@ -88,12 +90,10 @@ services.user.SeedService.largeant:  1003
 #services.user.SeedService.daq:       1005
 services.user.SeedService.daq: {
   SimWireDUNENoise:    1005
-  SimWireDUNEIndex:    1011
   SimWireDUNEPedestal: 1007
   SimWireDUNEStuck:    1009
 }
 #services.user.SeedService.SimWireDUNENoise:    1005
-#services.user.SeedService.SimWireDUNEIndex:    1011
 #services.user.SeedService.SimWireDUNEPedestal: 1007
 #services.user.SeedService.SimWireDUNEStuck:    1009
 
@@ -107,10 +107,6 @@ services.user.CompressReplaceService: { Zero: 0 }
 services.user.SimChannelExtractServiceBase: @local::scxall
 services.user.IDetPedestalService: @local::pedfixed
 
-# Specify the noise service.
-services.user.ChannelNoiseServiceBase: @local::chnoiseold
-
-#services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
-#services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0
-
 physics.producers.daq.PedestalOn: true
+services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
+services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0

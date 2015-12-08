@@ -132,4 +132,20 @@ pedfixed: {
   }
 }
 
+chnoiseold: {
+  service_provider: ExponentialChannelNoiseService
+  NoiseFactU: 0.05
+  NoiseFactV: 0.05
+  NoiseFactZ: 0.05
+  NoiseWidthU: 2000
+  NoiseWidthV: 2000
+  NoiseWidthZ: 2000
+  LowCutoffU: 7.5
+  LowCutoffV: 7.5
+  LowCutoffZ: 7.5
+  NoiseArrayPoints: 1000
+  OldNoiseIndex: true
+}
+
+
 END_PROLOG

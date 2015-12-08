@@ -53,14 +53,16 @@ extern "C" {
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGaussQ.h"
 
+#include "DZSCore/AdcTypes.h"
 #include "DZSInterface/ZeroSuppressServiceBase.h"
 #include "DZSService/CompressReplaceService.h"
 #include "DZSInterface/SimChannelExtractServiceBase.h"
+#include "DZSInterface/ChannelNoiseServiceBase.h"
 
 #include "CalibrationDBI/Interface/IDetPedestalService.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
 
-#define OLDNOISE1
+#undef  OLDNOISE1
 
 ///Detector simulation of raw signals on wires 
 namespace detsim {
@@ -114,7 +116,7 @@ namespace detsim {
     unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
     unsigned int           fNTimeSamples;     ///< number of ADC readout samples in all readout frames (per event)
   
-    std::vector<double>    fChargeWork;
+    std::vector<AdcSignal>    fChargeWork;
 #ifdef OLDNOISE1
     std::vector< std::vector<float> > fNoiseZ;///< noise on each channel for each time for Z (collection) plane
     std::vector< std::vector<float> > fNoiseU;///< noise on each channel for each time for U plane
@@ -165,6 +167,9 @@ namespace detsim {
     art::ServiceHandle<ZeroSuppressBase> m_pzs;
     art::ServiceHandle<CompressReplaceService> m_pcmp;
     art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
+#ifndef OLDNOISE1
+    art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
+#endif
 
   }; // class SimWireDUNE
 
@@ -236,7 +241,9 @@ namespace detsim {
     fInductionCalibPedRMS  = p.get< float                >("InductionCalibPedRMS");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
     art::ServiceHandle<util::DetectorProperties> detprop;
+#ifdef OLDNOISE1
     fSampleRate       = detprop->SamplingRate();
+#endif
     fNSamplesReadout  = detprop->ReadOutWindowSize();
     fNTimeSamples  = detprop->NumberTimeSamples();
     
@@ -261,7 +268,9 @@ namespace detsim {
     art::ServiceHandle<art::TFileService> tfs;
 
     fNoiseDist     = tfs->make<TH1F>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
+#ifdef OLDNOISE1
     fNoiseChanDist = tfs->make<TH1F>("NoiseChan", ";Noise channel;", fNoiseArrayPoints, 0, fNoiseArrayPoints);
+#endif
     fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
 
 
@@ -437,15 +446,18 @@ namespace detsim {
     fChargeWork.resize(signalSize, 0.);
           
  
-    std::vector<double> fChargeWorkCollInd;
+    std::vector<AdcSignal> fChargeWorkCollInd;
 
     art::ServiceHandle<util::LArFFT> fFFT;
 
     // Add all channels  
     art::ServiceHandle<art::RandomNumberGenerator> rng;
+#if 0
     //CLHEP::HepRandomEngine& noise_engine = rng->getEngine();
     CLHEP::HepRandomEngine& noise_engine = rng->getEngine("SimWireDUNENoise");
+    noise_engine.showStatus();
     CLHEP::RandFlat noise_flat(noise_engine);
+#endif
 
     std::map<int,double>::iterator mapIter;      
 
@@ -491,6 +503,7 @@ namespace detsim {
 
       // Add noise to each tick in the channel.
       if ( fNoiseOn && fNoiseModel==1 ) {              
+#ifdef OLDNOISE1
         // Noise was already generated for each wire in the event
         // raw digit vec is already in channel order
         // pick a new "noise channel" for every channel -- this makes sure    
@@ -503,6 +516,7 @@ namespace detsim {
         // The relative weights of the first and last channels are 0.5 and 0.6.
         unsigned int noisechan = nearbyint(flat.fire()*(1.*(fNoiseArrayPoints-1)+0.1));
         fNoiseChanDist->Fill(noisechan);
+        //mf::LogInfo("SimWireDUNE") << "chan/noisechan = " << chan << "/" << noisechan;
         for ( unsigned int itck=0; itck<signalSize; ++itck ) {
           double tnoise = 0.0;
           if      ( view==geo::kU ) tnoise = fNoiseU[noisechan][itck];
@@ -510,6 +524,9 @@ namespace detsim {
           else                      tnoise = fNoiseZ[noisechan][itck];
           fChargeWork[itck] += tnoise;
         }
+#else
+        m_pcns->addNoise(chan, fChargeWork);
+#endif
       } else if ( fNoiseOn && fNoiseModel==2 ) {
         float fASICGain      = sss->GetASICGain(chan);  
         double fShapingTime   = sss->GetShapingTime(chan);
@@ -678,7 +695,7 @@ namespace detsim {
     // multiply each noise value by fNTicks as the InvFFT 
     // divides each bin by fNTicks assuming that a forward FFT
     // has already been done.
-    for(unsigned int i = 0; i < noise.size(); ++i) noise[i] *= 1.*fNTicks;
+    for(unsigned int i = 0; i < noise.size(); ++i) noise[i] *= fNTicks;
 
     return;
   }

@@ -11,34 +11,32 @@
 
 #include <string>
 #include <iostream>
-#include <vector>
+#include "AdcTypes.h"
 
 class CompressReplace {
 
 public:
 
   typedef unsigned int Index;
-  typedef short Signal;
-  typedef std::vector<Signal> SignalVector;
   typedef std::vector<bool> FilterVector;
 
   // Ctor from the five parameters that characterize the algorithm.
-  CompressReplace(Signal azero =0);
+  CompressReplace(AdcCount azero =0);
 
   // Return the value assigned to suppressed channels.
-  Signal zero() const;
+  AdcCount zero() const;
 
   // Apply a filter to a signal vector.
   // Filtered-out signals are replaced with the value offset + zero().
   // Returns nonzero for error.
-  int compress(SignalVector& sigs, const FilterVector& keep, Signal offset) const;
+  int compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset) const;
 
   // Display the signal parameters.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;
 
 private:
 
-  Signal m_zero;
+  AdcCount m_zero;
 
 };
 

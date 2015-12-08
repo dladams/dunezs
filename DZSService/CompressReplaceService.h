@@ -34,9 +34,9 @@ public:
 
   // Compress a vector of signals.
   // Suppressed signals are replaced with the value of offset + (FCL parameter) Zero.
-  int compress(CompressReplace::SignalVector& sigs,
+  int compress(AdcCountVector& sigs,
                const CompressReplace::FilterVector& keep,
-               CompressReplace::Signal offset) const;
+               AdcCount offset) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;

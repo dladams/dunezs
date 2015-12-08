@@ -6,7 +6,7 @@
 // Interface for a service that extracts charge from
 // a SimChannel object and assigns it to ticks.
 //
-// The charge is distributed over two arrays: chg and xchg.
+// The charge is distributed over two arrays: sig and xsig.
 // The first is for normal collection/induction. The second
 // is for charge that is collected on the wire even if it is
 // an induction plane.
@@ -28,7 +28,7 @@ public:
 
   SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
-  int extract(const sim::SimChannel& sc, Charge& chg, Charge& xchg) const;
+  int extract(const sim::SimChannel& sc, AdcSignalVector& sig, AdcSignalVector& xsig) const;
 
 private:
 

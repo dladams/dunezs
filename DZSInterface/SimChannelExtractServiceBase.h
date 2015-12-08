@@ -15,6 +15,7 @@
 #define SimChannelExtractServiceBase_H
 
 #include <vector>
+#include "DZSCore/AdcTypes.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 namespace sim {
@@ -25,11 +26,9 @@ class SimChannelExtractServiceBase {
 
 public:
 
-  typedef std::vector<double> Charge;
-
   virtual ~SimChannelExtractServiceBase();
 
-  virtual int extract(const sim::SimChannel& sc, Charge& chg, Charge& xchg) const =0;
+  virtual int extract(const sim::SimChannel& sc, AdcSignalVector& sig, AdcSignalVector& xsig) const =0;
 
 };
 

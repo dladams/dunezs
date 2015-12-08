@@ -10,9 +10,6 @@ using std::ostream;
 using std::endl;
 
 typedef ZeroSuppressBase::Index        Index;
-typedef ZeroSuppressBase::Signal       Signal;
-typedef AdcCodeHelper::FloatSignal     FloatSignal;
-typedef ZeroSuppressBase::SignalVector SignalVector;
 typedef ZeroSuppressBase::ResultVector ResultVector;
 
 //**********************************************************************
@@ -28,7 +25,7 @@ ZeroSuppressFixedService::ZeroSuppressFixedService() { }
 //**********************************************************************
 
 int ZeroSuppressFixedService::
-filter(const SignalVector& sigs, Channel, FloatSignal&, ResultVector& keep) const {
+filter(const AdcCountVector& sigs, Channel, AdcPedestal&, ResultVector& keep) const {
   keep.clear();
   keep.resize(sigs.size(), true);
   return 0;

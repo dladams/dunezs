@@ -6,8 +6,6 @@
 using std::string;
 using std::ostream;
 
-typedef CompressReplace::Signal Signal;
-typedef CompressReplace::SignalVector SignalVector;
 typedef CompressReplace::FilterVector FilterVector;
 typedef CompressReplace::Index Index;
 
@@ -15,15 +13,14 @@ typedef CompressReplace::Index Index;
 
 CompressReplaceService::
 CompressReplaceService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) {
-  Signal zero = 0;
-  pset.get_if_present<Signal>("Zero", zero);
-  pset.get_if_present<Signal>("Option", zero);
+  AdcCount zero = 0;
+  pset.get_if_present<AdcCount>("Zero", zero);
   m_pact.reset(new CompressReplace(zero));
 }
   
 //**********************************************************************
 
-int CompressReplaceService::compress(SignalVector& sigs, const FilterVector& keep, Signal offset) const {
+int CompressReplaceService::compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset) const {
   if ( m_pact.get() == nullptr ) {
     throw cet::exception(__FUNCTION__) << "Compression is not configured properly.";
   }

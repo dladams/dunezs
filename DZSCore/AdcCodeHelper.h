@@ -15,37 +15,36 @@
 #ifndef AdcCodeHelper_H
 #define AdcCodeHelper_H
 
+#include "AdcTypes.h"
+
 class AdcCodeHelper {
 
 public:
 
-  typedef short Signal;
-  typedef float FloatSignal;
-
   // Ctor.
-  AdcCodeHelper(Signal aSuppressedSignalMax =0);
+  AdcCodeHelper(AdcCount aSuppressedSignalMax =0);
 
   // Return if the sticky bits are set.
-  bool hasStickyBits(Signal sig);
+  bool hasStickyBits(AdcCount sig);
 
   // Return if |pedsig| < SuppressedSignalMax.
   // Returns true if SuppressedSignalMax <= 0.
-  bool isSmall(Signal sig, FloatSignal ped =0.0);
+  bool isSmall(AdcCount sig, AdcSignal ped =0.0);
 
   // Convert a float signal to an integer signal.
-  Signal intSignal(FloatSignal fsig) const;
+  AdcCount intSignal(AdcSignal fsig) const;
 
   // Return a pedestal-subtracted signal.
-  FloatSignal subtract(Signal sig, FloatSignal ped) const;
+  AdcSignal subtract(AdcCount sig, AdcSignal ped) const;
 
   // Return a pedestal-subtracted signal as an integer.
-  Signal intSubtract(Signal sig, FloatSignal ped) const;
+  AdcCount intSubtract(AdcCount sig, AdcSignal ped) const;
 
 private:
 
   // Properties.
-  Signal m_SupresssedValue;
-  FloatSignal m_SuppressedSignalMax;
+  AdcCount m_SupresssedValue;
+  AdcSignal m_SuppressedSignalMax;
 
 };
   

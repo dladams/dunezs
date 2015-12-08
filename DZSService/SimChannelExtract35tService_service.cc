@@ -37,7 +37,7 @@ SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegist
 //**********************************************************************
 
 int SimChannelExtract35tService::
-extract(const sim::SimChannel& sc, Charge& fChargeWork, Charge& fChargeWorkCollInd) const {
+extract(const sim::SimChannel& sc, AdcSignalVector& fChargeWork, AdcSignalVector& fChargeWorkCollInd) const {
   string fname = "SimChannelExtract35tService::extract";
   art::ServiceHandle<geo::Geometry> geo;
   unsigned int chan = sc.Channel();

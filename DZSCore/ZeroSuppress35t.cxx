@@ -15,9 +15,6 @@ using std::vector;
 using std::setw;
 
 typedef ZeroSuppressBase::Index        Index;
-typedef ZeroSuppressBase::Signal       Signal;
-typedef ZeroSuppressBase::Pedestal     Pedestal;
-typedef ZeroSuppressBase::SignalVector SignalVector;
 typedef ZeroSuppressBase::ResultVector ResultVector;
 
 // Signal state.
@@ -33,14 +30,14 @@ namespace {
 // If skipStuck, the stuck bins do not contribute to sum or count.
 // Bins with sig <= thresh, do not contribute to sum.
 struct RunningSum {
-  RunningSum(const SignalVector& sigs, Pedestal ped, Index isig, Index ns, Signal thresh, bool skipStuck);
-  Signal sigsum;
+  RunningSum(const AdcCountVector& sigs, AdcPedestal ped, Index isig, Index ns, AdcCount thresh, bool skipStuck);
+  AdcCount sigsum;
   Index count;
   SignalTypeConverter sigcon;
 };
 
 RunningSum::
-RunningSum(const SignalVector& sigs, Pedestal ped, Index isig, Index nsig, Signal thresh, bool skipStuck) {
+RunningSum(const AdcCountVector& sigs, AdcPedestal ped, Index isig, Index nsig, AdcCount thresh, bool skipStuck) {
   sigsum = 0;
   count = 0;
   Index jsig1 = 0;
@@ -48,8 +45,8 @@ RunningSum(const SignalVector& sigs, Pedestal ped, Index isig, Index nsig, Signa
   Index jsig2 = isig;
   if ( jsig2 > sigs.size() ) jsig2 = sigs.size();
   for ( Index jsig=jsig1; jsig<jsig2; ++jsig ) {
-    Signal rawsig = sigs[jsig];
-    Signal sig = sigcon.convert<Signal>(rawsig - ped);
+    AdcCount rawsig = sigs[jsig];
+    AdcCount sig = sigcon.convert<AdcCount>(rawsig - ped);
     if ( skipStuck ) {
       Index lsb = rawsig & 0x3f;
       if ( lsb == 0 ) continue;
@@ -75,18 +72,18 @@ string sstate(SigState state) {
 
 //**********************************************************************
 
-ZeroSuppress35t::ZeroSuppress35t(Signal ts, Signal tl, Signal td,
+ZeroSuppress35t::ZeroSuppress35t(AdcCount ts, AdcCount tl, AdcCount td,
                                  Index ns, Index nl, Index nd, Index nt)
 : m_ts(ts), m_tl(tl), m_td(td), m_ns(ns), m_nl(nl), m_nd(nd), m_nt(nt), m_dbg(false) { }
 
 //**********************************************************************
 
 int ZeroSuppress35t::
-filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const {
+filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, ResultVector& keep) const {
   const string myname = "ZeroSuppress35t::filter: ";
   if ( m_dbg ) cout << "Filtering signal array of size " << sigs.size() << endl;
   bool m_skipStuck = false;
-  Signal m_ts = 0;
+  AdcCount m_ts = 0;
   unsigned int nsig = sigs.size();
   keep.clear();
   keep.resize(nsig, false);
@@ -94,16 +91,16 @@ filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep
   SigState state = OUT;
   unsigned int nlow = 0;
   for ( unsigned int isig=0; isig<nsig; ++isig ) {
-    Signal sig = sigs[isig];
+    AdcCount sig = sigs[isig];
     // Evaluate a running signal sum of the preceding m_nl signals.
     RunningSum rs(sigs, ped, isig, m_ns, m_ts, m_skipStuck);
-    Signal asigsum = std::abs(rs.sigsum);
+    AdcCount asigsum = std::abs(rs.sigsum);
     if ( m_dbg ) cout << setw(3) << isig << setw(6) << sig << setw(5) << sstate(state);
     // Last tick is outside a signal.
     if ( state == OUT || state == END ) {
       // If this tick is above TL, we are in the live region of a signal.
       // Keep the NL preceding signals.
-      Signal sumthresh = m_tl*rs.count;
+      AdcCount sumthresh = m_tl*rs.count;
       if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
       if ( asigsum > sumthresh ) {
         state = LIVE;
@@ -118,7 +115,7 @@ filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep
       }
     } else {
       // Last tick is is in the live region of a signal.
-      Signal sumthresh = m_td*rs.count;
+      AdcCount sumthresh = m_td*rs.count;
       if ( m_dbg ) cout << " RS sum/thresh=" << setw(3) << rs.sigsum << "/" << setw(3) << sumthresh;
         if ( state == LIVE ) {
         // If this tick is below TD, we are in the dead region of a signal.

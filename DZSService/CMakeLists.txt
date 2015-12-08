@@ -38,7 +38,11 @@ simple_plugin(SimChannelExtractAllService   "service"
              )
 simple_plugin(ExponentialChannelNoiseService   "service"
                 DZSInterface
-                art_Framework_Services_Optional_RandomNumberGenerator_service
+                Geometry
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
+                ${SEEDSERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
                 ${ART_UTILITIES}
                 ${CLHEP}

@@ -9,25 +9,23 @@ using std::ostream;
 using std::endl;
 using std::vector;
 
-typedef CompressReplace::Signal Signal;
-typedef CompressReplace::SignalVector SignalVector;
 typedef CompressReplace::FilterVector FilterVector;
 
 //**********************************************************************
 
-CompressReplace::CompressReplace(Signal azero)
+CompressReplace::CompressReplace(AdcCount azero)
 : m_zero(azero) { }
 
 //**********************************************************************
 
-Signal CompressReplace::zero() const {
+AdcCount CompressReplace::zero() const {
   return m_zero;
 }
 
 //**********************************************************************
 
 int CompressReplace::
-compress(SignalVector& sigs, const FilterVector& keep, Signal offset) const {
+compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset) const {
   for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
     if ( ! keep[isig] ) sigs[isig] = zero() + offset;
   }

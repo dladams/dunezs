@@ -58,14 +58,14 @@ int test_ZeroSuppress35tLegacyService() {
   pzs->print();
 
   cout << myname << "Create ADC data." << endl;
-  ZeroSuppressBase::SignalVector indata = { 1,  0, -2, -1,  1,  1, -1,  3, -1,  2,
-                                            6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
-                                            2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
+  AdcCountVector indata = { 1,  0, -2, -1,  1,  1, -1,  3, -1,  2,
+                            6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
+                            2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
   cout << myname << "Add pedestal." << endl;
   float ped = 211.2;
   short iped = short(ped);
   cout << "Pedestal: " << ped << endl;
-  for ( ZeroSuppressBase::Signal& data : indata ) data += iped;
+  for ( AdcCount& data : indata ) data += iped;
   cout << myname << "Suppressing." << endl;
   ZeroSuppressBase::ResultVector keep;
   assert( pzs->filter(indata, 1234, ped, keep) == 0 );

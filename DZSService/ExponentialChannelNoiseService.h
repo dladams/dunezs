@@ -11,17 +11,20 @@
 #include <vector>
 #include <iostream>
 
+class TH1;
+namespace CLHEP {
+class HepRandomEngine;
+}
+
 class ExponentialChannelNoiseService : public ChannelNoiseServiceBase {
 
 public:
-
-  typedef std::vector<SignalVector> SignalVectorVector;
 
   // Ctor.
   ExponentialChannelNoiseService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
   // Add noise to a signal array.
-  int addNoise(Channel chan, SignalVector& sigs) const;
+  int addNoise(Channel chan, AdcSignalVector& sigs) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
@@ -29,7 +32,7 @@ public:
   // Fill a noise vector.
   // Input vector contents are lost.
   // The size of the vector is obtained from the FFT service.
-  void generateNoise(float aNoiseFact, float aNoiseWidth, float aLowCutoff, SignalVector& noise) const;
+  void generateNoise(float aNoiseFact, float aNoiseWidth, float aLowCutoff, AdcSignalVector& noise) const;
 
 private:
  
@@ -47,12 +50,18 @@ private:
   float        fNoiseWidthV;       ///< exponential noise width (kHz)   for V plane
   float        fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
   unsigned int fNoiseArrayPoints;  ///< number of points in randomly generated noise array
+  bool         fOldNoiseIndex;     ///< Use old selection of noise array index
 
   // Noise arrays.
-  SignalVectorVector fNoiseZ;  ///< noise on each channel for each time for Z (collection) plane
-  SignalVectorVector fNoiseU;  ///< noise on each channel for each time for U plane
-  SignalVectorVector fNoiseV;  ///< noise on each channel for each time for V plane
+  AdcSignalVectorVector fNoiseZ;  ///< noise on each channel for each time for Z (collection) plane
+  AdcSignalVectorVector fNoiseU;  ///< noise on each channel for each time for U plane
+  AdcSignalVectorVector fNoiseV;  ///< noise on each channel for each time for V plane
 
+  // Histograms.
+  TH1* fNoiseHist;      ///< distribution of noise counts
+  TH1* fNoiseChanHist;  ///< distribution of accessed noise samples
+
+  CLHEP::HepRandomEngine* m_pran;
 
 };
 

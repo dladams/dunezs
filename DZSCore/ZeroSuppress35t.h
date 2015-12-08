@@ -22,13 +22,13 @@ class ZeroSuppress35t : public ZeroSuppressBase {
 public:
 
   // Ctor from the five parameters that characterize the algorithm.
-  ZeroSuppress35t(Signal ts, Signal tl, Signal td, Index ns, Index nl, Index nd, Index nt);
+  ZeroSuppress35t(AdcCount ts, AdcCount tl, AdcCount td, Index ns, Index nl, Index nd, Index nt);
 
   // Apply the ZS filter to a signal vector.
   // Entries in the result vector indicate whether the corresponding
   // ADC entry should be retained.
   // Returns nonzero for error.
-  int filter(const SignalVector& sigs, Channel chan, Pedestal& ped, ResultVector& keep) const;
+  int filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, ResultVector& keep) const;
 
   // Display the signal parameters.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
@@ -37,9 +37,9 @@ public:
 
 private:
 
-  Signal m_ts;
-  Signal m_tl;
-  Signal m_td;
+  AdcCount m_ts;
+  AdcCount m_tl;
+  AdcCount m_td;
   Index m_ns;
   Index m_nl;
   Index m_nd;

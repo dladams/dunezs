@@ -25,16 +25,16 @@ int main() {
   abort();
 #endif
   cout << myname << "Creating suppressor." << endl;
-  CompressReplace::Signal zero = 999;
+  AdcCount zero = 999;
   CompressReplace zs(zero);
   zs.print();
   cout << myname << "Checking zero." << endl;
   assert( zs.zero() == zero );
   cout << myname << "Compressing." << endl;
-  CompressReplace::SignalVector indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
-                                           6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
-                                           2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
-  CompressReplace::SignalVector outdata(indata);
+  AdcCountVector indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
+                            6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
+                            2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
+  AdcCountVector outdata(indata);
   CompressReplace::FilterVector keep(30, false);
   unsigned int isig = 0;
   for ( isig= 6; isig<28; ++isig ) keep[isig] = true;

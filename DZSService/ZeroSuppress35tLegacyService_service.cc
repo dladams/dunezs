@@ -10,9 +10,6 @@ using std::ostream;
 using std::endl;
 
 typedef ZeroSuppressBase::Index        Index;
-typedef ZeroSuppressBase::Signal       Signal;
-typedef AdcCodeHelper::FloatSignal     FloatSignal;
-typedef ZeroSuppressBase::SignalVector SignalVector;
 typedef ZeroSuppressBase::ResultVector ResultVector;
 
 namespace {
@@ -49,15 +46,15 @@ ZeroSuppress35tLegacyService(float aAdcThreshold,
 //**********************************************************************
 
 int ZeroSuppress35tLegacyService::
-filter(const SignalVector& sigs, Channel, FloatSignal& ped, ResultVector& keep) const {
+filter(const AdcCountVector& sigs, Channel, AdcPedestal& ped, ResultVector& keep) const {
   const unsigned int nsig = sigs.size();
   keep.clear();
   keep.resize(nsig, false);
   if ( nsig == 0 ) return 0;
   AdcCodeHelper ach(64);
   for ( unsigned int isig=0; isig<nsig; ++isig ) {
-    Signal rawsig = sigs[isig];
-    FloatSignal pedsig = ach.subtract(ped, rawsig);
+    AdcCount rawsig = sigs[isig];
+    AdcSignal pedsig = ach.subtract(ped, rawsig);
     if ( m_SuppressStickyBits ) {
       if ( ach.hasStickyBits(rawsig) && ach.isSmall(pedsig) ) {
         std::cout << "ZeroSuppress35tLegacyService::filter: Suppressing sticky ADC value " << pedsig

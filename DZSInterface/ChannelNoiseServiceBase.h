@@ -9,6 +9,7 @@
 #define ChannelNoiseServiceBase_H
 
 #include <vector>
+#include "DZSCore/AdcTypes.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 class ChannelNoiseServiceBase {
@@ -16,11 +17,12 @@ class ChannelNoiseServiceBase {
 public:
 
   typedef unsigned int Channel;
-  typedef std::vector<float> SignalVector;
 
   virtual ~ChannelNoiseServiceBase();
 
-  virtual int addNoise(Channel chan, SignalVector& sigs) const =0;
+  // Add noise to a signal vector sigs appropriate for channel chan.
+  // Noise is added for all entries in the input vector.
+  virtual int addNoise(Channel chan, AdcSignalVector& sigs) const =0;
 
 };
 
