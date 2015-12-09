@@ -91,7 +91,7 @@ namespace detsim {
 
     void         GenNoise(std::vector<float>& array);
 
-    std::string            fDriftEModuleLabel;///< module making the ionization electrons
+   std::string            fDriftEModuleLabel;///< module making the ionization electrons
     unsigned int           fNoiseOn;          ///< noise turned on or off for debugging; default is on
     unsigned int           fNoiseModel;          ///< noise model>
     int                    fNTicks;           ///< number of ticks of the clock
@@ -117,14 +117,6 @@ namespace detsim {
     //define max ADC value - if one wishes this can
     //be made a fcl parameter but not likely to ever change
     const float adcsaturation = 4095;
-    float                  fCollectionPed;    ///< ADC value of baseline for collection plane
-    float                  fCollectionPedRMS;    ///< ADC value of baseline RMS for collection plane
-    float                  fInductionPed;     ///< ADC value of baseline for induction plane
-    float                  fInductionPedRMS;     ///< ADC value of baseline RMS for induction plane
-    float                  fCollectionCalibPed;  ///< Assumed measured value for coll plane pedestal
-    float                  fCollectionCalibPedRMS;  ///< Assumed measured value for coll plane pedestal RMS
-    float                  fInductionCalibPed;     ///< Assumed measured value for ind plane pedestal
-    float                  fInductionCalibPedRMS;     ///< Assumed measured value for ind plane pedestal RMS
     bool                   fPedestalOn;          ///< switch for simulation of nonzero pedestals
 
     // input fcl parameters
@@ -183,16 +175,8 @@ namespace detsim {
   //-------------------------------------------------
   void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
     fDriftEModuleLabel= p.get< std::string         >("DriftEModuleLabel");
-    fNoiseOn           = p.get< unsigned int        >("NoiseOn");
+    fNoiseOn           = p.get<bool>("NoiseOn");
     fNoiseModel           = p.get< unsigned int     >("NoiseModel");
-    fCollectionPed    = p.get< float                >("CollectionPed");
-    fCollectionPedRMS = p.get< float                >("CollectionPedRMS");
-    fInductionPed     = p.get< float                >("InductionPed");
-    fInductionPedRMS  = p.get< float                >("InductionPedRMS");
-    fCollectionCalibPed    = p.get< float                >("CollectionCalibPed");
-    fCollectionCalibPedRMS = p.get< float                >("CollectionCalibPedRMS");
-    fInductionCalibPed     = p.get< float                >("InductionCalibPed");
-    fInductionCalibPedRMS  = p.get< float                >("InductionCalibPedRMS");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
     art::ServiceHandle<util::DetectorProperties> detprop;
     fNSamplesReadout  = detprop->ReadOutWindowSize();
@@ -345,30 +329,17 @@ namespace detsim {
     // digits to be transferred to the art::Event after the put statement below
     std::unique_ptr< std::vector<raw::RawDigit>   >  digcol(new std::vector<raw::RawDigit>);
           
-    unsigned int chan = 0; 
     fChargeWork.clear();
     fChargeWork.resize(signalSize, 0.);
-          
- 
     std::vector<AdcSignal> fChargeWorkCollInd;
 
     art::ServiceHandle<util::LArFFT> fFFT;
+    art::ServiceHandle<art::RandomNumberGenerator> rng;
 
     // Add all channels  
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-#if 0
-    //CLHEP::HepRandomEngine& noise_engine = rng->getEngine();
-    CLHEP::HepRandomEngine& noise_engine = rng->getEngine("SimWireDUNENoise");
-    noise_engine.showStatus();
-    CLHEP::RandFlat noise_flat(noise_engine);
-#endif
-
     std::map<int,double>::iterator mapIter;      
-
-
     unsigned int plane_number = 0;
-
-    for ( chan = 0; chan<geo->Nchannels(); ++chan ) {    
+    for ( unsigned int chan = 0; chan<geo->Nchannels(); ++chan ) {    
  
       fChargeWork.clear();    
       fChargeWork.resize(fNTimeSamples, 0.);    

@@ -114,3 +114,4 @@ services.user.ChannelNoiseServiceBase: @local::chnoiseold
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0
 
 physics.producers.daq.PedestalOn: true
+physics.producers.daq.NoiseOn: true

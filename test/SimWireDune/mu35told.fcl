@@ -8,7 +8,7 @@
 #include "services_dune.fcl"
 #include "singles_dune.fcl"
 #include "largeantmodules_dune.fcl"
-#include "new_detsimmodules_dune.fcl"
+#include "old_detsimmodules_dune.fcl"
 
 process_name: SinglesGen
 

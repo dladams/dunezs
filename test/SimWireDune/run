@@ -52,7 +52,12 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   echo
   echo Generating reference histograms.
   echo " Start: "`date`
-  COM="lar -c perf35t.fcl -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root"
+  if echo $SAMPLE | grep old 1>/dev/null; then
+    FCL=perf35told.fcl
+  else
+    FCL=perf35t.fcl
+  fi
+  COM="lar -c $FCL -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root"
   echo $COM
   $COM 2>&1 >${SAMPLE}perf.log
   STAT=$?

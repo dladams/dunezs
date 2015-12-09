@@ -1,0 +1,33 @@
+# old_detsimmodules_dune.fcl
+#
+# David Adams
+# November 2015
+#
+# Default configuration for SimWireDUNE.35t
+
+# Start with the 10kt configuration (for now).
+#include "detsimmodules_dune.fcl"
+
+BEGIN_PROLOG
+
+# Add the Calib pedestal info in case these are not yet
+# present in the current release.
+dune35t_simwire.CollectionCalibPed:     500
+dune35t_simwire.CollectionCalibPedRMS:    0.01
+dune35t_simwire.InductionCalibPed:     1800
+dune35t_simwire.InductionCalibPedRMS:     0.01
+
+# Change the noise model. Higher freq.
+# RMS = Gaussian sigma = 2.53 ADC counts.
+dune35t_simwire.NoiseModel:     1
+dune35t_simwire.NoiseWidthU:  2000
+dune35t_simwire.NoiseWidthV:  2000
+dune35t_simwire.NoiseWidthZ:  2000
+dune35t_simwire.NoiseFactU:   0.05
+dune35t_simwire.NoiseFactV:   0.05
+dune35t_simwire.NoiseFactZ:   0.05
+dune35t_simwire.LowCutoffU:    7.5
+dune35t_simwire.LowCutoffV:    7.5
+dune35t_simwire.LowCutoffZ:    7.5
+
+END_PROLOG

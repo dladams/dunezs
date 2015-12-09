@@ -5,36 +5,20 @@
 #
 # Default configuration for SimWireDUNE.
 
-# Start with the 10kt configuration (for now).
-#include "detsimmodules_dune.fcl"
-
 BEGIN_PROLOG
 
-# Change the noise model. Higher freq.
-# RMS = Gaussian sigma = 2.53 ADC counts.
-dune35t_simwire.NoiseModel:     1
-dune35t_simwire.NoiseWidthU:  2000
-dune35t_simwire.NoiseWidthV:  2000
-dune35t_simwire.NoiseWidthZ:  2000
-dune35t_simwire.NoiseFactU:   0.05
-dune35t_simwire.NoiseFactV:   0.05
-dune35t_simwire.NoiseFactZ:   0.05
-dune35t_simwire.LowCutoffU:    7.5
-dune35t_simwire.LowCutoffV:    7.5
-dune35t_simwire.LowCutoffZ:    7.5
-
-# Start with the setting for the old module.
-dune35tnew_simwire: @local::dune35t_simwire
-
-# Change the module name.
-dune35tnew_simwire.module_type: "SimWireDUNE"
-
-# Add the Calib pedestal info in case these are not yet
-# present in the current release.
-dune35tnew_simwire.CollectionCalibPed:     500
-dune35tnew_simwire.CollectionCalibPedRMS:    0.01
-dune35tnew_simwire.InductionCalibPed:     1800
-dune35tnew_simwire.InductionCalibPedRMS:     0.01
+dune35tnew_simwire: { 
+  module_type:        "SimWireDUNE"
+  DriftEModuleLabel:  "largeant"
+  CompressionType:    "ZeroSuppression"       #could also be none
+  NoiseOn:             true
+  NoiseModel:          1        #1 for original model, 2 for a model similar to uBooNE
+  SaveEmptyChannel:   true      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
+  SimStuckBits:       false        #simulate stuck bits
+  StuckBitsProbabilitiesFname:     "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
+  StuckBitsOverflowProbHistoName:     "pCorrFracOverflowVsInputLsbCell"
+  StuckBitsUnderflowProbHistoName:     "pCorrFracUnderflowVsInputLsbCell"
+}
 
 zsnone: {
   service_provider: ZeroSuppressFixedService
