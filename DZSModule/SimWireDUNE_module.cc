@@ -62,7 +62,7 @@ extern "C" {
 #include "CalibrationDBI/Interface/IDetPedestalService.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
 
-#undef  OLDNOISE1
+#define OLDNOISE2
 
 ///Detector simulation of raw signals on wires 
 namespace detsim {
@@ -94,34 +94,11 @@ namespace detsim {
     std::string            fDriftEModuleLabel;///< module making the ionization electrons
     unsigned int           fNoiseOn;          ///< noise turned on or off for debugging; default is on
     unsigned int           fNoiseModel;          ///< noise model>
-#ifdef OLDNOISE1
-    float                  fNoiseFact;        ///< noise scale factor
-    float                  fNoiseWidth;       ///< exponential noise width (kHz)
-    float                  fLowCutoff;        ///< low frequency filter cutoff (kHz)
-    float                  fNoiseFactZ;        ///< noise scale factor for Z (collection) plane
-    float                  fNoiseWidthZ;       ///< exponential noise width (kHz)  for Z (collection) plane
-    float                  fLowCutoffZ;        ///< low frequency filter cutoff (kHz) for Z (collection) plane
-    float                  fNoiseFactU;        ///< noise scale factor  for U plane
-    float                  fNoiseWidthU;       ///< exponential noise width (kHz)   for U plane
-    float                  fLowCutoffU;        ///< low frequency filter cutoff (kHz)  for U plane
-    float                  fNoiseFactV;        ///< noise scale factor   for V plane
-    float                  fNoiseWidthV;       ///< exponential noise width (kHz)   for V plane
-    float                  fLowCutoffV;        ///< low frequency filter cutoff (kHz)  for V plane
-    unsigned int           fNoiseArrayPoints; ///< number of  points in randomly generated noise array
-#endif
     int                    fNTicks;           ///< number of ticks of the clock
-#ifdef OLDNOISE1
-    double                 fSampleRate;       ///< sampling rate in ns
-#endif
     unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
     unsigned int           fNTimeSamples;     ///< number of ADC readout samples in all readout frames (per event)
   
     std::vector<AdcSignal>    fChargeWork;
-#ifdef OLDNOISE1
-    std::vector< std::vector<float> > fNoiseZ;///< noise on each channel for each time for Z (collection) plane
-    std::vector< std::vector<float> > fNoiseU;///< noise on each channel for each time for U plane
-    std::vector< std::vector<float> > fNoiseV;///< noise on each channel for each time for V plane
-#endif
     
     TH1*                fNoiseDist;          ///< distribution of noise counts
     TH1*                fNoiseChanDist;      ///< distribution of noise channels
@@ -163,13 +140,11 @@ namespace detsim {
     double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
     double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
 
-    // New properties.
+    // New services.
     art::ServiceHandle<ZeroSuppressBase> m_pzs;
     art::ServiceHandle<CompressReplaceService> m_pcmp;
     art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
-#ifndef OLDNOISE1
     art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
-#endif
 
   }; // class SimWireDUNE
 
@@ -203,32 +178,11 @@ namespace detsim {
   SimWireDUNE::~SimWireDUNE() {
 
     fChargeWork.clear();
- 
-#ifdef OLDNOISE1
-    for(unsigned int i = 0; i < fNoiseZ.size(); ++i) fNoiseZ[i].clear();
-    fNoiseZ.clear();
-    for(unsigned int i = 0; i < fNoiseU.size(); ++i) fNoiseU[i].clear();
-    fNoiseU.clear();
-    for(unsigned int i = 0; i < fNoiseV.size(); ++i) fNoiseV[i].clear();
-    fNoiseV.clear();
-#endif
   }
 
   //-------------------------------------------------
   void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
     fDriftEModuleLabel= p.get< std::string         >("DriftEModuleLabel");
-#ifdef OLDNOISE1
-    fNoiseFactZ        = p.get< double              >("NoiseFactZ");
-    fNoiseWidthZ       = p.get< double              >("NoiseWidthZ");
-    fLowCutoffZ        = p.get< double              >("LowCutoffZ");
-    fNoiseFactU        = p.get< double              >("NoiseFactU");
-    fNoiseWidthU       = p.get< double              >("NoiseWidthU");
-    fLowCutoffU        = p.get< double              >("LowCutoffU");
-    fNoiseFactV        = p.get< double              >("NoiseFactV");
-    fNoiseWidthV       = p.get< double              >("NoiseWidthV");
-    fLowCutoffV        = p.get< double              >("LowCutoffV");
-    fNoiseArrayPoints = p.get< unsigned int         >("NoiseArrayPoints");
-#endif
     fNoiseOn           = p.get< unsigned int        >("NoiseOn");
     fNoiseModel           = p.get< unsigned int     >("NoiseModel");
     fCollectionPed    = p.get< float                >("CollectionPed");
@@ -241,9 +195,6 @@ namespace detsim {
     fInductionCalibPedRMS  = p.get< float                >("InductionCalibPedRMS");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
     art::ServiceHandle<util::DetectorProperties> detprop;
-#ifdef OLDNOISE1
-    fSampleRate       = detprop->SamplingRate();
-#endif
     fNSamplesReadout  = detprop->ReadOutWindowSize();
     fNTimeSamples  = detprop->NumberTimeSamples();
     
@@ -268,11 +219,7 @@ namespace detsim {
     art::ServiceHandle<art::TFileService> tfs;
 
     fNoiseDist     = tfs->make<TH1F>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
-#ifdef OLDNOISE1
-    fNoiseChanDist = tfs->make<TH1F>("NoiseChan", ";Noise channel;", fNoiseArrayPoints, 0, fNoiseArrayPoints);
-#endif
     fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
-
 
     art::ServiceHandle<util::LArFFT> fFFT;
     fNTicks = fFFT->FFTSize();
@@ -326,49 +273,6 @@ namespace detsim {
     fLastChannelsInPlane.push_back(geo->Nchannels()-1);
 
      
-#ifdef OLDNOISE1
-    //Generate noise if selected to be on
-    if(fNoiseOn && fNoiseModel==1){
-      //fNoise.resize(geo->Nchannels());
-      fNoiseZ.resize(fNoiseArrayPoints);
-      fNoiseU.resize(fNoiseArrayPoints);
-      fNoiseV.resize(fNoiseArrayPoints);
-      
-      // GenNoise() will further resize each channel's 
-      // fNoise vector to fNoiseArrayPoints long.
-      
-      for(unsigned int p = 0; p < fNoiseArrayPoints; ++p){
-        
-        fNoiseFact = fNoiseFactZ;
-        fNoiseWidth = fNoiseWidthZ;
-        fLowCutoff = fLowCutoffZ;
-
-        GenNoise(fNoiseZ[p]);
-        for(int i = 0; i < fNTicks; ++i)
-          fNoiseDist->Fill(fNoiseZ[p][i]);
-        
-        fNoiseFact = fNoiseFactU;
-        fNoiseWidth = fNoiseWidthU;
-        fLowCutoff = fLowCutoffU;
-
-        GenNoise(fNoiseU[p]);
-        for(int i = 0; i < fNTicks; ++i)         
-          fNoiseDist->Fill(fNoiseU[p][i]);
-
-
-        fNoiseFact = fNoiseFactV;
-        fNoiseWidth = fNoiseWidthV;
-        fLowCutoff = fLowCutoffV;
- 
-    
-        GenNoise(fNoiseV[p]);
-        for(int i = 0; i < fNTicks; ++i)
-          fNoiseDist->Fill(fNoiseV[p][i]);
-        
-      }// end loop over wires
-    } 
-#endif
-
     if(fSimStuckBits){
   
       mf::LogInfo("SimWireDUNE") << " using ADC stuck code probabilities from .root file " ;
@@ -503,30 +407,7 @@ namespace detsim {
 
       // Add noise to each tick in the channel.
       if ( fNoiseOn && fNoiseModel==1 ) {              
-#ifdef OLDNOISE1
-        // Noise was already generated for each wire in the event
-        // raw digit vec is already in channel order
-        // pick a new "noise channel" for every channel -- this makes sure    
-        // the noise has the right coherent characteristics to be on one channel
-        CLHEP::HepRandomEngine& engine = rng->getEngine("SimWireDUNENoise");
-        CLHEP::RandFlat flat(engine);
-        //unsigned int noisechan = flat.fire()*fNoiseArrayPoints;
-        //if ( noisechan == fNoiseArrayPoints ) --noisechan;
-        // Keep this strange way of choosing noise channel to be consistent with old results.
-        // The relative weights of the first and last channels are 0.5 and 0.6.
-        unsigned int noisechan = nearbyint(flat.fire()*(1.*(fNoiseArrayPoints-1)+0.1));
-        fNoiseChanDist->Fill(noisechan);
-        //mf::LogInfo("SimWireDUNE") << "chan/noisechan = " << chan << "/" << noisechan;
-        for ( unsigned int itck=0; itck<signalSize; ++itck ) {
-          double tnoise = 0.0;
-          if      ( view==geo::kU ) tnoise = fNoiseU[noisechan][itck];
-          else if ( view==geo::kV ) tnoise = fNoiseV[noisechan][itck];
-          else                      tnoise = fNoiseZ[noisechan][itck];
-          fChargeWork[itck] += tnoise;
-        }
-#else
         m_pcns->addNoise(chan, fChargeWork);
-#endif
       } else if ( fNoiseOn && fNoiseModel==2 ) {
         float fASICGain      = sss->GetASICGain(chan);  
         double fShapingTime   = sss->GetShapingTime(chan);
@@ -649,54 +530,3 @@ namespace detsim {
 
     return;
   }
-
-#ifdef OLDNOISE1
-  //-------------------------------------------------
-  void SimWireDUNE::GenNoise(std::vector<float>& noise) {
-    art::ServiceHandle<art::RandomNumberGenerator> rng;
-    //CLHEP::HepRandomEngine &engine = rng->getEngine();
-    CLHEP::HepRandomEngine &engine = rng->getEngine("SimWireDUNENoise");
-    CLHEP::RandFlat flat(engine);
-
-    noise.clear();
-    noise.resize(fNTicks,0.0);
-    // noise in frequency space
-    std::vector<TComplex> noiseFrequency(fNTicks/2+1, 0.);
-
-    double pval = 0.; 
-    double lofilter = 0.;
-    double phase = 0.;
-    double rnd[2] = {0.};
-
-    // width of frequencyBin in kHz
-    double binWidth = 1.0/(fNTicks*fSampleRate*1.0e-6);
-    for(int i=0; i< fNTicks/2+1; ++i){
-      // exponential noise spectrum 
-      pval = fNoiseFact*exp(-(double)i*binWidth/fNoiseWidth);
-      // low frequency cutoff     
-      lofilter = 1.0/(1.0+exp(-(i-fLowCutoff/binWidth)/0.5));
-      // randomize 10%
-      flat.fireArray(2,rnd,0,1);
-      pval *= lofilter*(0.9+0.2*rnd[0]);
-      // random pahse angle
-      phase = rnd[1]*2.*TMath::Pi();
-
-      TComplex tc(pval*cos(phase),pval*sin(phase));
-      noiseFrequency[i] += tc;
-    }
-  
-   
-    // inverse FFT MCSignal
-    art::ServiceHandle<util::LArFFT> fFFT;
-    fFFT->DoInvFFT(noiseFrequency, noise);
-
-    noiseFrequency.clear();
-
-    // multiply each noise value by fNTicks as the InvFFT 
-    // divides each bin by fNTicks assuming that a forward FFT
-    // has already been done.
-    for(unsigned int i = 0; i < noise.size(); ++i) noise[i] *= fNTicks;
-
-    return;
-  }
-#endif
