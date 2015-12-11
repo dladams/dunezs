@@ -61,4 +61,4 @@ if [ $STAT -ne 0 ]; then
 fi
 
 echo
-echo Done
+echo Done `date`

@@ -67,4 +67,3 @@ if [ ! -r ${SAMPLE}perf.root ]; then
     exit 1
   fi
 fi
-

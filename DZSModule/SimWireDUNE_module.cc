@@ -98,7 +98,6 @@ namespace detsim {
     unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
     unsigned int           fNTimeSamples;     ///< number of ADC readout samples in all readout frames (per event)
   
-    std::vector<AdcSignal>    fChargeWork;
     
     TH1*                fNoiseDist;          ///< distribution of noise counts
     TH1*                fNoiseChanDist;      ///< distribution of noise channels
@@ -169,7 +168,6 @@ namespace detsim {
   //-------------------------------------------------
   SimWireDUNE::~SimWireDUNE() {
 
-    fChargeWork.clear();
   }
 
   //-------------------------------------------------
@@ -216,7 +214,6 @@ namespace detsim {
       mf::LogError("SimWireDUNE") << "Cannot have number of readout samples "
                                      << "greater than FFTSize!";
 
-    fChargeWork.resize(fNTicks, 0.);
     art::ServiceHandle<geo::Geometry> geo;
 
     bool foundfirstcollectionchannel = false;
@@ -303,24 +300,21 @@ namespace detsim {
     art::ServiceHandle<geo::Geometry> geo;
     unsigned int signalSize = fNTicks;
 
+    // Get the SignalShapingService.
+    art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
+
     // Get the pedestal retriever.
     const lariov::IDetPedestalProvider& pedestalProvider
       = art::ServiceHandle<lariov::IDetPedestalService>()->GetPedestalProvider();
     mf::LogInfo("SimWireDUNE") << "Pedestal for channel 0: " << pedestalProvider.PedMean(0);
 
-    // vectors for working
-    std::vector<short>    adcvec(signalSize, 0);        
-    std::vector<const sim::SimChannel*> chanHandle;
-    evt.getView(fDriftEModuleLabel,chanHandle);
-
-    //Get fIndShape and fColShape from SignalShapingService, on the fly
-    art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
-
     // make a vector of const sim::SimChannel* that has same number
     // of entries as the number of channels in the detector
     // and set the entries for the channels that have signal on them
     // using the chanHandle
+    std::vector<const sim::SimChannel*> chanHandle;
     std::vector<const sim::SimChannel*> channels(geo->Nchannels());
+    evt.getView(fDriftEModuleLabel, chanHandle);
     for ( size_t c=0; c<chanHandle.size(); ++c ) {
       channels[chanHandle[c]->Channel()] = chanHandle[c];
     }
@@ -329,10 +323,6 @@ namespace detsim {
     // digits to be transferred to the art::Event after the put statement below
     std::unique_ptr< std::vector<raw::RawDigit>   >  digcol(new std::vector<raw::RawDigit>);
           
-    fChargeWork.clear();
-    fChargeWork.resize(signalSize, 0.);
-    std::vector<AdcSignal> fChargeWorkCollInd;
-
     art::ServiceHandle<util::LArFFT> fFFT;
     art::ServiceHandle<art::RandomNumberGenerator> rng;
 
@@ -341,8 +331,6 @@ namespace detsim {
     unsigned int plane_number = 0;
     for ( unsigned int chan = 0; chan<geo->Nchannels(); ++chan ) {    
  
-      fChargeWork.clear();    
-      fChargeWork.resize(fNTimeSamples, 0.);    
 
       // get the sim::SimChannel for this channel
       const sim::SimChannel* psc = channels[chan];
@@ -351,12 +339,19 @@ namespace detsim {
         mf::LogError("SimWireDUNE") << "ERROR: CHANNEL NUMBER " << chan << " OUTSIDE OF PLANE";
       }
 
+      // Create vector that holds the floating ADC count for each tick.
+      // DLA Dec2015: I get memory errors if I don't first size this to signalSize = fNTicks.
+      //              Maybe a feature/defect of deconvolution?
+      std::vector<AdcSignal> fChargeWork(signalSize, 0.0);
+      fChargeWork.resize(fNTimeSamples);
+
       // Use the SimChannel to assign signal charge to each tick in the channel.
       if ( psc ) {      
         // Use the SimChannel extraction service to find the charge seen by each channel.
         // If extra charge is collected, it is stored in fChargeWorkCollInd and should
         // be shaped for collection even if this is an induction channel.
-        fChargeWorkCollInd.clear();
+        std::vector<AdcSignal> fChargeWorkCollInd(signalSize, 0.0);
+        fChargeWorkCollInd.resize(0);
         if ( m_pscx->extract(*psc, fChargeWork, fChargeWorkCollInd) ) {
           throw cet::exception("SimWireDUNE") << "Error calling SC extractor" <<"\n";
         }
@@ -365,7 +360,7 @@ namespace detsim {
         fChargeWork.resize(signalSize, 0);
         sss->Convolute(chan,fChargeWork);
 
-        // If there is extra charge, convolve it and add it to the working charge.
+        // If there is extra charge, convolve it as collected charge and add it to the working charge.
         if ( fChargeWorkCollInd.size() > 0 ) {
           fChargeWorkCollInd.resize(signalSize, 0);
           sss->Convolute(fFirstCollectionChannel, fChargeWorkCollInd); 
@@ -442,6 +437,7 @@ namespace detsim {
       }
 
       // Convert floating ADC to count in ADC range.
+      std::vector<short> adcvec(signalSize, 0);        
       for ( unsigned int itck=0; itck<signalSize; ++itck ) {
         double chg = fChargeWork[itck];
         short adc = (chg >=0) ? (short) (chg+0.5) : (short) (chg-0.5);
@@ -490,8 +486,6 @@ namespace detsim {
       digcol->push_back(rd);            // add this digit to the collection
 
 
-      adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
- 
       if(chan==fLastChannelsInPlane.at(plane_number))
         ++plane_number;
 

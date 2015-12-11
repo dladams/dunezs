@@ -73,7 +73,6 @@ int ExponentialChannelNoiseService::addNoise(Channel chan, AdcSignalVector& sigs
     noisechan = flat.fire()*fNoiseArrayPoints;
     if ( noisechan == fNoiseArrayPoints ) --noisechan;
   }
-  std::cout << "chan/noisechan: "  << chan << "/" << noisechan << endl;
   fNoiseChanHist->Fill(noisechan);
   art::ServiceHandle<geo::Geometry> geo;
   const geo::View_t view = geo->View(chan);
