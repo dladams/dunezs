@@ -50,12 +50,10 @@ extern "C" {
 #include "TFile.h"
 #include "TProfile.h"
 
-#define OLDNOISE2
+#undef  OLDNOISE2
 
 #include "CLHEP/Random/RandFlat.h"
-#ifdef OLDNOISE2
 #include "CLHEP/Random/RandGaussQ.h"
-#endif
 
 #include "DZSCore/AdcTypes.h"
 #include "DZSInterface/ZeroSuppressServiceBase.h"
@@ -95,12 +93,10 @@ namespace detsim {
 
    std::string            fDriftEModuleLabel;///< module making the ionization electrons
     unsigned int           fNoiseOn;          ///< noise turned on or off for debugging; default is on
-    unsigned int           fNoiseModel;          ///< noise model>
     int                    fFFTSize;          ///< number of ticks for FFT
     unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
   
     
-    TH1*                fNoiseDist;          ///< distribution of noise counts
     TH1*                fNoiseChanDist;      ///< distribution of noise channels
     TH1*                fPedNoiseDist;       ///< distribution of pedestal noise counts
     
@@ -110,9 +106,6 @@ namespace detsim {
     uint32_t               fFirstCollectionChannel;
 
     // variables for finding the first and last channel numbers on each plane
-
-    std::vector< uint32_t > fFirstChannelsInPlane;
-    std::vector< uint32_t > fLastChannelsInPlane;
 
     //define max ADC value - if one wishes this can
     //be made a fcl parameter but not likely to ever change
@@ -175,7 +168,6 @@ namespace detsim {
   void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
     fDriftEModuleLabel= p.get<std::string>("DriftEModuleLabel");
     fNoiseOn          = p.get<bool>("NoiseOn");
-    fNoiseModel       = p.get< unsigned int     >("NoiseModel");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
     art::ServiceHandle<util::DetectorProperties> detprop;
     fNSamplesReadout  = detprop->ReadOutWindowSize();
@@ -201,7 +193,6 @@ namespace detsim {
     // get access to the TFile service
     art::ServiceHandle<art::TFileService> tfs;
 
-    fNoiseDist     = tfs->make<TH1F>("Noise", ";Noise  (ADC);", 1000,   -10., 10.);
     fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
 
     art::ServiceHandle<util::LArFFT> fFFT;
@@ -217,42 +208,13 @@ namespace detsim {
 
     art::ServiceHandle<geo::Geometry> geo;
 
-    bool foundfirstcollectionchannel = false;
-    fFirstChannelsInPlane.push_back(0);
-    unsigned int currentPlaneNumber = geo->ChannelToWire(0).at(0).Plane; // ID of current wire plane
-    unsigned int currentTPCNumber = geo->ChannelToWire(0).at(0).TPC; // ID of current wire plane
-
-    for (uint32_t ichan=0;ichan<geo->Nchannels();ichan++) {
-
-        if(!foundfirstcollectionchannel)
-          {
-            const geo::View_t view = geo->View(ichan);
-            if (view == geo::kZ)
-              {
-                foundfirstcollectionchannel = true;
-                fFirstCollectionChannel = ichan;
-                //break;
-              }
-          }
-
-        const unsigned int thisPlaneNumber = geo->ChannelToWire(ichan).at(0).Plane;
-        const unsigned int thisTPCNumber = geo->ChannelToWire(ichan).at(0).TPC;
-                
-        if(thisPlaneNumber != currentPlaneNumber || (thisPlaneNumber == geo::kZ && thisTPCNumber != currentTPCNumber))
-          {
-            fLastChannelsInPlane.push_back(ichan-1);
-            fFirstChannelsInPlane.push_back(ichan); 
-            currentPlaneNumber = thisPlaneNumber;
-            currentTPCNumber = thisTPCNumber;
-          }
-
-      } 
-    if (!foundfirstcollectionchannel)
-      {
-        throw  cet::exception("SimWireDUNE  BeginJob") << " Could not find any collection channels\n";
+    // Find the first collection channel.
+    for ( uint32_t ichan=0; ichan<geo->Nchannels(); ++ichan ) {
+      if ( geo->View(ichan) == geo::kZ ) {
+        fFirstCollectionChannel = ichan;
+        break;
       }
-    
-    fLastChannelsInPlane.push_back(geo->Nchannels()-1);
+    }
 
      
     if(fSimStuckBits){
@@ -329,7 +291,6 @@ namespace detsim {
 
     // Add all channels  
     std::map<int,double>::iterator mapIter;      
-    unsigned int plane_number = 0;
     for ( unsigned int chan = 0; chan<geo->Nchannels(); ++chan ) {    
  
 
@@ -370,45 +331,8 @@ namespace detsim {
       }  // end if psc
 
       // Add noise to each tick in the channel.
-      if ( fNoiseOn && fNoiseModel==1 ) {              
+      if ( fNoiseOn ) {              
         m_pcns->addNoise(chan, fChargeWork);
-#ifdef OLDNOISE2
-      } else if ( fNoiseOn && fNoiseModel==2 ) {
-        float fASICGain      = sss->GetASICGain(chan);  
-        double fShapingTime   = sss->GetShapingTime(chan);
-        std::map< double, int > fShapingTimeOrder;
-        fShapingTimeOrder = { {0.5, 0}, {1.0, 1}, {2.0, 2}, {3.0, 3} };
-        DoubleVec              fNoiseFactVec;
-        auto tempNoiseVec = sss->GetNoiseFactVec();
-        if ( fShapingTimeOrder.find( fShapingTime ) != fShapingTimeOrder.end() ){
-          size_t i = 0;
-          fNoiseFactVec.resize(2);
-          for (auto& item : tempNoiseVec) {
-            fNoiseFactVec[i]   = item.at( fShapingTimeOrder.find( fShapingTime )->second );
-            fNoiseFactVec[i] *= fASICGain/4.7;
-            ++i;
-          }
-        } else {
-          throw cet::exception("SimWireDUNE")
-            << "\033[93m"
-            << "Shaping Time received from signalservices_dune.fcl is not one of allowed values"
-            << std::endl
-            << "Allowed values: 0.5, 1.0, 2.0, 3.0 usec"
-            << "\033[00m"
-            << std::endl;
-        }
-        art::ServiceHandle<art::RandomNumberGenerator> rng;
-        CLHEP::HepRandomEngine &engine = rng->getEngine("SimWireDUNENoise");
-        CLHEP::RandGaussQ rGauss_Ind(engine, 0.0, fNoiseFactVec[0]);
-        CLHEP::RandGaussQ rGauss_Col(engine, 0.0, fNoiseFactVec[1]);
-        for ( unsigned int itck = 0; itck<signalSize; ++itck){
-          double tnoise = 0.0;
-          if      ( view==geo::kU ) tnoise = rGauss_Ind.fire();
-          else if ( view==geo::kV ) tnoise = rGauss_Ind.fire();
-          else                      tnoise = rGauss_Col.fire();
-          fChargeWork[itck] += tnoise;
-        }
-#endif
       }
 
       float calibrated_pedestal_value     = 0.0; // Estimated calibrated value of pedestal to be passed to RawDigits collection
@@ -485,9 +409,6 @@ namespace detsim {
       if ( fSaveEmptyChannel || nkeep>0 )
       digcol->push_back(rd);            // add this digit to the collection
 
-
-      if(chan==fLastChannelsInPlane.at(plane_number))
-        ++plane_number;
 
     }// end loop over channels      
 

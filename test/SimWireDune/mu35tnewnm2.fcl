@@ -116,4 +116,3 @@ services.user.ChannelNoiseServiceBase: @local::chnoisewhite
 
 physics.producers.daq.PedestalOn: true
 physics.producers.daq.NoiseOn: true
-#physics.producers.daq.NoiseModel: 2
