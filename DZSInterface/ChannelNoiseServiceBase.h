@@ -9,6 +9,7 @@
 #define ChannelNoiseServiceBase_H
 
 #include <vector>
+#include <iostream>
 #include "DZSCore/AdcTypes.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
@@ -23,6 +24,9 @@ public:
   // Add noise to a signal vector sigs appropriate for channel chan.
   // Noise is added for all entries in the input vector.
   virtual int addNoise(Channel chan, AdcSignalVector& sigs) const =0;
+
+  // Print parameters.
+  virtual std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const =0;
 
 };
 

@@ -50,8 +50,12 @@ extern "C" {
 #include "TFile.h"
 #include "TProfile.h"
 
+#define OLDNOISE2
+
 #include "CLHEP/Random/RandFlat.h"
+#ifdef OLDNOISE2
 #include "CLHEP/Random/RandGaussQ.h"
+#endif
 
 #include "DZSCore/AdcTypes.h"
 #include "DZSInterface/ZeroSuppressServiceBase.h"
@@ -61,8 +65,6 @@ extern "C" {
 
 #include "CalibrationDBI/Interface/IDetPedestalService.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
-
-#define OLDNOISE2
 
 ///Detector simulation of raw signals on wires 
 namespace detsim {
@@ -94,9 +96,8 @@ namespace detsim {
    std::string            fDriftEModuleLabel;///< module making the ionization electrons
     unsigned int           fNoiseOn;          ///< noise turned on or off for debugging; default is on
     unsigned int           fNoiseModel;          ///< noise model>
-    int                    fNTicks;           ///< number of ticks of the clock
+    int                    fFFTSize;          ///< number of ticks for FFT
     unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
-    unsigned int           fNTimeSamples;     ///< number of ADC readout samples in all readout frames (per event)
   
     
     TH1*                fNoiseDist;          ///< distribution of noise counts
@@ -172,13 +173,12 @@ namespace detsim {
 
   //-------------------------------------------------
   void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
-    fDriftEModuleLabel= p.get< std::string         >("DriftEModuleLabel");
-    fNoiseOn           = p.get<bool>("NoiseOn");
-    fNoiseModel           = p.get< unsigned int     >("NoiseModel");
+    fDriftEModuleLabel= p.get<std::string>("DriftEModuleLabel");
+    fNoiseOn          = p.get<bool>("NoiseOn");
+    fNoiseModel       = p.get< unsigned int     >("NoiseModel");
     fPedestalOn       = p.get< bool                 >("PedestalOn");  
     art::ServiceHandle<util::DetectorProperties> detprop;
     fNSamplesReadout  = detprop->ReadOutWindowSize();
-    fNTimeSamples  = detprop->NumberTimeSamples();
     
     fSimStuckBits        = p.get< bool >("SimStuckBits"); 
 
@@ -190,6 +190,7 @@ namespace detsim {
 
     m_pzs->print();
     m_pcmp->print();
+    m_pcns->print();
 
     return;
   }
@@ -204,15 +205,15 @@ namespace detsim {
     fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
 
     art::ServiceHandle<util::LArFFT> fFFT;
-    fNTicks = fFFT->FFTSize();
+    fFFTSize = fFFT->FFTSize();
 
-    if ( fNTicks%2 != 0 ) 
+    if ( fFFTSize%2 != 0 ) 
       LOG_DEBUG("SimWireDUNE") << "Warning: FFTSize not a power of 2. "
-                                  << "May cause issues in (de)convolution.\n";
+                               << "May cause issues in (de)convolution.\n";
 
-    if ( (int)fNSamplesReadout > fNTicks ) 
+    if ( (int)fNSamplesReadout > fFFTSize ) 
       mf::LogError("SimWireDUNE") << "Cannot have number of readout samples "
-                                     << "greater than FFTSize!";
+                                  << "greater than FFTSize!";
 
     art::ServiceHandle<geo::Geometry> geo;
 
@@ -298,7 +299,7 @@ namespace detsim {
 
     // Get the geometry.
     art::ServiceHandle<geo::Geometry> geo;
-    unsigned int signalSize = fNTicks;
+    unsigned int signalSize = fFFTSize;
 
     // Get the SignalShapingService.
     art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
@@ -340,10 +341,7 @@ namespace detsim {
       }
 
       // Create vector that holds the floating ADC count for each tick.
-      // DLA Dec2015: I get memory errors if I don't first size this to signalSize = fNTicks.
-      //              Maybe a feature/defect of deconvolution?
       std::vector<AdcSignal> fChargeWork(signalSize, 0.0);
-      fChargeWork.resize(fNTimeSamples);
 
       // Use the SimChannel to assign signal charge to each tick in the channel.
       if ( psc ) {      
@@ -374,6 +372,7 @@ namespace detsim {
       // Add noise to each tick in the channel.
       if ( fNoiseOn && fNoiseModel==1 ) {              
         m_pcns->addNoise(chan, fChargeWork);
+#ifdef OLDNOISE2
       } else if ( fNoiseOn && fNoiseModel==2 ) {
         float fASICGain      = sss->GetASICGain(chan);  
         double fShapingTime   = sss->GetShapingTime(chan);
@@ -409,6 +408,7 @@ namespace detsim {
           else                      tnoise = rGauss_Col.fire();
           fChargeWork[itck] += tnoise;
         }
+#endif
       }
 
       float calibrated_pedestal_value     = 0.0; // Estimated calibrated value of pedestal to be passed to RawDigits collection

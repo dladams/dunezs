@@ -29,11 +29,11 @@ if [ ! -r ${SAMPLE}.fcl ]; then
   exit 1
 fi
 
-# Generate reference event data.
+# Generate event data.
 if [ ! -r ${SAMPLE}_event.root ]; then
   rm -f ${SAMPLE}perf.root
   echo
-  echo Generating reference event data.
+  echo run: Generating event data.
   echo " Start: "`date`
   COM="lar -n 5 -c ${SAMPLE}.fcl -T ${SAMPLE}_hist.root -o ${SAMPLE}_event.root"
   echo $COM >${SAMPLE}.log
@@ -50,7 +50,7 @@ fi
 # Generate reference histograms.
 if [ ! -r ${SAMPLE}perf.root ]; then
   echo
-  echo Generating reference histograms.
+  echo run: Generating histograms.
   echo " Start: "`date`
   if echo $SAMPLE | grep old 1>/dev/null; then
     FCL=perf35told.fcl

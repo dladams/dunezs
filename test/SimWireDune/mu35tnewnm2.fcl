@@ -108,11 +108,12 @@ services.user.SimChannelExtractServiceBase: @local::scxall
 services.user.IDetPedestalService: @local::pedfixed
 
 # Specify the noise service.
-services.user.ChannelNoiseServiceBase: @local::chnoiseold
+#services.user.ChannelNoiseServiceBase: @local::chnoiseold
+services.user.ChannelNoiseServiceBase: @local::chnoisewhite
 
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0
 
 physics.producers.daq.PedestalOn: true
 physics.producers.daq.NoiseOn: true
-physics.producers.daq.NoiseModel: 2
+#physics.producers.daq.NoiseModel: 2

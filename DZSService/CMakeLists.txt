@@ -48,3 +48,16 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
+simple_plugin(WhiteChannelNoiseService   "service"
+                DZSInterface
+                Geometry
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
+                SignalShapingServiceDUNE35t_service
+                ${SEEDSERVICE_SERVICE}
+                ${ART_FRAMEWORK_CORE}
+                ${ART_UTILITIES}
+                ${CLHEP}
+                ${ROOT_BASIC_LIB_LIST}
+             )
