@@ -41,13 +41,13 @@ if [ ! -r ${SAMPLE}_event.root ]; then
   STAT=$?
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}_event.root ]; then
-    echo Reference event generation failed.
+    echo run: Event generation failed.
     exit 1
   fi
   fcldump ${SAMPLE}.fcl 10 > ${SAMPLE}.fcldump
 fi
 
-# Generate reference histograms.
+# Generate histograms.
 if [ ! -r ${SAMPLE}perf.root ]; then
   echo
   echo run: Generating histograms.
@@ -63,7 +63,7 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   STAT=$?
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}perf.root ]; then
-    echo Test histogram generation failed.
+    echo run: Histogram generation failed.
     exit 1
   fi
 fi

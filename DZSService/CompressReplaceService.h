@@ -9,7 +9,7 @@
 //   Zero [0] - replacement value
 
 #ifndef CompressReplaceService_H
-#define CompressReplaceService_J
+#define CompressReplaceService_H
 
 #include "DZSCore/CompressReplace.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"

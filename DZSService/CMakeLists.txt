@@ -61,3 +61,17 @@ simple_plugin(WhiteChannelNoiseService   "service"
                 ${CLHEP}
                 ${ROOT_BASIC_LIB_LIST}
              )
+simple_plugin(StuckBitsService   "service"
+                DZSInterface
+                Geometry
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
+                ${SEEDSERVICE_SERVICE}
+                ${ART_FRAMEWORK_CORE}
+                ${ART_UTILITIES}
+                ${MF_MESSAGELOGGER}
+                ${MF_UTILITIES}
+                ${CLHEP}
+                ${ROOT_BASIC_LIB_LIST}
+                BASENAME_ONLY
+             )

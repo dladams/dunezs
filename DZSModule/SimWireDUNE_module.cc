@@ -7,6 +7,8 @@
 //
 // Developed from  SimWireDUNE35t_module.cc.
 
+#undef  OLDSTUCK
+
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -60,6 +62,7 @@ extern "C" {
 #include "DZSService/CompressReplaceService.h"
 #include "DZSInterface/SimChannelExtractServiceBase.h"
 #include "DZSInterface/ChannelNoiseServiceBase.h"
+#include "DZSService/StuckBitsService.h"
 
 #include "CalibrationDBI/Interface/IDetPedestalService.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
@@ -101,35 +104,35 @@ namespace detsim {
     TH1*                fPedNoiseDist;       ///< distribution of pedestal noise counts
     
 
-    // variables for simulating the charge deposition in gaps and charge drifting over the comb materials.
-
+    // Find a collection channel for dhaping extra charge.
     uint32_t               fFirstCollectionChannel;
 
-    // variables for finding the first and last channel numbers on each plane
+    // Define max ADC value.
+    const float adcmax = 4095;
 
-    //define max ADC value - if one wishes this can
     //be made a fcl parameter but not likely to ever change
-    const float adcsaturation = 4095;
     bool                   fPedestalOn;          ///< switch for simulation of nonzero pedestals
 
     // input fcl parameters
 
     bool                   fSimStuckBits;      ///< switch for simulation of stuck bits
-
+#ifdef OLDSTUCK
     std::string            fStuckBitsProbabilitiesFname; ///< file holding ADC stuck code overflow and underflow probabilities 
     std::string            fStuckBitsOverflowProbHistoName; ///< Name of histogram holding ADC stuck code overflow probabilities 
     std::string            fStuckBitsUnderflowProbHistoName; ///< Name of histogram holding ADC stuck code underflow probabilities 
+    double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
+    double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
+#endif
 
     bool                   fSaveEmptyChannel;  // switch for saving channels with all zero entries
 
-    double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
-    double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
 
     // New services.
     art::ServiceHandle<ZeroSuppressBase> m_pzs;
     art::ServiceHandle<CompressReplaceService> m_pcmp;
     art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
     art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
+    art::ServiceHandle<StuckBitsService> m_pasb;
 
   }; // class SimWireDUNE
 
@@ -146,17 +149,23 @@ namespace detsim {
     // Create other services with local seeds. SeedService will not create two engines.
     int seedNoise = 2001;
     int seedPedestal = 2003;
+#ifdef OLDSTUCK
     int seedStuck = 2005;
+#endif
     bool useSeedSvc = true;
     if ( useSeedSvc ) {
       art::ServiceHandle<artext::SeedService> seedSvc;
       seedNoise    = seedSvc->getSeed("SimWireDUNENoise");
       seedPedestal = seedSvc->getSeed("SimWireDUNEPedestal");
+#ifdef OLDSTUCK
       seedStuck    = seedSvc->getSeed("SimWireDUNEStuck");
+#endif
     }
     createEngine(seedNoise,    "HepJamesRandom", "SimWireDUNENoise");
     createEngine(seedPedestal, "HepJamesRandom", "SimWireDUNEPedestal");
+#ifdef OLDSTUCK
     createEngine(seedStuck,    "HepJamesRandom", "SimWireDUNEStuck");
+#endif
   }
 
   //-------------------------------------------------
@@ -172,17 +181,20 @@ namespace detsim {
     art::ServiceHandle<util::DetectorProperties> detprop;
     fNSamplesReadout  = detprop->ReadOutWindowSize();
     
+#ifdef OLDSTUCK
     fSimStuckBits        = p.get< bool >("SimStuckBits"); 
 
     fStuckBitsProbabilitiesFname = p.get< std::string         >("StuckBitsProbabilitiesFname");
     fStuckBitsOverflowProbHistoName = p.get< std::string         >("StuckBitsOverflowProbHistoName");
     fStuckBitsUnderflowProbHistoName = p.get< std::string         >("StuckBitsUnderflowProbHistoName");
+#endif
   
     fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
 
     m_pzs->print();
     m_pcmp->print();
     m_pcns->print();
+    m_pasb->print();
 
     return;
   }
@@ -217,6 +229,7 @@ namespace detsim {
     }
 
      
+#ifdef OLDSTUCK
     if(fSimStuckBits){
   
       mf::LogInfo("SimWireDUNE") << " using ADC stuck code probabilities from .root file " ;
@@ -249,6 +262,7 @@ namespace detsim {
     
       fin->Close();
     }
+#endif
     return;
 
   }
@@ -365,7 +379,7 @@ namespace detsim {
       for ( unsigned int itck=0; itck<signalSize; ++itck ) {
         double chg = fChargeWork[itck];
         short adc = (chg >=0) ? (short) (chg+0.5) : (short) (chg-0.5);
-        if ( adc > adcsaturation ) adc = adcsaturation;
+        if ( adc > adcmax ) adc = adcmax;
         if ( adc < 0 ) adc = 0;
         adcvec[itck] = adc;
       }
@@ -374,6 +388,7 @@ namespace detsim {
       
       // Add stuck bits.
       if ( fSimStuckBits ) {
+#ifdef OLDSTUCK
         for ( size_t i = 0; i < adcvec.size(); ++i ) {
           art::ServiceHandle<art::RandomNumberGenerator> rng;
           CLHEP::HepRandomEngine& stuck_engine = rng->getEngine("SimWireDUNEStuck");
@@ -392,6 +407,9 @@ namespace detsim {
             adcvec[i] += 64; // correct 1st MSB value by adding 64
           }
         }
+#else
+        m_pasb->modify(chan, adcvec);
+#endif
       }
       
       // Zero suppress and compress.
