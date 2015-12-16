@@ -12,12 +12,8 @@ dune35tnew_simwire: {
   DriftEModuleLabel:  "largeant"
   CompressionType:    "ZeroSuppression"       #could also be none
   NoiseOn:             true
-  NoiseModel:          1        #1 for original model, 2 for a model similar to uBooNE
+  StuckBitsOn:       false        #simulate stuck bits
   SaveEmptyChannel:   true      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
-  SimStuckBits:       false        #simulate stuck bits
-  StuckBitsProbabilitiesFname:     "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
-  StuckBitsOverflowProbHistoName:     "pCorrFracOverflowVsInputLsbCell"
-  StuckBitsUnderflowProbHistoName:     "pCorrFracUnderflowVsInputLsbCell"
 }
 
 zsnone: {
@@ -133,6 +129,12 @@ chnoiseold: {
 
 chnoisewhite: {
   service_provider: WhiteChannelNoiseService
+}
+
+stuckbits: {
+  StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
+  StuckBitsProbabilitiesFname: "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
+  StuckBitsUnderflowProbHistoName: "pCorrFracUnderflowVsInputLsbCell"
 }
 
 END_PROLOG

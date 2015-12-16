@@ -98,9 +98,9 @@ services.user.SeedService.daq: {
 #services.user.SeedService.SimWireDUNEStuck:    1009
 
 # Specify the zero suppression service.
-#services.user.ZeroSuppressBase: @local::zsnone
+services.user.ZeroSuppressBase: @local::zsnone
 #services.user.ZeroSuppressBase: @local::zslegacy
-services.user.ZeroSuppressBase: @local::zsonline
+#services.user.ZeroSuppressBase: @local::zsonline
 
 # Specify the compression service.
 services.user.CompressReplaceService: { Zero: 0 }
@@ -110,12 +110,10 @@ services.user.IDetPedestalService: @local::pedfixed
 # Specify the noise service.
 services.user.ChannelNoiseServiceBase: @local::chnoiseold
 
-# Specify the stuck bits service.
-services.user.StuckBitsService: @local::stuckbits
-
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0
 
-physics.producers.daq.PedestalOn:  true
-physics.producers.daq.NoiseOn:     true
-physics.producers.daq.StuckBitsOn: false
+physics.producers.daq.PedestalOn: true
+physics.producers.daq.NoiseOn: false
+
+physics.producers.daq.SimStuckBits: false

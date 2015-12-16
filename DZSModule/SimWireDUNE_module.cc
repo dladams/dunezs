@@ -7,8 +7,6 @@
 //
 // Developed from  SimWireDUNE35t_module.cc.
 
-#undef  OLDSTUCK
-
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -76,194 +74,153 @@ namespace detsim {
 
 }
 
-  // Base class for creation of raw signals on wires. 
-  class SimWireDUNE : public art::EDProducer {
+using std::cout;
+using std::endl;
+
+//**********************************************************************
+
+// Base class for creation of raw signals on wires. 
+class SimWireDUNE : public art::EDProducer {
     
-  public:
+public:
         
-    explicit SimWireDUNE(fhicl::ParameterSet const& pset); 
-    virtual ~SimWireDUNE();
+  explicit SimWireDUNE(fhicl::ParameterSet const& pset); 
+  virtual ~SimWireDUNE();
     
-    // read/write access to event
-    void produce (art::Event& evt);
-    void beginJob();
-    void endJob();
-    void reconfigure(fhicl::ParameterSet const& p);
+  // read/write access to event
+  void produce (art::Event& evt);
+  void beginJob();
+  void endJob();
+  void reconfigure(fhicl::ParameterSet const& p);
 
-  private:
+private:
 
-    void         GenNoise(std::vector<float>& array);
+  void         GenNoise(std::vector<float>& array);
 
-   std::string            fDriftEModuleLabel;///< module making the ionization electrons
-    unsigned int           fNoiseOn;          ///< noise turned on or off for debugging; default is on
-    int                    fFFTSize;          ///< number of ticks for FFT
-    unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
+  std::string            fDriftEModuleLabel;///< module making the ionization electrons
+  int                    fFFTSize;          ///< number of ticks for FFT
+  unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
   
+  TH1*                fNoiseChanDist;      ///< distribution of noise channels
+  TH1*                fPedNoiseDist;       ///< distribution of pedestal noise counts
     
-    TH1*                fNoiseChanDist;      ///< distribution of noise channels
-    TH1*                fPedNoiseDist;       ///< distribution of pedestal noise counts
-    
 
-    // Find a collection channel for dhaping extra charge.
-    uint32_t               fFirstCollectionChannel;
+  // Find a collection channel for dhaping extra charge.
+  uint32_t               fFirstCollectionChannel;
 
-    // Define max ADC value.
-    const float adcmax = 4095;
+  // Define max ADC value.
+  const float adcmax = 4095;
 
-    //be made a fcl parameter but not likely to ever change
-    bool                   fPedestalOn;          ///< switch for simulation of nonzero pedestals
+  bool fNoiseOn;           ///< noise turned on or off for debugging; default is on
+  bool fPedestalOn;        ///< switch for simulation of nonzero pedestals
+  bool fStuckBitsOn;       ///< switch for simulation of stuck bits
+  bool fSaveEmptyChannel;  ///< switch for saving channels with all zero entries
 
-    // input fcl parameters
+  // New services.
+  art::ServiceHandle<ZeroSuppressBase> m_pzs;
+  art::ServiceHandle<CompressReplaceService> m_pcmp;
+  art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
+  art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
+  art::ServiceHandle<StuckBitsService> m_pasb;
 
-    bool                   fSimStuckBits;      ///< switch for simulation of stuck bits
-#ifdef OLDSTUCK
-    std::string            fStuckBitsProbabilitiesFname; ///< file holding ADC stuck code overflow and underflow probabilities 
-    std::string            fStuckBitsOverflowProbHistoName; ///< Name of histogram holding ADC stuck code overflow probabilities 
-    std::string            fStuckBitsUnderflowProbHistoName; ///< Name of histogram holding ADC stuck code underflow probabilities 
-    double               fOverflowProbs[64];       ///< array of probabilities of 6 LSF bits getting stuck at 000000
-    double               fUnderflowProbs[64];     ///< array of probabilities of 6 LSF bits getting stuck at 111111
-#endif
+}; // class SimWireDUNE
 
-    bool                   fSaveEmptyChannel;  // switch for saving channels with all zero entries
+DEFINE_ART_MODULE(SimWireDUNE)
 
+//**********************************************************************
 
-    // New services.
-    art::ServiceHandle<ZeroSuppressBase> m_pzs;
-    art::ServiceHandle<CompressReplaceService> m_pcmp;
-    art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
-    art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
-    art::ServiceHandle<StuckBitsService> m_pasb;
+SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset) {
+  reconfigure(pset);
+  produces< std::vector<raw::RawDigit> >();
+  // create a default random engine; obtain the random seed from SeedService,
+  // unless overridden in configuration with key "Seed"
+  //seedSvc->createEngine(*this, pset, "SimWireDUNENoise");
+  // Create other services with local seeds. SeedService will not create two engines.
+  int seedNoise = 2001;
+  int seedPedestal = 2003;
+  bool useSeedSvc = true;
+  if ( useSeedSvc ) {
+    art::ServiceHandle<artext::SeedService> seedSvc;
+    seedNoise    = seedSvc->getSeed("SimWireDUNENoise");
+    seedPedestal = seedSvc->getSeed("SimWireDUNEPedestal");
+  }
+  createEngine(seedNoise,    "HepJamesRandom", "SimWireDUNENoise");
+  createEngine(seedPedestal, "HepJamesRandom", "SimWireDUNEPedestal");
+}
 
-  }; // class SimWireDUNE
+//**********************************************************************
 
-  DEFINE_ART_MODULE(SimWireDUNE)
+SimWireDUNE::~SimWireDUNE() { }
 
-  //-------------------------------------------------
+//**********************************************************************
 
-  SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset) {
-    this->reconfigure(pset);
-    produces< std::vector<raw::RawDigit> >();
-    // create a default random engine; obtain the random seed from SeedService,
-    // unless overridden in configuration with key "Seed"
-    //seedSvc->createEngine(*this, pset, "SimWireDUNENoise");
-    // Create other services with local seeds. SeedService will not create two engines.
-    int seedNoise = 2001;
-    int seedPedestal = 2003;
-#ifdef OLDSTUCK
-    int seedStuck = 2005;
-#endif
-    bool useSeedSvc = true;
-    if ( useSeedSvc ) {
-      art::ServiceHandle<artext::SeedService> seedSvc;
-      seedNoise    = seedSvc->getSeed("SimWireDUNENoise");
-      seedPedestal = seedSvc->getSeed("SimWireDUNEPedestal");
-#ifdef OLDSTUCK
-      seedStuck    = seedSvc->getSeed("SimWireDUNEStuck");
-#endif
-    }
-    createEngine(seedNoise,    "HepJamesRandom", "SimWireDUNENoise");
-    createEngine(seedPedestal, "HepJamesRandom", "SimWireDUNEPedestal");
-#ifdef OLDSTUCK
-    createEngine(seedStuck,    "HepJamesRandom", "SimWireDUNEStuck");
-#endif
+void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
+  fDriftEModuleLabel = p.get<std::string>("DriftEModuleLabel");
+  fNoiseOn           = p.get<bool>("NoiseOn");
+  fPedestalOn        = p.get<bool>("PedestalOn");  
+  fStuckBitsOn        = p.get<bool>("StuckBitsOn");  
+  fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
+
+  art::ServiceHandle<util::DetectorProperties> detprop;
+  fNSamplesReadout  = detprop->ReadOutWindowSize();
+
+  cout << "SimWireDUNE::reconfigure" << endl;
+  cout << "  Compression service:" << endl;
+  m_pcmp->print(cout, "    ");
+  cout << "  Zero suppression service:" << endl;
+  m_pzs->print(cout, "    ");
+  if ( fNoiseOn ) {
+    cout << "  Channel noise service:" << endl;
+    m_pcns->print(cout, "    ");
+  } else {
+    cout << "  Channel noise is off." << endl;
+  }
+  if ( fPedestalOn ) {
+    cout << "  Pedestal addition is on" << endl;
+  } else {
+    cout << "  Pedestal addition is off." << endl;
+  }
+  if ( fStuckBitsOn ) {
+    cout << "  Stuck bits service:" << endl;
+    m_pasb->print(cout, "    ");
+  } else {
+    cout << "  Stuck bits is off." << endl;
   }
 
-  //-------------------------------------------------
-  SimWireDUNE::~SimWireDUNE() {
+  return;
+}
 
-  }
+//**********************************************************************
 
-  //-------------------------------------------------
-  void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
-    fDriftEModuleLabel= p.get<std::string>("DriftEModuleLabel");
-    fNoiseOn          = p.get<bool>("NoiseOn");
-    fPedestalOn       = p.get< bool                 >("PedestalOn");  
-    art::ServiceHandle<util::DetectorProperties> detprop;
-    fNSamplesReadout  = detprop->ReadOutWindowSize();
-    
-#ifdef OLDSTUCK
-    fSimStuckBits        = p.get< bool >("SimStuckBits"); 
+void SimWireDUNE::beginJob() { 
 
-    fStuckBitsProbabilitiesFname = p.get< std::string         >("StuckBitsProbabilitiesFname");
-    fStuckBitsOverflowProbHistoName = p.get< std::string         >("StuckBitsOverflowProbHistoName");
-    fStuckBitsUnderflowProbHistoName = p.get< std::string         >("StuckBitsUnderflowProbHistoName");
-#endif
-  
-    fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
+  // get access to the TFile service
+  art::ServiceHandle<art::TFileService> tfs;
 
-    m_pzs->print();
-    m_pcmp->print();
-    m_pcns->print();
-    m_pasb->print();
+  fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
 
-    return;
-  }
+  art::ServiceHandle<util::LArFFT> fFFT;
+  fFFTSize = fFFT->FFTSize();
 
-  //-------------------------------------------------
-  void SimWireDUNE::beginJob() { 
-
-    // get access to the TFile service
-    art::ServiceHandle<art::TFileService> tfs;
-
-    fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
-
-    art::ServiceHandle<util::LArFFT> fFFT;
-    fFFTSize = fFFT->FFTSize();
-
-    if ( fFFTSize%2 != 0 ) 
-      LOG_DEBUG("SimWireDUNE") << "Warning: FFTSize not a power of 2. "
+  if ( fFFTSize%2 != 0 ) 
+    LOG_DEBUG("SimWireDUNE") << "Warning: FFTSize not a power of 2. "
                                << "May cause issues in (de)convolution.\n";
 
-    if ( (int)fNSamplesReadout > fFFTSize ) 
-      mf::LogError("SimWireDUNE") << "Cannot have number of readout samples "
+  if ( (int)fNSamplesReadout > fFFTSize ) 
+    mf::LogError("SimWireDUNE") << "Cannot have number of readout samples "
                                   << "greater than FFTSize!";
 
-    art::ServiceHandle<geo::Geometry> geo;
+  art::ServiceHandle<geo::Geometry> geo;
 
-    // Find the first collection channel.
-    for ( uint32_t ichan=0; ichan<geo->Nchannels(); ++ichan ) {
-      if ( geo->View(ichan) == geo::kZ ) {
-        fFirstCollectionChannel = ichan;
-        break;
-      }
+  // Find the first collection channel.
+  for ( uint32_t ichan=0; ichan<geo->Nchannels(); ++ichan ) {
+    if ( geo->View(ichan) == geo::kZ ) {
+      fFirstCollectionChannel = ichan;
+      break;
     }
+  }
 
-     
-#ifdef OLDSTUCK
-    if(fSimStuckBits){
-  
-      mf::LogInfo("SimWireDUNE") << " using ADC stuck code probabilities from .root file " ;
-
-      // constructor decides if initialized value is a path or an environment variable
-      std::string fname;
-      cet::search_path sp("FW_SEARCH_PATH");
-      sp.find_file( fStuckBitsProbabilitiesFname, fname );
-        
-      std::unique_ptr<TFile> fin(new TFile(fname.c_str(), "READ"));
-      if ( !fin->IsOpen() ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC stuck code probabilities file " << fname << "!" << std::endl;
- 
-      TString iOverflowHistoName = Form( "%s", fStuckBitsOverflowProbHistoName.c_str());
-      TProfile *overflowtemp = (TProfile*) fin->Get( iOverflowHistoName );  
-      if ( !overflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code overflow probabilities histogram " << fStuckBitsOverflowProbHistoName << "!" << std::endl;
-      
-      if ( overflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Overflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
- 
-      TString iUnderflowHistoName = Form( "%s", fStuckBitsUnderflowProbHistoName.c_str());     
-      TProfile *underflowtemp = (TProfile*) fin->Get( iUnderflowHistoName );  
-      if ( !underflowtemp ) throw art::Exception( art::errors::NotFound ) << "Could not find the ADC code underflow probabilities histogram " << fStuckBitsUnderflowProbHistoName << "!" << std::endl;
-      
-      if ( underflowtemp->GetNbinsX() != 64 ) throw art::Exception( art::errors::InvalidNumber ) << "Underflow ADC stuck code probability histograms should always have 64 bins corresponding to each of 64 LSB cells!" << std::endl;
-
-
-      for(unsigned int cellnumber=0; cellnumber < 64; ++cellnumber){
-        fOverflowProbs[cellnumber] = overflowtemp->GetBinContent(cellnumber+1);
-        fUnderflowProbs[cellnumber] = underflowtemp->GetBinContent(cellnumber+1);
-      }
-    
-      fin->Close();
-    }
-#endif
-    return;
+  return;
 
   }
 
@@ -349,8 +306,8 @@ namespace detsim {
         m_pcns->addNoise(chan, fChargeWork);
       }
 
-      float calibrated_pedestal_value     = 0.0; // Estimated calibrated value of pedestal to be passed to RawDigits collection
-      float calibrated_pedestal_rms_value = 0.0; // Estimated calibrated value of pedestal RMS to be passed to RawDigits collection
+      float calibrated_pedestal_value     = 0.0; // Pedestal to be recorded in RawDigits collection
+      float calibrated_pedestal_rms_value = 0.0; // Pedestal RMS to be recorded in RawDigits collection
 
       // Add pedestal including variation to each tick in the channel.
       if ( fPedestalOn ) {
@@ -387,29 +344,8 @@ namespace detsim {
       adcvec.resize(fNSamplesReadout);
       
       // Add stuck bits.
-      if ( fSimStuckBits ) {
-#ifdef OLDSTUCK
-        for ( size_t i = 0; i < adcvec.size(); ++i ) {
-          art::ServiceHandle<art::RandomNumberGenerator> rng;
-          CLHEP::HepRandomEngine& stuck_engine = rng->getEngine("SimWireDUNEStuck");
-          CLHEP::RandFlat stuck_flat(stuck_engine);
-          double rnd = stuck_flat.fire(0,1);
-          unsigned int zeromask = 0xffc0;
-          unsigned int onemask = 0x003f;
-          unsigned int sixlsbs = adcvec[i] & onemask;
-          int probability_index = (int)sixlsbs;
-          if ( rnd < fUnderflowProbs[probability_index] ) {
-            adcvec[i] = adcvec[i] | onemask; // 6 LSBs are stuck at 3F
-            adcvec[i] -= 64; // correct 1st MSB value by subtracting 64
-          } else if ( rnd > fUnderflowProbs[probability_index] &&
-                    rnd < fUnderflowProbs[probability_index] + fOverflowProbs[probability_index] ) {
-            adcvec[i] = adcvec[i] & zeromask; // 6 LSBs are stuck at 0
-            adcvec[i] += 64; // correct 1st MSB value by adding 64
-          }
-        }
-#else
+      if ( fStuckBitsOn ) {
         m_pasb->modify(chan, adcvec);
-#endif
       }
       
       // Zero suppress and compress.

@@ -5,7 +5,8 @@
 #
 # Script to generate reference raw data.
 #
-# Uses new simulation (SimWireDUNE) with low noise and new ZS.
+# Uses new simulation (SimWireDUNE) with stuck bits added.
+# There is no noise and no ZS.
 
 #include "services_dune.fcl"
 #include "singles_dune.fcl"
@@ -98,9 +99,9 @@ services.user.SeedService.daq: {
 #services.user.SeedService.SimWireDUNEStuck:    1009
 
 # Specify the zero suppression service.
-#services.user.ZeroSuppressBase: @local::zsnone
+services.user.ZeroSuppressBase: @local::zsnone
 #services.user.ZeroSuppressBase: @local::zslegacy
-services.user.ZeroSuppressBase: @local::zsonline
+#services.user.ZeroSuppressBase: @local::zsonline
 
 # Specify the compression service.
 services.user.CompressReplaceService: { Zero: 0 }
@@ -117,5 +118,6 @@ services.user.StuckBitsService: @local::stuckbits
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0
 
 physics.producers.daq.PedestalOn:  true
-physics.producers.daq.NoiseOn:     true
-physics.producers.daq.StuckBitsOn: false
+physics.producers.daq.NoiseOn:     false
+physics.producers.daq.StuckBitsOn: true
+

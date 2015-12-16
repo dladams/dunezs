@@ -91,10 +91,10 @@ int StuckBitsService::modify(Channel, AdcCountVector& adcvec) const {
 //**********************************************************************
 
 ostream& StuckBitsService::print(ostream& out, string prefix) const {
-  out << "StuckBitsService:" << endl;
-  out << "       StuckBitsProbabilitiesFname: " << fStuckBitsProbabilitiesFname << endl;
-  out << "   fStuckBitsOverflowProbHistoName: " << fStuckBitsOverflowProbHistoName << endl;
-  out << "  fStuckBitsUnderflowProbHistoName: " << fStuckBitsUnderflowProbHistoName << endl;
+  out << prefix << "StuckBitsService:" << endl;
+  out << prefix << "       StuckBitsProbabilitiesFname: " << fStuckBitsProbabilitiesFname << endl;
+  out << prefix << "   fStuckBitsOverflowProbHistoName: " << fStuckBitsOverflowProbHistoName << endl;
+  out << prefix << "  fStuckBitsUnderflowProbHistoName: " << fStuckBitsUnderflowProbHistoName << endl;
   return out;
 }
 
