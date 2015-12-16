@@ -102,10 +102,15 @@ services.user.SeedService.daq: {
 #services.user.ZeroSuppressBase: @local::zslegacy
 services.user.ZeroSuppressBase: @local::zsonline
 
+# Specify the SimChannel extraction service.
+services.user.SimChannelExtractServiceBase: @local::scxall
+
 # Specify the compression service.
 services.user.CompressReplaceService: { Zero: 0 }
-services.user.SimChannelExtractServiceBase: @local::scxall
+
+# Specify the pedestal service.
 services.user.IDetPedestalService: @local::pedfixed
+services.user.PedestalAdditionService: @local::padprovided
 
 # Specify the noise service.
 services.user.ChannelNoiseServiceBase: @local::chnoiseold

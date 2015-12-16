@@ -7,8 +7,11 @@
 //
 // Developed from  SimWireDUNE35t_module.cc.
 
+#undef OLDPED
+
 #include <vector>
 #include <string>
+#include <sstream>
 #include <algorithm>
 #include <sstream>
 #include <bitset>
@@ -50,8 +53,6 @@ extern "C" {
 #include "TFile.h"
 #include "TProfile.h"
 
-#undef  OLDNOISE2
-
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGaussQ.h"
 
@@ -60,21 +61,15 @@ extern "C" {
 #include "DZSService/CompressReplaceService.h"
 #include "DZSInterface/SimChannelExtractServiceBase.h"
 #include "DZSInterface/ChannelNoiseServiceBase.h"
+#include "DZSInterface/PedestalAdditionService.h"
 #include "DZSService/StuckBitsService.h"
 
+#ifdef OLDPED
 #include "CalibrationDBI/Interface/IDetPedestalService.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+#endif
 
-///Detector simulation of raw signals on wires 
-namespace detsim {
-
-    typedef enum {
-      NONACTIVE, UCOMB, VCOMB, ACTIVE, HORIZGAP, VERTGAP
-    } GapType_t;
-
-}
-
-using std::cout;
+using std::ostringstream;
 using std::endl;
 
 //**********************************************************************
@@ -102,7 +97,9 @@ private:
   unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
   
   TH1*                fNoiseChanDist;      ///< distribution of noise channels
+#ifdef OLDPED
   TH1*                fPedNoiseDist;       ///< distribution of pedestal noise counts
+#endif
     
 
   // Find a collection channel for dhaping extra charge.
@@ -122,6 +119,9 @@ private:
   art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
   art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
   art::ServiceHandle<StuckBitsService> m_pasb;
+#ifndef OLDPED
+  art::ServiceHandle<PedestalAdditionService> m_ppad;
+#endif
 
 }; // class SimWireDUNE
 
@@ -137,15 +137,21 @@ SimWireDUNE::SimWireDUNE(fhicl::ParameterSet const& pset) {
   //seedSvc->createEngine(*this, pset, "SimWireDUNENoise");
   // Create other services with local seeds. SeedService will not create two engines.
   int seedNoise = 2001;
+#ifdef OLDPED
   int seedPedestal = 2003;
+#endif
   bool useSeedSvc = true;
   if ( useSeedSvc ) {
     art::ServiceHandle<artext::SeedService> seedSvc;
     seedNoise    = seedSvc->getSeed("SimWireDUNENoise");
+#ifdef OLDPED
     seedPedestal = seedSvc->getSeed("SimWireDUNEPedestal");
+#endif
   }
   createEngine(seedNoise,    "HepJamesRandom", "SimWireDUNENoise");
+#ifdef OLDPED
   createEngine(seedPedestal, "HepJamesRandom", "SimWireDUNEPedestal");
+#endif
 }
 
 //**********************************************************************
@@ -164,28 +170,33 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   art::ServiceHandle<util::DetectorProperties> detprop;
   fNSamplesReadout  = detprop->ReadOutWindowSize();
 
-  cout << "SimWireDUNE::reconfigure" << endl;
-  cout << "  Compression service:" << endl;
-  m_pcmp->print(cout, "    ");
-  cout << "  Zero suppression service:" << endl;
-  m_pzs->print(cout, "    ");
+  ostringstream out;
+  out << "  Compression service:";
+  m_pcmp->print(out, "    ");
+  out << "  Zero suppression service:" << endl;;
+  out << endl;
+  m_pzs->print(out, "    ");
   if ( fNoiseOn ) {
-    cout << "  Channel noise service:" << endl;
-    m_pcns->print(cout, "    ");
+    out << "  Channel noise service:" << endl;;
+    m_pcns->print(out, "    ");
   } else {
-    cout << "  Channel noise is off." << endl;
+    out << "  Channel noise is off.";
   }
+  out << endl;
   if ( fPedestalOn ) {
-    cout << "  Pedestal addition is on" << endl;
+    out << "  Pedestal addition service:" << endl;;
+    m_ppad->print(out, "    ");
   } else {
-    cout << "  Pedestal addition is off." << endl;
+    out << "  Pedestal addition is off.";
   }
+  out << endl;
   if ( fStuckBitsOn ) {
-    cout << "  Stuck bits service:" << endl;
-    m_pasb->print(cout, "    ");
+    out << "  Stuck bits service:" << endl;;
+    m_pasb->print(out, "    ");
   } else {
-    cout << "  Stuck bits is off." << endl;
+    out << "  Stuck bits is off.";
   }
+  mf::LogInfo("SimWireDUNE::reconfigure") << out.str();
 
   return;
 }
@@ -197,14 +208,16 @@ void SimWireDUNE::beginJob() {
   // get access to the TFile service
   art::ServiceHandle<art::TFileService> tfs;
 
+#ifdef OLDPED
   fPedNoiseDist  = tfs->make<TH1F>("PedNoise", ";Pedestal noise  (ADC);", 1000,   -1., 1.);
+#endif
 
   art::ServiceHandle<util::LArFFT> fFFT;
   fFFTSize = fFFT->FFTSize();
 
   if ( fFFTSize%2 != 0 ) 
     LOG_DEBUG("SimWireDUNE") << "Warning: FFTSize not a power of 2. "
-                               << "May cause issues in (de)convolution.\n";
+                             << "May cause issues in (de)convolution.\n";
 
   if ( (int)fNSamplesReadout > fFFTSize ) 
     mf::LogError("SimWireDUNE") << "Cannot have number of readout samples "
@@ -237,10 +250,12 @@ void SimWireDUNE::beginJob() {
     // Get the SignalShapingService.
     art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
 
+#ifdef OLDPED
     // Get the pedestal retriever.
     const lariov::IDetPedestalProvider& pedestalProvider
       = art::ServiceHandle<lariov::IDetPedestalService>()->GetPedestalProvider();
     mf::LogInfo("SimWireDUNE") << "Pedestal for channel 0: " << pedestalProvider.PedMean(0);
+#endif
 
     // make a vector of const sim::SimChannel* that has same number
     // of entries as the number of channels in the detector
@@ -309,6 +324,7 @@ void SimWireDUNE::beginJob() {
       float calibrated_pedestal_value     = 0.0; // Pedestal to be recorded in RawDigits collection
       float calibrated_pedestal_rms_value = 0.0; // Pedestal RMS to be recorded in RawDigits collection
 
+#ifdef OLDPED
       // Add pedestal including variation to each tick in the channel.
       if ( fPedestalOn ) {
         // Fetch the pedestal for this channel.
@@ -330,6 +346,9 @@ void SimWireDUNE::beginJob() {
         calibrated_pedestal_value = ped_mean;
         calibrated_pedestal_rms_value = ped_rms;
       }
+#else
+      m_ppad->addPedestal(chan, fChargeWork, calibrated_pedestal_value, calibrated_pedestal_rms_value);
+#endif
 
       // Convert floating ADC to count in ADC range.
       std::vector<short> adcvec(signalSize, 0);        

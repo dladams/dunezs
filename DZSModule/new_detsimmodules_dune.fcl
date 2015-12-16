@@ -112,6 +112,11 @@ pedfixed: {
   }
 }
 
+padprovided: {
+  service_provider: ProvidedPedestalAdditionService
+  NoiseScale: 1.0
+}
+
 chnoiseold: {
   service_provider: ExponentialChannelNoiseService
   NoiseFactU: 0.05
