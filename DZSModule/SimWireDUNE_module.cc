@@ -7,6 +7,8 @@
 //
 // Developed from  SimWireDUNE35t_module.cc.
 
+#undef CONVOLUTE
+
 #include <vector>
 #include <string>
 #include <sstream>
@@ -32,10 +34,12 @@ extern "C" {
 // art extensions
 #include "artextensions/SeedService/SeedService.hh"
 
+#ifdef CONVOLUTE
 #include "Utilities/LArFFT.h"
+#include "dune/Utilities/SignalShapingServiceDUNE35t.h"
+#endif
 #include "RawData/raw.h"
 #include "Utilities/LArProperties.h"
-#include "dune/Utilities/SignalShapingServiceDUNE35t.h"
 #include "Geometry/Geometry.h"
 
 #include "Simulation/sim.h"
@@ -86,14 +90,16 @@ private:
   void         GenNoise(std::vector<float>& array);
 
   std::string            fDriftEModuleLabel;///< module making the ionization electrons
+#ifdef CONVOLUTE
   int                    fFFTSize;          ///< number of ticks for FFT
+  // Find a collection channel for dhaping extra charge.
+  uint32_t               fFirstCollectionChannel;
+#endif
   unsigned int           fNSamplesReadout;  ///< number of ADC readout samples in 1 readout frame
   
   TH1*                fNoiseChanDist;      ///< distribution of noise channels
     
 
-  // Find a collection channel for dhaping extra charge.
-  uint32_t               fFirstCollectionChannel;
 
   // Define max ADC value.
   const float adcmax = 4095;
@@ -187,6 +193,7 @@ void SimWireDUNE::beginJob() {
   // get access to the TFile service
   art::ServiceHandle<art::TFileService> tfs;
 
+#ifdef CONVOLUTE
   art::ServiceHandle<util::LArFFT> fFFT;
   fFFTSize = fFFT->FFTSize();
 
@@ -207,6 +214,7 @@ void SimWireDUNE::beginJob() {
       break;
     }
   }
+#endif
 
   return;
 
@@ -220,10 +228,16 @@ void SimWireDUNE::beginJob() {
 
     // Get the geometry.
     art::ServiceHandle<geo::Geometry> geo;
-    unsigned int signalSize = fFFTSize;
 
+#ifdef CONVOLUTE
+    unsigned int signalSize = fFFTSize;
+#endif
+
+#ifdef CONVOLUTE
     // Get the SignalShapingService.
     art::ServiceHandle<util::SignalShapingServiceDUNE35t> sss;
+    art::ServiceHandle<util::LArFFT> fFFT;
+#endif
 
     // make a vector of const sim::SimChannel* that has same number
     // of entries as the number of channels in the detector
@@ -240,7 +254,6 @@ void SimWireDUNE::beginJob() {
     // digits to be transferred to the art::Event after the put statement below
     std::unique_ptr< std::vector<raw::RawDigit>   >  digcol(new std::vector<raw::RawDigit>);
           
-    art::ServiceHandle<util::LArFFT> fFFT;
     art::ServiceHandle<art::RandomNumberGenerator> rng;
 
     // Add all channels  
@@ -255,9 +268,10 @@ void SimWireDUNE::beginJob() {
       }
 
       // Create vector that holds the floating ADC count for each tick.
-      std::vector<AdcSignal> fChargeWork(signalSize, 0.0);
+      std::vector<AdcSignal> fChargeWork;
 
       // Use the SimChannel to assign signal charge to each tick in the channel.
+#ifdef CONVOLUTE
       if ( psc ) {      
         // Use the SimChannel extraction service to find the charge seen by each channel.
         // If extra charge is collected, it is stored in fChargeWorkCollInd and should
@@ -269,7 +283,6 @@ void SimWireDUNE::beginJob() {
         }
 
         // Convolve charge with appropriate response function 
-        fChargeWork.resize(signalSize, 0);
         sss->Convolute(chan,fChargeWork);
 
         // If there is extra charge, convolve it as collected charge and add it to the working charge.
@@ -280,8 +293,10 @@ void SimWireDUNE::beginJob() {
             fChargeWork[itck] += fChargeWorkCollInd[itck];
           }
         }
-
       }  // end if psc
+#else
+      m_pscx->extract(psc, fChargeWork);
+#endif
 
       // Add noise to each tick in the channel.
       if ( fNoiseOn ) {              
@@ -296,8 +311,8 @@ void SimWireDUNE::beginJob() {
       }
 
       // Convert floating ADC to count in ADC range.
-      std::vector<short> adcvec(signalSize, 0);        
-      for ( unsigned int itck=0; itck<signalSize; ++itck ) {
+      std::vector<short> adcvec(fChargeWork.size(), 0);        
+      for ( unsigned int itck=0; itck<fChargeWork.size(); ++itck ) {
         double chg = fChargeWork[itck];
         short adc = (chg >=0) ? (short) (chg+0.5) : (short) (chg-0.5);
         if ( adc > adcmax ) adc = adcmax;
@@ -323,7 +338,7 @@ void SimWireDUNE::beginJob() {
       // Create and store raw digit.
       raw::RawDigit rd(chan, fNSamplesReadout, adcvec, myCompression);
       rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
-      adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
+      //adcvec.resize(signalSize);        // Then, resize adcvec back to full length.  Do not initialize to zero (slow)
       if ( fSaveEmptyChannel || nkeep>0 )
       digcol->push_back(rd);            // add this digit to the collection
 

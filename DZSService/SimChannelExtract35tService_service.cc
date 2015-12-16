@@ -10,7 +10,9 @@ using std::string;
 //**********************************************************************
 
 SimChannelExtract35tService::
-SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&) {
+SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&)
+: m_ntick(0),
+  fFirstCollectionChannel(9999999) {
   fFractUUCollect         = pset.get< float >("FractUUCollect");
   fFractUVCollect         = pset.get< float >("FractUVCollect");
   fFractVUCollect         = pset.get< float >("FractVUCollect");
@@ -37,15 +39,19 @@ SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegist
 //**********************************************************************
 
 int SimChannelExtract35tService::
-extract(const sim::SimChannel& sc, AdcSignalVector& fChargeWork, AdcSignalVector& fChargeWorkCollInd) const {
+extract(const sim::SimChannel* psc, AdcSignalVector& fChargeWork) const {
+  fChargeWork.clear();
+  fChargeWork.resize(m_ntick, 0.0);
+  if ( psc == nullptr ) return 0;
+  AdcSignalVector fChargeWorkCollInd(m_ntick, 0.0);
   string fname = "SimChannelExtract35tService::extract";
   art::ServiceHandle<geo::Geometry> geo;
-  unsigned int chan = sc.Channel();
+  unsigned int chan = psc->Channel();
   const geo::View_t view = geo->View(chan);
   fChargeWorkCollInd.clear();
   fChargeWorkCollInd.resize(fChargeWork.size(), 0.);
   for ( size_t t=0; t<fChargeWork.size(); ++t ) {
-    const std::vector<sim::IDE> ides = sc.TrackIDsAndEnergies(t,t);
+    const std::vector<sim::IDE> ides = psc->TrackIDsAndEnergies(t,t);
     for ( auto const &ide : ides ) {
       GapType_t gaptype = combtest35t(ide.x,ide.y,ide.z);
       switch ( gaptype ) {
@@ -125,6 +131,12 @@ extract(const sim::SimChannel& sc, AdcSignalVector& fChargeWork, AdcSignalVector
       }  // end switch gaptype
     }  // end loop over ides
   }  // end loop over ticks
+  // Convolute and combine charges.
+  m_psss->Convolute(chan, fChargeWork);
+  m_psss->Convolute(fFirstCollectionChannel, fChargeWorkCollInd);
+  for ( unsigned int itck=0; itck<m_ntick; ++itck ) {
+    fChargeWork[itck] += fChargeWorkCollInd[itck];
+  }
   return 0;
 }
 
@@ -134,7 +146,20 @@ void SimChannelExtract35tService::init() {
 
   if ( m_init ) return;
 
+  // Fetch the number of ticks.
+  m_ntick = m_pfft->FFTSize();
+  if ( m_ntick%2 != 0 )
+    throw cet::exception("SimChannelExtractAllService")
+          << "FFT size is not a power of 2.";
   art::ServiceHandle<geo::Geometry> geo;
+
+  // Find the first collection channel.
+  for ( uint32_t ichan=0; ichan<geo->Nchannels(); ++ichan ) {
+    if ( geo->View(ichan) == geo::kZ ) {
+      fFirstCollectionChannel = ichan;
+      break;
+    }
+  }
 
   // initialize the comb test positions.  This is clumsy here mainly due to the irregular geometry
   // should write something more systematic for the FD.  There is also some duplication as the

@@ -12,13 +12,15 @@ CLEAN=
 DBG=0
 SAMTEST=mu35tnew
 SAMREF=
-while getopts hct:r:d:v OPT; do
+KEEP=
+while getopts hct:r:d:vk OPT; do
   case $OPT in
   h) HELP=true;;
   c) CLEAN=true;;
   t) SAMTEST=$OPTARG;;
   r) SAMREF=$OPTARG;;
   d) DBG=$OPTARG;;
+  k) KEEP=true 
   esac
 done
 shift $(( OPTIND-1 ))
@@ -29,14 +31,19 @@ fi
 
 # Generate test sample.
 ARG=
+GEN=
 if [ -n "$CLEAN" ]; then
   ARG="-c"
+  GEN=true
 fi
-echo
-echo Generating test sample.
-if ! ./run $ARG $SAMTEST; then
-  echo Sample generation failed
-  exit 1 
+
+if [ -z "$KEEP"]; then
+  echo
+  echo Generating test sample.
+  if ! ./run $ARG $SAMTEST; then
+    echo Sample generation failed
+    exit 1 
+  fi
 fi
 
 if [ -n "$HELP" ]; then
@@ -45,8 +52,9 @@ if [ -n "$HELP" ]; then
   echo   "-d: Run comparison at debug level VAL"
   echo   "    VAL = 1 shows differing channels"
   echo   "-t: Arg is name for test sample [mu35tnew]"
-  echo   "-r: Arg is name for reference sample [mu35tnewref]"
+  echo   "-r: Arg is name for reference sample [TEST_SAMPLE+ref]"
   echo   "-c: Regenerate test sample."
+  echo   "-k: Keep existing test sample."
   exit 0
 fi
 

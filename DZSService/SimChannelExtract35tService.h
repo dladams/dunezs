@@ -17,6 +17,9 @@
 #include <vector>
 #include "DZSInterface/SimChannelExtractServiceBase.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "Utilities/LArFFT.h"
+#include "dune/Utilities/SignalShapingServiceDUNE35t.h"
 
 namespace sim {
 class SimChannel;
@@ -28,7 +31,7 @@ public:
 
   SimChannelExtract35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
-  int extract(const sim::SimChannel& sc, AdcSignalVector& sig, AdcSignalVector& xsig) const;
+  int extract(const sim::SimChannel* psc, AdcSignalVector& sig) const;
 
 private:
 
@@ -38,6 +41,12 @@ private:
 
   void init();
   GapType_t combtest35t(double x, double y, double z) const;
+
+  art::ServiceHandle<util::LArFFT> m_pfft;
+  art::ServiceHandle<util::SignalShapingServiceDUNE35t> m_psss;
+  unsigned int m_ntick;
+
+  unsigned int fFirstCollectionChannel;  // 1st coll channel is used for shaping extra charge
 
   bool m_init = false;
 

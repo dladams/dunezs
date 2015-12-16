@@ -28,17 +28,22 @@ simple_plugin(CompressReplaceService        "service" DZSCore BASENAME_ONLY)
 simple_plugin(SimChannelExtract35tService   "service"
                 DZSCore DZSInterface
                 Geometry Simulation Utilities
+                SignalShapingServiceDUNE35t_service
                 ${ART_UTILITIES}
                 ${ROOT_BASIC_LIB_LIST} BASENAME_ONLY
              )
 simple_plugin(SimChannelExtractAllService   "service"
                 DZSCore DZSInterface
                 Simulation
+                Utilities
+                SignalShapingServiceDUNE35t_service
+                ${ART_UTILITIES}
                 ${ROOT_BASIC_LIB_LIST} BASENAME_ONLY
              )
 simple_plugin(ExponentialChannelNoiseService   "service"
                 DZSInterface
                 Geometry
+                SignalShapingServiceDUNE35t_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
@@ -51,10 +56,10 @@ simple_plugin(ExponentialChannelNoiseService   "service"
 simple_plugin(WhiteChannelNoiseService   "service"
                 DZSInterface
                 Geometry
+                SignalShapingServiceDUNE35t_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
-                SignalShapingServiceDUNE35t_service
                 ${SEEDSERVICE_SERVICE}
                 ${ART_FRAMEWORK_CORE}
                 ${ART_UTILITIES}
