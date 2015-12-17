@@ -40,7 +40,9 @@ int main() {
   for ( isig= 6; isig<28; ++isig ) keep[isig] = true;
   cout << myname << "Compressing." << endl;
   float offset = 20.0;
-  assert( zs.compress(outdata, keep, offset) == 0 );
+  raw::Compress_t comp = raw::kHuffman;
+  assert( zs.compress(outdata, keep, offset, comp) == 0 );
+  assert( comp == raw::kNone );
   for ( isig=0; isig<indata.size(); ++isig ) {
     cout << setw(3) << isig << ":" << setw(6) << indata[isig] << setw(6) << outdata[isig] << endl;
   }

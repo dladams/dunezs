@@ -20,11 +20,13 @@ CompressReplaceService(const fhicl::ParameterSet& pset, art::ActivityRegistry&) 
   
 //**********************************************************************
 
-int CompressReplaceService::compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset) const {
+int CompressReplaceService::
+compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset,
+         raw::Compress_t& comp) const {
   if ( m_pact.get() == nullptr ) {
     throw cet::exception(__FUNCTION__) << "Compression is not configured properly.";
   }
-  return m_pact->compress(sigs, keep, offset);
+  return m_pact->compress(sigs, keep, offset, comp);
 }
 
 //**********************************************************************

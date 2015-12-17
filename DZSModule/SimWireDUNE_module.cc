@@ -210,11 +210,11 @@ void SimWireDUNE::produce(art::Event& evt) {
     m_pzs->filter(adcvec, chan, pedval, keep);
     int nkeep = 0;
     for ( bool kept : keep ) if ( kept ) ++nkeep;
-    m_pcmp->compress(adcvec, keep, pedval);
-    raw::Compress_t myCompression = raw::kNone;
+    raw::Compress_t comp = raw::kNone;
+    m_pcmp->compress(adcvec, keep, pedval, comp);
 
     // Create and store raw digit.
-    raw::RawDigit rd(chan, nTickReadout, adcvec, myCompression);
+    raw::RawDigit rd(chan, nTickReadout, adcvec, comp);
     rd.SetPedestal(pedval, pedrms);
     digcol->push_back(rd);            // add this digit to the collection
 

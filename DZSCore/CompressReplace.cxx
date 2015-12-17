@@ -25,10 +25,12 @@ AdcCount CompressReplace::zero() const {
 //**********************************************************************
 
 int CompressReplace::
-compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset) const {
+compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset,
+         raw::Compress_t& comp) const {
   for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
     if ( ! keep[isig] ) sigs[isig] = zero() + offset;
   }
+  comp = raw::kNone;
   return 0;
 }
 

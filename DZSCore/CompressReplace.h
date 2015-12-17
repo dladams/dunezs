@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include "AdcTypes.h"
+#include "SimpleTypesAndConstants/RawTypes.h"
 
 class CompressReplace {
 
@@ -29,7 +30,8 @@ public:
   // Apply a filter to a signal vector.
   // Filtered-out signals are replaced with the value offset + zero().
   // Returns nonzero for error.
-  int compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset) const;
+  int compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset,
+               raw::Compress_t& comp) const;
 
   // Display the signal parameters.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;

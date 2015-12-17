@@ -58,7 +58,9 @@ int test_CompressReplaceService() {
   unsigned int isig = 0;
   float offset = 20.0;
   for ( isig= 6; isig<28; ++isig ) keep[isig] = true;
-  assert( pcr->compress(outdata, keep, offset) == 0 );
+  raw::Compress_t comp = raw::kHuffman;
+  assert( pcr->compress(outdata, keep, offset, comp) == 0 );
+  assert( comp == raw::kNone );
   for ( unsigned int idat=0; idat<indata.size(); ++idat ) {
     cout << setw(6) << indata[idat] << setw(6) << outdata[idat] << endl;
   }

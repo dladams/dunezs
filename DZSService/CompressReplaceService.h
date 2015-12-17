@@ -36,7 +36,8 @@ public:
   // Suppressed signals are replaced with the value of offset + (FCL parameter) Zero.
   int compress(AdcCountVector& sigs,
                const CompressReplace::FilterVector& keep,
-               AdcCount offset) const;
+               AdcCount offset,
+               raw::Compress_t& comp) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="  ") const;
