@@ -54,7 +54,7 @@ int test_CompressReplaceService() {
                             6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
                             2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
   AdcCountVector outdata(indata);
-  CompressReplace::FilterVector keep(30, false);
+  CompressReplaceService::FilterVector keep(30, false);
   unsigned int isig = 0;
   float offset = 20.0;
   for ( isig= 6; isig<28; ++isig ) keep[isig] = true;
