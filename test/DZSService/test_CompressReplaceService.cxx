@@ -34,7 +34,7 @@ int test_CompressReplaceService(const CompressReplaceService& cr) {
                             6, 12, 21, 17, 12,  7,  5,  2,  1, -1,
                             2,  1,  1, -1, -1, -2,  3,  1,  1, -1 };
   AdcCountVector outdata(indata);
-  CompressReplaceService::FilterVector keep(30, false);
+  AdcFilterVector keep(30, false);
   unsigned int isig = 0;
   float offset = 20.0;
   for ( isig= 6; isig<28; ++isig ) keep[isig] = true;
@@ -65,9 +65,11 @@ int test_CompressReplaceService_as_service() {
 
   cout << myname << line() << endl;
   cout << myname << "Add the CompressReplace service." << endl;
-  scfg = "Zero: 0";
+  scfg += "service_provider: \"CompressReplaceService\"";
+  scfg += "\n";
+  scfg += "Zero: 0";
   cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("CompressReplaceService", scfg) == 0 );
+  assert( ash.addService("AdcCompressService", scfg) == 0 );
 
   cout << myname << line() << endl;
   cout << myname << "Load the services." << endl;

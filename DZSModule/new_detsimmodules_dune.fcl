@@ -65,6 +65,11 @@ scxall: {
   service_provider: SimChannelExtractAllService
 }
 
+cmpreplace: {
+  service_provider: CompressReplaceService
+  Zero: 0
+}
+
 scx35t: {
   service_provider: SimChannelExtract35tService
   FractHorizGapUCollect: 0.1

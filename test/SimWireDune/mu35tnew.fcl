@@ -107,7 +107,7 @@ services.user.SimChannelExtractServiceBase: @local::scxall
 #services.user.SimChannelExtractServiceBase: @local::scx35t
 
 # Specify the compression service.
-services.user.CompressReplaceService: { Zero: 0 }
+services.user.AdcCompressService: @local::cmpreplace
 
 # Specify the pedestal service.
 services.user.IDetPedestalService: @local::pedfixed

@@ -12,14 +12,7 @@
 #ifndef CompressReplaceService_H
 #define CompressReplaceService_H
 
-#include <string>
-#include <iostream>
-#include <memory>
-#include <string>
-#include <iostream>
-#include "DZSInterface/AdcTypes.h"
-#include "SimpleTypesAndConstants/RawTypes.h"
-#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "DZSInterface/AdcCompressService.h"
 
 namespace fhicl {
 class ParameterSet;
@@ -28,12 +21,9 @@ namespace art {
 class ActivityRegistry;
 }
 
-class CompressReplaceService {
+class CompressReplaceService : public AdcCompressService {
 
 public:
-
-  typedef unsigned int Index;
-  typedef std::vector<bool> FilterVector;
 
   // Ctor from parameters that characterize the algorithm.
   CompressReplaceService(AdcCount azero =0);
@@ -44,7 +34,7 @@ public:
   // Compress a vector of signals.
   // Suppressed signals are replaced with the value of offset + (FCL parameter) Zero.
   int compress(AdcCountVector& sigs,
-               const FilterVector& keep,
+               const AdcFilterVector& keep,
                AdcCount offset,
                raw::Compress_t& comp) const;
 
@@ -60,6 +50,6 @@ private:
 
 };
 
-DECLARE_ART_SERVICE(CompressReplaceService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(CompressReplaceService, AdcCompressService, LEGACY)
 
 #endif

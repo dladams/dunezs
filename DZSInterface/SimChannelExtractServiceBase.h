@@ -10,7 +10,7 @@
 #define SimChannelExtractServiceBase_H
 
 #include <vector>
-#include "DZSCore/AdcTypes.h"
+#include "DZSInterface/AdcTypes.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 namespace sim {

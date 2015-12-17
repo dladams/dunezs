@@ -7,9 +7,6 @@ using std::string;
 using std::ostream;
 using std::endl;
 
-//typedef CompressReplace::FilterVector FilterVector;
-//typedef CompressReplace::Index Index;
-
 //**********************************************************************
 
 CompressReplaceService::CompressReplaceService(AdcCount azero)
@@ -26,7 +23,7 @@ CompressReplaceService(const fhicl::ParameterSet& pset, art::ActivityRegistry&)
 //**********************************************************************
 
 int CompressReplaceService::
-compress(AdcCountVector& sigs, const FilterVector& keep, AdcCount offset,
+compress(AdcCountVector& sigs, const AdcFilterVector& keep, AdcCount offset,
          raw::Compress_t& comp) const {
   for ( unsigned int isig=0; isig<sigs.size(); ++isig ) {
     if ( ! keep[isig] ) sigs[isig] = zero() + offset;
@@ -52,6 +49,6 @@ ostream& CompressReplaceService::print(ostream& out, string prefix) const {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE(CompressReplaceService)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(CompressReplaceService, AdcCompressService)
 
 //**********************************************************************

@@ -12,5 +12,5 @@ cet_test(test_ZeroSuppress35tLegacyService SOURCES test_ZeroSuppress35tLegacySer
 )
 
 cet_test(test_CompressReplaceService SOURCES test_CompressReplaceService.cxx
-  LIBRARIES CompressReplaceService_service AXService DZSCore
+  LIBRARIES CompressReplaceService_service AXService
 )

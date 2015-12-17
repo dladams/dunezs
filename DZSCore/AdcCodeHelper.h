@@ -15,7 +15,7 @@
 #ifndef AdcCodeHelper_H
 #define AdcCodeHelper_H
 
-#include "AdcTypes.h"
+#include "DZSInterface/AdcTypes.h"
 
 class AdcCodeHelper {
 

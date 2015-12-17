@@ -24,7 +24,9 @@
 simple_plugin(ZeroSuppress35tService        "service" DZSCore BASENAME_ONLY)
 simple_plugin(ZeroSuppress35tLegacyService  "service" DZSCore BASENAME_ONLY)
 simple_plugin(ZeroSuppressFixedService      "service" DZSCore BASENAME_ONLY)
-simple_plugin(CompressReplaceService        "service" DZSCore BASENAME_ONLY)
+simple_plugin(CompressReplaceService        "service" BASENAME_ONLY
+                DZSInterface
+)
 simple_plugin(SimChannelExtract35tService   "service"
                 DZSCore DZSInterface
                 Geometry Simulation Utilities

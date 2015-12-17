@@ -19,4 +19,6 @@ typedef std::vector<AdcSignalVector> AdcSignalVectorVector;
 
 typedef float AdcPedestal;
 
+typedef std::vector<bool> AdcFilterVector;
+
 #endif

@@ -12,7 +12,7 @@
 
 #include <string>
 #include <iostream>
-#include "AdcTypes.h"
+#include "DZSInterface/AdcTypes.h"
 
 class ZeroSuppressBase {
 

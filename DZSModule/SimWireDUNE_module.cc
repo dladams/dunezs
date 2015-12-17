@@ -26,9 +26,9 @@
 #include "RawData/RawDigit.h"
 #include "Utilities/DetectorProperties.h"
 
-#include "DZSCore/AdcTypes.h"
+#include "DZSInterface/AdcTypes.h"
 #include "DZSInterface/ZeroSuppressServiceBase.h"
-#include "DZSService/CompressReplaceService.h"
+#include "DZSInterface/AdcCompressService.h"
 #include "DZSInterface/SimChannelExtractServiceBase.h"
 #include "DZSInterface/ChannelNoiseServiceBase.h"
 #include "DZSInterface/PedestalAdditionService.h"
@@ -66,7 +66,7 @@ private:
   // Services.
   art::ServiceHandle<geo::Geometry> m_pgeo;
   art::ServiceHandle<ZeroSuppressBase> m_pzs;
-  art::ServiceHandle<CompressReplaceService> m_pcmp;
+  art::ServiceHandle<AdcCompressService> m_pcmp;
   art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
   art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
   art::ServiceHandle<StuckBitsService> m_pasb;
