@@ -4,9 +4,6 @@
 // December 2015
 //
 // Service interface for applying suppression and compressing an ADC vector.
-//
-// FCL parameters
-//   Zero [0] - replacement value
 
 #ifndef AdcCompressService_H
 #define AdcCompressService_H
@@ -36,7 +33,7 @@ public:
 
   // Compress a vector of signals.
   //     sigs: I/O ADC vector to be compressed
-  //     keep: Input Boolean vector indicating which signals are retained.
+  //     keep: Input boolean vector indicating which signals are retained.
   //   offset: Input pedestal. If used, the same value must be supplied for uncompression.
   //     comp: Output value indicating the compression strategy. Needed for uncompression.
   virtual int compress(AdcCountVector& sigs,

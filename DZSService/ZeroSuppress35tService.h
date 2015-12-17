@@ -3,14 +3,18 @@
 // David Adams
 // November 2015
 //
-// Service wrapper for 35-ton zero suppression.
+// Utility/service wrapper for 35-ton zero suppression.
+//
+// The algorithm is that described by James Russell at the September 2015
+// DUNE collaboration meeting:
+//   https://indico.fnal.gov/conferenceOtherViews.py?view=standard&confId=10100
+// and is described with later modifications at
+//   https://cdcvs.fnal.gov/redmine/projects/35ton/wiki/Data_compression_and_zero_suppression
 
 #ifndef ZeroSuppress35tService_H
 #define ZeroSuppress35tService_H
 
-#include "DZSCore/ZeroSuppress35t.h"
-#include "DZSInterface/ZeroSuppressServiceBase.h"
-#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "DZSInterface/AdcSuppressService.h"
 
 #include <memory>
 #include <string>
@@ -23,27 +27,43 @@ namespace art {
 class ActivityRegistry;
 }
 
-class ZeroSuppress35tService : public ZeroSuppressBase {
+class ZeroSuppress35tService : public AdcSuppressService {
 
 public:
 
-  // Ctor.
+  typedef unsigned int Index;
+
+  // Ctor from parameters.
+  ZeroSuppress35tService(AdcCount ts, AdcCount tl, AdcCount td, Index ns, Index nl, Index nd, Index nt);
+
+  // Ctor from FCL.
   ZeroSuppress35tService(fhicl::ParameterSet const& pset, art::ActivityRegistry&);
 
   // Filter an array of signals. Result is written to keep.
-  int filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, ResultVector& keep) const;
+  int filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, AdcFilterVector& keep) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
 
+  // Set the debug flag.
+  void setDebug(int dbg);
 
 private:
 
-  // Pointer to the class that does the work.
-  std::shared_ptr<ZeroSuppress35t> m_pzs;
+  // Parameters.
+  AdcCount m_ts;
+  AdcCount m_tl;
+  AdcCount m_td;
+  Index m_ns;
+  Index m_nl;
+  Index m_nd;
+  Index m_nt;
+
+  // Debug flag.
+  bool m_dbg;
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppress35tService, ZeroSuppressBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppress35tService, AdcSuppressService, LEGACY)
 
 #endif

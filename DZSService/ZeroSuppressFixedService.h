@@ -11,8 +11,7 @@
 #ifndef ZeroSuppressFixedService_H
 #define ZeroSuppressFixedService_H
 
-#include "DZSInterface/ZeroSuppressServiceBase.h"
-#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "DZSInterface/AdcSuppressService.h"
 
 #include <memory>
 #include <string>
@@ -25,7 +24,7 @@ namespace art {
 class ActivityRegistry;
 }
 
-class ZeroSuppressFixedService : public ZeroSuppressBase {
+class ZeroSuppressFixedService : public AdcSuppressService {
 
 public:
 
@@ -36,7 +35,7 @@ public:
   ZeroSuppressFixedService();
 
   // Filter an array of signals. Result is written to keep.
-  int filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, ResultVector& keep) const;
+  int filter(const AdcCountVector& sigs, Channel chan, AdcPedestal& ped, AdcFilterVector& keep) const;
 
   // Print the configuration.
   std::ostream& print(std::ostream& out =std::cout, std::string prefix ="") const;
@@ -47,6 +46,6 @@ private:
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppressFixedService, ZeroSuppressBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppressFixedService, AdcSuppressService, LEGACY)
 
 #endif

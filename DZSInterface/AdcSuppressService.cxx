@@ -1,9 +1,9 @@
-// ZeroSuppressBase.cxx
+// AdcSuppressService.cxx
 
-#include <DZSCore/ZeroSuppressBase.h>
+#include "DZSInterface/AdcSuppressService.h"
 
 //**********************************************************************
 
-ZeroSuppressBase::~ZeroSuppressBase() { }
+AdcSuppressService::~AdcSuppressService() { }
 
 //**********************************************************************

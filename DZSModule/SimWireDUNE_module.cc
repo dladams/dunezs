@@ -27,7 +27,7 @@
 #include "Utilities/DetectorProperties.h"
 
 #include "DZSInterface/AdcTypes.h"
-#include "DZSInterface/ZeroSuppressServiceBase.h"
+#include "DZSInterface/AdcSuppressService.h"
 #include "DZSInterface/AdcCompressService.h"
 #include "DZSInterface/SimChannelExtractServiceBase.h"
 #include "DZSInterface/ChannelNoiseServiceBase.h"
@@ -65,7 +65,7 @@ private:
 
   // Services.
   art::ServiceHandle<geo::Geometry> m_pgeo;
-  art::ServiceHandle<ZeroSuppressBase> m_pzs;
+  art::ServiceHandle<AdcSuppressService> m_pzs;
   art::ServiceHandle<AdcCompressService> m_pcmp;
   art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
   art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
@@ -99,7 +99,7 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   ostringstream out;
   out << "  Compression service:";
   m_pcmp->print(out, "    ");
-  out << "  Zero suppression service:" << endl;;
+  out << "  ADC suppression service:" << endl;;
   out << endl;
   m_pzs->print(out, "    ");
   if ( fNoiseOn ) {
@@ -206,7 +206,7 @@ void SimWireDUNE::produce(art::Event& evt) {
     }
     
     // Zero suppress and compress.
-    ZeroSuppressBase::ResultVector keep;
+    AdcFilterVector keep;
     m_pzs->filter(adcvec, chan, pedval, keep);
     int nkeep = 0;
     for ( bool kept : keep ) if ( kept ) ++nkeep;

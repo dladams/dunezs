@@ -9,9 +9,6 @@ using std::string;
 using std::ostream;
 using std::endl;
 
-typedef ZeroSuppressBase::Index        Index;
-typedef ZeroSuppressBase::ResultVector ResultVector;
-
 namespace {
 
 string sbool(bool arg) {
@@ -20,6 +17,8 @@ string sbool(bool arg) {
 }
 
 }  // end unnamed namespace.
+
+typedef unsigned int Index;
 
 //**********************************************************************
 
@@ -46,7 +45,7 @@ ZeroSuppress35tLegacyService(float aAdcThreshold,
 //**********************************************************************
 
 int ZeroSuppress35tLegacyService::
-filter(const AdcCountVector& sigs, Channel, AdcPedestal& ped, ResultVector& keep) const {
+filter(const AdcCountVector& sigs, Channel, AdcPedestal& ped, AdcFilterVector& keep) const {
   const unsigned int nsig = sigs.size();
   keep.clear();
   keep.resize(nsig, false);
@@ -109,6 +108,6 @@ ostream& ZeroSuppress35tLegacyService::print(ostream& out, string prefix) const 
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppress35tLegacyService, ZeroSuppressBase)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppress35tLegacyService, AdcSuppressService)
 
 //**********************************************************************

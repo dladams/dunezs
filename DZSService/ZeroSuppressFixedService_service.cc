@@ -9,9 +9,6 @@ using std::string;
 using std::ostream;
 using std::endl;
 
-typedef ZeroSuppressBase::Index        Index;
-typedef ZeroSuppressBase::ResultVector ResultVector;
-
 //**********************************************************************
 
 ZeroSuppressFixedService::
@@ -25,7 +22,7 @@ ZeroSuppressFixedService::ZeroSuppressFixedService() { }
 //**********************************************************************
 
 int ZeroSuppressFixedService::
-filter(const AdcCountVector& sigs, Channel, AdcPedestal&, ResultVector& keep) const {
+filter(const AdcCountVector& sigs, Channel, AdcPedestal&, AdcFilterVector& keep) const {
   keep.clear();
   keep.resize(sigs.size(), true);
   return 0;
@@ -40,6 +37,6 @@ ostream& ZeroSuppressFixedService::print(ostream& out, string prefix) const {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppressFixedService, ZeroSuppressBase)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(ZeroSuppressFixedService, AdcSuppressService)
 
 //**********************************************************************

@@ -21,9 +21,17 @@
 #)
 
 # Add plugin for each service.
-simple_plugin(ZeroSuppress35tService        "service" DZSCore BASENAME_ONLY)
-simple_plugin(ZeroSuppress35tLegacyService  "service" DZSCore BASENAME_ONLY)
-simple_plugin(ZeroSuppressFixedService      "service" DZSCore BASENAME_ONLY)
+simple_plugin(ZeroSuppress35tService        "service" BASENAME_ONLY
+                DZSInterface
+                DZSCore
+)
+simple_plugin(ZeroSuppress35tLegacyService  "service" BASENAME_ONLY
+                DZSInterface
+                DZSCore
+)
+simple_plugin(ZeroSuppressFixedService      "service" BASENAME_ONLY
+                DZSInterface
+)
 simple_plugin(CompressReplaceService        "service" BASENAME_ONLY
                 DZSInterface
 )

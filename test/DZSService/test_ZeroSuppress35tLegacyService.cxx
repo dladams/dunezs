@@ -44,7 +44,7 @@ int test_ZeroSuppress35tLegacyService() {
   scfg += " SuppressStickyBits: true";
   scfg += " MinTickGap: 2";
   cout << myname << "Configuration: " << scfg << endl;
-  assert( ash.addService("ZeroSuppressBase", scfg) == 0 );
+  assert( ash.addService("AdcSuppressService", scfg) == 0 );
 
   cout << myname << line << endl;
   cout << myname << "Load the services." << endl;
@@ -54,7 +54,6 @@ int test_ZeroSuppress35tLegacyService() {
   cout << myname << line << endl;
   cout << myname << "Get the service." << endl;
   art::ServiceHandle<ZeroSuppress35tLegacyService> pzs;
-  //art::ServiceHandle<ZeroSuppressBase> pzs;
   pzs->print();
 
   cout << myname << "Create ADC data." << endl;
@@ -67,7 +66,7 @@ int test_ZeroSuppress35tLegacyService() {
   cout << "Pedestal: " << ped << endl;
   for ( AdcCount& data : indata ) data += iped;
   cout << myname << "Suppressing." << endl;
-  ZeroSuppressBase::ResultVector keep;
+  AdcFilterVector keep;
   assert( pzs->filter(indata, 1234, ped, keep) == 0 );
   for ( unsigned int idat=0; idat<indata.size(); ++idat ) {
     cout << setw(4) << idat << setw(6) << indata[idat] << setw(6) << keep[idat] << endl;
