@@ -13,7 +13,3 @@ cet_test(test_AdcCodeHelper SOURCES test_AdcCodeHelper.cxx
 cet_test(test_ZeroSuppress35t SOURCES test_ZeroSuppress35t.cxx
   LIBRARIES DZSCore
 )
-
-cet_test(test_CompressReplace SOURCES test_CompressReplace.cxx
-  LIBRARIES DZSCore
-)
