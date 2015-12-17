@@ -64,6 +64,7 @@ private:
   bool fSaveEmptyChannel;  ///< switch for saving channels with all zero entries
 
   // Services.
+  art::ServiceHandle<geo::Geometry> m_pgeo;
   art::ServiceHandle<ZeroSuppressBase> m_pzs;
   art::ServiceHandle<CompressReplaceService> m_pcmp;
   art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
@@ -138,18 +139,15 @@ void SimWireDUNE::endJob() { }
 
 void SimWireDUNE::produce(art::Event& evt) {
 
-  // Get the geometry.
-  art::ServiceHandle<geo::Geometry> geo;
-
-  // make a vector of const sim::SimChannel* that has same number
+  // Make a vector of const sim::SimChannel* that has same number
   // of entries as the number of channels in the detector
   // and set the entries for the channels that have signal on them
   // using the chanHandle
   std::vector<const sim::SimChannel*> chanHandle;
-  std::vector<const sim::SimChannel*> channels(geo->Nchannels());
+  std::vector<const sim::SimChannel*> simChannels(m_pgeo->Nchannels(), nullptr);
   evt.getView(fDriftEModuleLabel, chanHandle);
   for ( size_t c=0; c<chanHandle.size(); ++c ) {
-    channels[chanHandle[c]->Channel()] = chanHandle[c];
+    simChannels[chanHandle[c]->Channel()] = chanHandle[c];
   }
     
   // make an unique_ptr of sim::SimDigits that allows ownership of the produced
@@ -162,11 +160,11 @@ void SimWireDUNE::produce(art::Event& evt) {
 
   // Loop over channels.
   std::map<int,double>::iterator mapIter;      
-  for ( unsigned int chan = 0; chan<geo->Nchannels(); ++chan ) {    
+  for ( unsigned int chan = 0; chan<m_pgeo->Nchannels(); ++chan ) {    
 
-    // get the sim::SimChannel for this channel
-    const sim::SimChannel* psc = channels[chan];
-    const geo::View_t view = geo->View(chan);
+    // Get the SimChannel for this channel
+    const sim::SimChannel* psc = simChannels[chan];
+    const geo::View_t view = m_pgeo->View(chan);
     if (view != geo::kU && view != geo::kV && view != geo::kZ) {
       mf::LogError("SimWireDUNE") << "ERROR: CHANNEL NUMBER " << chan << " OUTSIDE OF PLANE";
     }
@@ -174,7 +172,7 @@ void SimWireDUNE::produce(art::Event& evt) {
     // Create vector that holds the floating ADC count for each tick.
     std::vector<AdcSignal> fChargeWork;
 
-    // Use the SimChannel to assign signal charge to each tick in the channel.
+    // Extract the floating ADC count from the SimChannel for each tick in the channel.
     m_pscx->extract(psc, fChargeWork);
 
     // Add noise to each tick in the channel.
@@ -183,20 +181,20 @@ void SimWireDUNE::produce(art::Event& evt) {
     }
 
     // Add pedestal.
-    float calibrated_pedestal_value     = 0.0; // Pedestal to be recorded in RawDigits collection
-    float calibrated_pedestal_rms_value = 0.0; // Pedestal RMS to be recorded in RawDigits collection
+    float pedval = 0.0; // Pedestal to be recorded in RawDigits collection
+    float pedrms = 0.0; // Pedestal RMS to be recorded in RawDigits collection
     if ( fPedestalOn ) {
-      m_ppad->addPedestal(chan, fChargeWork, calibrated_pedestal_value, calibrated_pedestal_rms_value);
+      m_ppad->addPedestal(chan, fChargeWork, pedval, pedrms);
     }
 
-    // Convert floating ADC to count in ADC range.
+    // Convert floating ADC to integral ADC count.
     std::vector<short> adcvec(fChargeWork.size(), 0);        
     const float adcmax = 4095;
     for ( unsigned int itck=0; itck<fChargeWork.size(); ++itck ) {
-      double chg = fChargeWork[itck];
-      short adc = (chg >=0) ? (short) (chg+0.5) : (short) (chg-0.5);
+      AdcSignal adcsig = fChargeWork[itck];
+      short adc = 0;
+      if ( adcsig > 0 ) adc = (short) (adcsig + 0.5);
       if ( adc > adcmax ) adc = adcmax;
-      if ( adc < 0 ) adc = 0;
       adcvec[itck] = adc;
     }
     // Resize to the correct number of time samples, dropping extra samples.
@@ -209,15 +207,15 @@ void SimWireDUNE::produce(art::Event& evt) {
     
     // Zero suppress and compress.
     ZeroSuppressBase::ResultVector keep;
-    m_pzs->filter(adcvec, chan, calibrated_pedestal_value, keep);
+    m_pzs->filter(adcvec, chan, pedval, keep);
     int nkeep = 0;
     for ( bool kept : keep ) if ( kept ) ++nkeep;
-    m_pcmp->compress(adcvec, keep, calibrated_pedestal_value);
+    m_pcmp->compress(adcvec, keep, pedval);
     raw::Compress_t myCompression = raw::kNone;
 
     // Create and store raw digit.
     raw::RawDigit rd(chan, nTickReadout, adcvec, myCompression);
-    rd.SetPedestal(calibrated_pedestal_value,calibrated_pedestal_rms_value);
+    rd.SetPedestal(pedval, pedrms);
     digcol->push_back(rd);            // add this digit to the collection
 
   }  // end loop over channels      
