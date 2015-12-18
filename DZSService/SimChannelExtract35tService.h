@@ -15,7 +15,7 @@
 #define SimChannelExtract35tService_H
 
 #include <vector>
-#include "DZSInterface/SimChannelExtractServiceBase.h"
+#include "DZSInterface/SimChannelExtractService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "Utilities/LArFFT.h"
@@ -25,7 +25,7 @@ namespace sim {
 class SimChannel;
 }
 
-class SimChannelExtract35tService : public SimChannelExtractServiceBase {
+class SimChannelExtract35tService : public SimChannelExtractService {
 
 public:
 
@@ -81,7 +81,7 @@ private:
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtract35tService, SimChannelExtractServiceBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtract35tService, SimChannelExtractService, LEGACY)
 
 #endif
 

@@ -1,4 +1,4 @@
-// SimChannelExtractServiceBase.h
+// SimChannelExtractService.h
 
 // David Adams
 // December 2015
@@ -6,8 +6,8 @@
 // Interface for a service that extracts charge for one channel from
 // a SimChannel object and assigns it to ticks.
 
-#ifndef SimChannelExtractServiceBase_H
-#define SimChannelExtractServiceBase_H
+#ifndef SimChannelExtractService_H
+#define SimChannelExtractService_H
 
 #include <vector>
 #include "DZSInterface/AdcTypes.h"
@@ -17,17 +17,17 @@ namespace sim {
 class SimChannel;
 }
 
-class SimChannelExtractServiceBase {
+class SimChannelExtractService {
 
 public:
 
-  virtual ~SimChannelExtractServiceBase() =default;
+  virtual ~SimChannelExtractService() =default;
 
   virtual int extract(const sim::SimChannel* psc, AdcSignalVector& sig) const =0;
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE(SimChannelExtractServiceBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(SimChannelExtractService, LEGACY)
 
 #endif
 

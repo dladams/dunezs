@@ -177,6 +177,6 @@ void ExponentialChannelNoiseService::generateNoise() {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(ExponentialChannelNoiseService, ChannelNoiseServiceBase)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(ExponentialChannelNoiseService, ChannelNoiseService)
 
 //**********************************************************************

@@ -525,6 +525,6 @@ SimChannelExtract35tService::combtest35t(double x, double y, double z) const {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtract35tService, SimChannelExtractServiceBase)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtract35tService, SimChannelExtractService)
 
 //**********************************************************************

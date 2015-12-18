@@ -34,6 +34,6 @@ extract(const sim::SimChannel* psc, AdcSignalVector& sigs) const {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtractAllService, SimChannelExtractServiceBase)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(SimChannelExtractAllService, SimChannelExtractService)
 
 //**********************************************************************

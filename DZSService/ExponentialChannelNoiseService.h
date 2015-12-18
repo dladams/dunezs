@@ -7,7 +7,7 @@
 #ifndef ExponentialChannelNoiseService_H
 #define ExponentialChannelNoiseService_H
 
-#include "DZSInterface/ChannelNoiseServiceBase.h"
+#include "DZSInterface/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 
@@ -16,7 +16,7 @@ namespace CLHEP {
 class HepRandomEngine;
 }
 
-class ExponentialChannelNoiseService : public ChannelNoiseServiceBase {
+class ExponentialChannelNoiseService : public ChannelNoiseService {
 
 public:
 
@@ -65,6 +65,6 @@ private:
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(ExponentialChannelNoiseService, ChannelNoiseServiceBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(ExponentialChannelNoiseService, ChannelNoiseService, LEGACY)
 
 #endif

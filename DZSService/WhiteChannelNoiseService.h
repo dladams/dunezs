@@ -6,7 +6,7 @@
 #ifndef WhiteChannelNoiseService_H
 #define WhiteChannelNoiseService_H
 
-#include "DZSInterface/ChannelNoiseServiceBase.h"
+#include "DZSInterface/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 
@@ -15,7 +15,7 @@ namespace CLHEP {
 class HepRandomEngine;
 }
 
-class WhiteChannelNoiseService : public ChannelNoiseServiceBase {
+class WhiteChannelNoiseService : public ChannelNoiseService {
 
 public:
 
@@ -37,6 +37,6 @@ private:
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(WhiteChannelNoiseService, ChannelNoiseServiceBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(WhiteChannelNoiseService, ChannelNoiseService, LEGACY)
 
 #endif

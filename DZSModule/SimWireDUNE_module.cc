@@ -29,8 +29,8 @@
 #include "DZSInterface/AdcTypes.h"
 #include "DZSInterface/AdcSuppressService.h"
 #include "DZSInterface/AdcCompressService.h"
-#include "DZSInterface/SimChannelExtractServiceBase.h"
-#include "DZSInterface/ChannelNoiseServiceBase.h"
+#include "DZSInterface/SimChannelExtractService.h"
+#include "DZSInterface/ChannelNoiseService.h"
 #include "DZSInterface/PedestalAdditionService.h"
 #include "DZSService/StuckBitsService.h"
 
@@ -67,8 +67,8 @@ private:
   art::ServiceHandle<geo::Geometry> m_pgeo;
   art::ServiceHandle<AdcSuppressService> m_pzs;
   art::ServiceHandle<AdcCompressService> m_pcmp;
-  art::ServiceHandle<SimChannelExtractServiceBase> m_pscx;
-  art::ServiceHandle<ChannelNoiseServiceBase> m_pcns;
+  art::ServiceHandle<SimChannelExtractService> m_pscx;
+  art::ServiceHandle<ChannelNoiseService> m_pcns;
   art::ServiceHandle<StuckBitsService> m_pasb;
   art::ServiceHandle<PedestalAdditionService> m_ppad;
 

@@ -89,6 +89,6 @@ ostream& WhiteChannelNoiseService::print(ostream& out, string prefix) const {
 
 //**********************************************************************
 
-DEFINE_ART_SERVICE_INTERFACE_IMPL(WhiteChannelNoiseService ,ChannelNoiseServiceBase)
+DEFINE_ART_SERVICE_INTERFACE_IMPL(WhiteChannelNoiseService ,ChannelNoiseService)
 
 //**********************************************************************

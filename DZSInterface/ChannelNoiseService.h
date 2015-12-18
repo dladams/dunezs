@@ -1,25 +1,25 @@
-// ChannelNoiseServiceBase.h
+// ChannelNoiseService.h
 
 // David Adams
 // December 2015
 //
 // Interface for a service that adds noise to a TPC signal vector.
 
-#ifndef ChannelNoiseServiceBase_H
-#define ChannelNoiseServiceBase_H
+#ifndef ChannelNoiseService_H
+#define ChannelNoiseService_H
 
 #include <vector>
 #include <iostream>
 #include "DZSInterface/AdcTypes.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
-class ChannelNoiseServiceBase {
+class ChannelNoiseService {
 
 public:
 
   typedef unsigned int Channel;
 
-  virtual ~ChannelNoiseServiceBase() =default;
+  virtual ~ChannelNoiseService() =default;
 
   // Add noise to a signal vector sigs appropriate for channel chan.
   // Noise is added for all entries in the input vector.
@@ -30,7 +30,7 @@ public:
 
 };
 
-DECLARE_ART_SERVICE_INTERFACE(ChannelNoiseServiceBase, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(ChannelNoiseService, LEGACY)
 
 #endif
 
