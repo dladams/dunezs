@@ -90,11 +90,11 @@ services.SeedService.largeant:  1003
 #services.SeedService.SimWireDUNEStuck:    1009
 
 # SimDet services.
-services.ZeroSuppress:             @local::zsonline
 services.SimChannelExtractService: @local::scxall
 services.ChannelNoiseService:      @local::chnoiseold
-services.IDetPedestalService:      @local::pedfixed
+services.IDetPedestalService:      @local::pedlegacy
 services.PedestalAdditionService:  @local::padprovided
+services.ZeroSuppress:             @local::zsonline
 services.AdcCompressService:       @local::cmpreplace
 services.StuckBitsService:         @local::stuckbits
 

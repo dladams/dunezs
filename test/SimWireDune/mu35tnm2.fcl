@@ -1,0 +1,7 @@
+# mu35tnm2.fcl
+#
+# Switch to white noise (noise model 2).
+
+#include "mu35tnew.fcl"
+
+services.ChannelNoiseService: @local::chnoisewhite

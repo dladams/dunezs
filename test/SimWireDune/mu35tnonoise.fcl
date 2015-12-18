@@ -1,0 +1,7 @@
+# mu35tnonoise.fcl
+#
+# Turn off noise.
+
+#include "mu35tdefault.fcl"
+
+physics.producers.daq.NoiseOn:     false

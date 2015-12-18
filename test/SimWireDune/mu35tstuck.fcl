@@ -1,0 +1,8 @@
+# mu35tstuck.fcl
+#
+# Add stuck bits. Turn off noise and.
+
+#include "mu35tnew.fcl"
+
+physics.producers.daq.NoiseOn:     false
+physics.producers.daq.StuckBitsOn:  true

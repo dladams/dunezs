@@ -96,7 +96,7 @@ scx35t: {
   FractZVMiss: 0.2
 }
 
-pedfixed: {
+pedlegacy: {
   service_provider: SIOVDetPedestalService
   DetPedestalRetrievalAlg: {
     AlgName:            "DetPedestalRetrievalAlg"
@@ -116,6 +116,10 @@ pedfixed: {
     DefaultRmsErr:      0.0
   }
 }
+
+pedlegacynorms: @local::pedlegacy
+pedlegacynorms.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
+pedlegacynorms.DetPedestalRetrievalAlg.DefaultIndRms: 0.0
 
 padprovided: {
   service_provider: ProvidedPedestalAdditionService
