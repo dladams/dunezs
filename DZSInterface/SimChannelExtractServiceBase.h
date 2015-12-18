@@ -21,7 +21,7 @@ class SimChannelExtractServiceBase {
 
 public:
 
-  virtual ~SimChannelExtractServiceBase();
+  virtual ~SimChannelExtractServiceBase() =default;
 
   virtual int extract(const sim::SimChannel* psc, AdcSignalVector& sig) const =0;
 

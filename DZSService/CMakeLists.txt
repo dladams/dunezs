@@ -22,28 +22,24 @@
 
 # Add plugin for each service.
 simple_plugin(ZeroSuppress35tService        "service" BASENAME_ONLY
-                DZSInterface
                 DZSCore
 )
 simple_plugin(ZeroSuppress35tLegacyService  "service" BASENAME_ONLY
-                DZSInterface
                 DZSCore
 )
 simple_plugin(ZeroSuppressFixedService      "service" BASENAME_ONLY
-                DZSInterface
 )
 simple_plugin(CompressReplaceService        "service" BASENAME_ONLY
-                DZSInterface
 )
 simple_plugin(SimChannelExtract35tService   "service"
-                DZSCore DZSInterface
+                DZSCore
                 Geometry Simulation Utilities
                 SignalShapingServiceDUNE35t_service
                 ${ART_UTILITIES}
                 ${ROOT_BASIC_LIB_LIST} BASENAME_ONLY
              )
 simple_plugin(SimChannelExtractAllService   "service"
-                DZSCore DZSInterface
+                DZSCore
                 Simulation
                 Utilities
                 SignalShapingServiceDUNE35t_service
@@ -51,7 +47,6 @@ simple_plugin(SimChannelExtractAllService   "service"
                 ${ROOT_BASIC_LIB_LIST} BASENAME_ONLY
              )
 simple_plugin(ExponentialChannelNoiseService   "service"
-                DZSInterface
                 Geometry
                 SignalShapingServiceDUNE35t_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
@@ -64,7 +59,6 @@ simple_plugin(ExponentialChannelNoiseService   "service"
                 ${ROOT_BASIC_LIB_LIST}
              )
 simple_plugin(WhiteChannelNoiseService   "service"
-                DZSInterface
                 Geometry
                 SignalShapingServiceDUNE35t_service
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
@@ -77,7 +71,6 @@ simple_plugin(WhiteChannelNoiseService   "service"
                 ${ROOT_BASIC_LIB_LIST}
              )
 simple_plugin(ProvidedPedestalAdditionService "service" BASENAME_ONLY
-                DZSInterface
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
@@ -88,7 +81,6 @@ simple_plugin(ProvidedPedestalAdditionService "service" BASENAME_ONLY
                 ${ROOT_BASIC_LIB_LIST}
              )
 simple_plugin(StuckBitsService   "service"
-                DZSInterface
                 Geometry
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                 ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}

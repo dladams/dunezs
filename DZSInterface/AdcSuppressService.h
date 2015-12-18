@@ -31,7 +31,7 @@ public:
   typedef unsigned int Channel;
 
   // Dtor.
-  virtual ~AdcSuppressService();
+  virtual ~AdcSuppressService() =default;
 
   // Suppress a vector of signals.
   //     sigs: Input ADC vector.

@@ -29,7 +29,7 @@ class AdcCompressService {
 public:
 
   // Dtor.
-  virtual ~AdcCompressService();
+  virtual ~AdcCompressService() =default;
 
   // Compress a vector of signals.
   //     sigs: I/O ADC vector to be compressed

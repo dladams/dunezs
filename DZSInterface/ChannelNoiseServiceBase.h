@@ -19,7 +19,7 @@ public:
 
   typedef unsigned int Channel;
 
-  virtual ~ChannelNoiseServiceBase();
+  virtual ~ChannelNoiseServiceBase() =default;
 
   // Add noise to a signal vector sigs appropriate for channel chan.
   // Noise is added for all entries in the input vector.

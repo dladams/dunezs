@@ -12,7 +12,6 @@ art_make( BASENAME_ONLY
 			Filters
 			RawData
                         DZSCore
-                        DZSInterface
                         CompressReplaceService_service
                         StuckBitsService_service
 			TimeService_service
