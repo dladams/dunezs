@@ -98,13 +98,13 @@ services.user.SeedService.daq: {
 #services.user.SeedService.SimWireDUNEStuck:    1009
 
 # Specify the zero suppression service.
-services.user.ZeroSuppressBase: @local::zsnone
-#services.user.ZeroSuppressBase: @local::zslegacy
-#services.user.ZeroSuppressBase: @local::zsonline
+services.user.ZeroSuppress: @local::zsnone
+#services.user.ZeroSuppress: @local::zslegacy
+#services.user.ZeroSuppress: @local::zsonline
 
 # Specify the SimChannel extraction service.
-services.user.SimChannelExtractServiceBase: @local::scxall
-#services.user.SimChannelExtractServiceBase: @local::scx35t
+services.user.SimChannelExtractService: @local::scxall
+#services.user.SimChannelExtractService: @local::scx35t
 
 # Specify the compression service.
 services.user.AdcCompressService: @local::cmpreplace
@@ -114,7 +114,7 @@ services.user.IDetPedestalService: @local::pedfixed
 services.user.PedestalAdditionService: @local::padprovided
 
 # Specify the noise service.
-services.user.ChannelNoiseServiceBase: @local::chnoiseold
+services.user.ChannelNoiseService: @local::chnoiseold
 
 # Specify the stuck bits service.
 services.user.StuckBitsService: @local::stuckbits

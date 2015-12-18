@@ -122,6 +122,7 @@ services.user.StuckBitsService: @local::stuckbits
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultCollRms: 0.0
 #services.user.IDetPedestalService.DetPedestalRetrievalAlg.DefaultIndRms:  0.0
 
-physics.producers.daq.PedestalOn:  true
 physics.producers.daq.NoiseOn:     true
+physics.producers.daq.PedestalOn:  true
+physics.producers.daq.SuppressOn:  true
 physics.producers.daq.StuckBitsOn: false

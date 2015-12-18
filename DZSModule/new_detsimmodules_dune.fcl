@@ -11,8 +11,10 @@ dune35tnew_simwire: {
   module_type:        "SimWireDUNE"
   DriftEModuleLabel:  "largeant"
   CompressionType:    "ZeroSuppression"       #could also be none
-  NoiseOn:             true
-  StuckBitsOn:       false        #simulate stuck bits
+  NoiseOn:            false
+  PedestalOn:         false
+  SuppressOn:         false
+  StuckBitsOn:        false        #simulate stuck bits
   SaveEmptyChannel:   true      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
 }
 

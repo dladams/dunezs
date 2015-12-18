@@ -5,7 +5,8 @@
 #
 # Script to generate reference raw data.
 #
-# Uses new simulation (SimWireDUNE) with low noise and new ZS.
+# Uses new simulation (SimWireDUNE) with low noise and new ZS
+# and combs enabled.
 
 #include "services_dune.fcl"
 #include "singles_dune.fcl"
@@ -98,23 +99,23 @@ services.user.SeedService.daq: {
 #services.user.SeedService.SimWireDUNEStuck:    1009
 
 # Specify the zero suppression service.
-#services.user.ZeroSuppressBase: @local::zsnone
-#services.user.ZeroSuppressBase: @local::zslegacy
-services.user.ZeroSuppressBase: @local::zsonline
+#services.user.ZeroSuppress: @local::zsnone
+#services.user.ZeroSuppress: @local::zslegacy
+services.user.ZeroSuppress: @local::zsonline
 
 # Specify the SimChannel extraction service.
-#services.user.SimChannelExtractServiceBase: @local::scxall
-services.user.SimChannelExtractServiceBase: @local::scx35t
+#services.user.SimChannelExtractService: @local::scxall
+services.user.SimChannelExtractService: @local::scx35t
 
 # Specify the compression service.
-services.user.CompressReplaceService: { Zero: 0 }
+services.user.AdcCompressService: @local::cmpreplace
 
 # Specify the pedestal service.
 services.user.IDetPedestalService: @local::pedfixed
 services.user.PedestalAdditionService: @local::padprovided
 
 # Specify the noise service.
-services.user.ChannelNoiseServiceBase: @local::chnoiseold
+services.user.ChannelNoiseService: @local::chnoiseold
 
 # Specify the stuck bits service.
 services.user.StuckBitsService: @local::stuckbits

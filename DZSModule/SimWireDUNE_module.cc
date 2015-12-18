@@ -61,6 +61,7 @@ private:
   bool fNoiseOn;           ///< noise turned on or off for debugging; default is on
   bool fPedestalOn;        ///< switch for simulation of nonzero pedestals
   bool fStuckBitsOn;       ///< switch for simulation of stuck bits
+  bool fSuppressOn;        ///< switch for simulation of zero suppression
   bool fSaveEmptyChannel;  ///< switch for saving channels with all zero entries
 
   // Services.
@@ -94,14 +95,12 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
   fNoiseOn           = p.get<bool>("NoiseOn");
   fPedestalOn        = p.get<bool>("PedestalOn");  
   fStuckBitsOn        = p.get<bool>("StuckBitsOn");  
+  fSuppressOn         = p.get<bool>("SuppressOn");  
   fSaveEmptyChannel    = p.get< bool >("SaveEmptyChannel");  
 
   ostringstream out;
   out << "  Compression service:";
   m_pcmp->print(out, "    ");
-  out << "  ADC suppression service:" << endl;;
-  out << endl;
-  m_pzs->print(out, "    ");
   if ( fNoiseOn ) {
     out << "  Channel noise service:" << endl;;
     m_pcns->print(out, "    ");
@@ -114,6 +113,13 @@ void SimWireDUNE::reconfigure(fhicl::ParameterSet const& p) {
     m_ppad->print(out, "    ");
   } else {
     out << "  Pedestal addition is off.";
+  }
+  out << endl;
+  if ( fSuppressOn ) {
+    out << "  ADC suppression service:" << endl;
+    m_pzs->print(out, "    ");
+  } else {
+    out << "ADC suppression is off.";
   }
   out << endl;
   if ( fStuckBitsOn ) {
@@ -206,8 +212,10 @@ void SimWireDUNE::produce(art::Event& evt) {
     }
     
     // Zero suppress and compress.
-    AdcFilterVector keep;
-    m_pzs->filter(adcvec, chan, pedval, keep);
+    AdcFilterVector keep(adcvec.size(), true);
+    if ( fSuppressOn ) {
+      m_pzs->filter(adcvec, chan, pedval, keep);
+    }
     int nkeep = 0;
     for ( bool kept : keep ) if ( kept ) ++nkeep;
     raw::Compress_t comp = raw::kNone;
