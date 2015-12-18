@@ -96,18 +96,16 @@ scx35t: {
   FractZVMiss: 0.2
 }
 
-dbretrieval: {
-  AlgName: "DatabaseRetrievalAlg"
-  DBFolderName:  ""
-  DBUrl: ""
-  DBTag: ""
-}
-
 pedfixed: {
   service_provider: SIOVDetPedestalService
   DetPedestalRetrievalAlg: {
     AlgName:            "DetPedestalRetrievalAlg"
-    DatabaseRetrievalAlg: @local::dbretrieval
+    DatabaseRetrievalAlg: {
+      AlgName: "DatabaseRetrievalAlg"
+      DBFolderName:  ""
+      DBUrl: ""
+      DBTag: ""
+    }
     UseDB: false
     UseFile: false
     DefaultCollMean:  500.0
