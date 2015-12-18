@@ -1,11 +1,11 @@
 # dunezs/DZSCore/CMakeLists.txt
 #
 # David Adams
-# November 2015
+# December 2015
 #
-# CMake instructions for the DZSINterface library which holds
-# service interface classes.
+# CMake instructions for service interface classes.
 
+# No need to make a library for these.
 #art_make(BASENAME_ONLY
 #  LIB_LIBRARIES
 #    ${Boost_SYSTEM_LIBRARY}
