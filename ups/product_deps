@@ -5,13 +5,13 @@
 
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	dunezs  v00_00_01
+parent	dunezs  v00_00_02
 defaultqual	e9
 
 fcldir product_dir job
 
 product         version
-art             v1_17_03
+art             v1_17_04
 gcc             v4_9_3
 
 cetbuildtools	v4_15_00	-	only_for_build
