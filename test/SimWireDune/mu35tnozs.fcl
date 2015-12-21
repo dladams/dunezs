@@ -1,0 +1,7 @@
+# mu35tnozs.fcl
+#
+# Drop zero suppression.
+
+#include "mu35tnew.fcl"
+
+physics.producers.daq.SuppressOn: false

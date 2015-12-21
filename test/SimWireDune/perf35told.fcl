@@ -3,7 +3,7 @@
 # David Adams
 # November 2015
 #
-# Use DXDisplay to generate raw data histograms.
+# Use DXDisplay to generate raw data histograms ignoring pedestals.
 #
 # Usage example:
 

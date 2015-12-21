@@ -1,0 +1,13 @@
+# mu35thinoise.fcl
+#
+# High noise (2X default).
+
+#include "mu35tnew.fcl"
+
+# Double noise factors.
+services.ChannelNoiseService.NoiseFactU: 0.10
+services.ChannelNoiseService.NoiseFactV: 0.10
+services.ChannelNoiseService.NoiseFactZ: 0.10
+
+# Switch to high-noise zero suppression.
+services.ZeroSuppress:             @local::zsonline_nhi

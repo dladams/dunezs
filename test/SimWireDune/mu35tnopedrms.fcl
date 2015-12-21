@@ -1,6 +1,6 @@
-# mu35tnoped.fcl
+# mu35tnopedrms.fcl
 #
-# Drop pedestals noise.
+# Drop pedestal noise.
 
 #include "mu35tnew.fcl"
 

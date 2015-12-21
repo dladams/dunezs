@@ -7,16 +7,21 @@
 
 BEGIN_PROLOG
 
+#***********************************************************************
+
+# DetSim module
+
 dune35tnew_simwire: { 
   module_type:        "SimWireDUNE"
   DriftEModuleLabel:  "largeant"
-  CompressionType:    "ZeroSuppression"       #could also be none
   NoiseOn:            false
   PedestalOn:         false
   SuppressOn:         false
-  StuckBitsOn:        false        #simulate stuck bits
-  SaveEmptyChannel:   true      #if channel's ADC vector is entirely full of zeros, save it in RawDigit collection (true) or discard (false)
+  StuckBitsOn:        false
+  SaveEmptyChannel:   true
 }
+
+#***********************************************************************
 
 zsnone: {
   service_provider: ZeroSuppressFixedService
@@ -63,13 +68,10 @@ zsonline_nhi2: {
   TD: 10
 }
 
+#***********************************************************************
+
 scxall: {
   service_provider: SimChannelExtractAllService
-}
-
-cmpreplace: {
-  service_provider: CompressReplaceService
-  Zero: 0
 }
 
 scx35t: {
@@ -95,6 +97,15 @@ scx35t: {
   FractZUMiss: 0.2
   FractZVMiss: 0.2
 }
+
+#***********************************************************************
+
+cmpreplace: {
+  service_provider: CompressReplaceService
+  Zero: 0
+}
+
+#***********************************************************************
 
 pedlegacy: {
   service_provider: SIOVDetPedestalService
@@ -126,6 +137,8 @@ padprovided: {
   NoiseScale: 1.0
 }
 
+#***********************************************************************
+
 chnoiseold: {
   service_provider: ExponentialChannelNoiseService
   NoiseFactU: 0.05
@@ -145,10 +158,14 @@ chnoisewhite: {
   service_provider: WhiteChannelNoiseService
 }
 
+#***********************************************************************
+
 stuckbits: {
   StuckBitsOverflowProbHistoName: "pCorrFracOverflowVsInputLsbCell"
   StuckBitsProbabilitiesFname: "ADCStuckCodeProbabilities35t/output_produceDcScanSummaryPlots_20150827_coldTest_0p1to1p4_step0p0010.root"
   StuckBitsUnderflowProbHistoName: "pCorrFracUnderflowVsInputLsbCell"
 }
+
+#***********************************************************************
 
 END_PROLOG
