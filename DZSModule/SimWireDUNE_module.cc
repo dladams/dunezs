@@ -195,7 +195,7 @@ void SimWireDUNE::produce(art::Event& evt) {
 
     // Convert floating ADC to integral ADC count.
     std::vector<short> adcvec(fChargeWork.size(), 0);        
-    const float adcmax = 4095;
+    const short adcmax = 4095;
     for ( unsigned int itck=0; itck<fChargeWork.size(); ++itck ) {
       AdcSignal adcsig = fChargeWork[itck];
       short adc = 0;

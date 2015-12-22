@@ -3,7 +3,7 @@
 # David Adams
 # November 2015
 #
-# Use DXDisplay to generate raw data histograms ignoring pedestals.
+# Use DXDisplay to generate raw data histograms.
 #
 # Usage example:
 
@@ -15,5 +15,3 @@ physics.analyzers.DXDisplay.DebugLevel:            1
 physics.analyzers.DXDisplay.TdcTickMax:         2800    # 1 drift is about 2780 ticks
 physics.analyzers.DXDisplay.DoRawSignalHists:   true
 physics.analyzers.DXDisplay.DoSimChannelSignalHists:  true
-
-physics.analyzers.DXDisplay.RawPedestalOption:  0
