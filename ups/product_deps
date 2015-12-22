@@ -5,18 +5,14 @@
 
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	dunezs  v00_00_02
+parent	dunezs  v00_00_03
 defaultqual	e9
 
-fcldir product_dir job
-
 product         version
-art             v1_17_04
+larsoft         v04_31_00
+art             v1_17_05
 gcc             v4_9_3
-
-cetbuildtools	v4_15_00	-	only_for_build
 end_product_list
-
   
 # e6  - with gcc 4.9.1 and -std=c++1y
 qualifier	art     	 gcc	notes
