@@ -26,12 +26,12 @@
 #include "RawData/RawDigit.h"
 #include "Utilities/DetectorProperties.h"
 
-#include "DZSInterface/AdcTypes.h"
-#include "DZSInterface/AdcSuppressService.h"
-#include "DZSInterface/AdcCompressService.h"
-#include "DZSInterface/SimChannelExtractService.h"
-#include "DZSInterface/ChannelNoiseService.h"
-#include "DZSInterface/PedestalAdditionService.h"
+#include "dune/DuneInterface/AdcTypes.h"
+#include "dune/DuneInterface/AdcSuppressService.h"
+#include "dune/DuneInterface/AdcCompressService.h"
+#include "dune/DuneInterface/SimChannelExtractService.h"
+#include "dune/DuneInterface/ChannelNoiseService.h"
+#include "dune/DuneInterface/PedestalAdditionService.h"
 #include "DZSService/StuckBitsService.h"
 
 using std::ostringstream;

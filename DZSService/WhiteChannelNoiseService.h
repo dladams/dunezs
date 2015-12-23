@@ -6,7 +6,7 @@
 #ifndef WhiteChannelNoiseService_H
 #define WhiteChannelNoiseService_H
 
-#include "DZSInterface/ChannelNoiseService.h"
+#include "dune/DuneInterface/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 

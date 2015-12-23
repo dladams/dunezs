@@ -7,7 +7,7 @@
 #ifndef ExponentialChannelNoiseService_H
 #define ExponentialChannelNoiseService_H
 
-#include "DZSInterface/ChannelNoiseService.h"
+#include "dune/DuneInterface/ChannelNoiseService.h"
 #include <vector>
 #include <iostream>
 

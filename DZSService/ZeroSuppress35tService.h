@@ -14,7 +14,7 @@
 #ifndef ZeroSuppress35tService_H
 #define ZeroSuppress35tService_H
 
-#include "DZSInterface/AdcSuppressService.h"
+#include "dune/DuneInterface/AdcSuppressService.h"
 
 #include <memory>
 #include <string>

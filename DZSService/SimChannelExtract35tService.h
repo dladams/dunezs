@@ -15,7 +15,7 @@
 #define SimChannelExtract35tService_H
 
 #include <vector>
-#include "DZSInterface/SimChannelExtractService.h"
+#include "dune/DuneInterface/SimChannelExtractService.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "Utilities/LArFFT.h"

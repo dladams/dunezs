@@ -13,7 +13,7 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include <string>
 #include <iostream>
-#include "DZSInterface/AdcTypes.h"
+#include "dune/DuneInterface/AdcTypes.h"
 
 namespace fhicl {
 class ParameterSet;
