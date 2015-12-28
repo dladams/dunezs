@@ -3,14 +3,14 @@
 # David Adams
 # November 2015
 
-cet_test(test_ZeroSuppress35tService SOURCES test_ZeroSuppress35tService.cxx
-  LIBRARIES ZeroSuppress35tService_service AXService DZSCore
+cet_test(test_Dune35tZeroSuppressService SOURCES test_Dune35tZeroSuppressService.cxx
+  LIBRARIES dune_DetSim_Service_Dune35tZeroSuppressService_service AXService DetSim
 )
 
-cet_test(test_ZeroSuppress35tLegacyService SOURCES test_ZeroSuppress35tLegacyService.cxx
-  LIBRARIES ZeroSuppress35tLegacyService_service AXService DZSCore
+cet_test(test_Legacy35tZeroSuppressService SOURCES test_Legacy35tZeroSuppressService.cxx
+  LIBRARIES dune_DetSim_Service_Legacy35tZeroSuppressService_service AXService DetSim
 )
 
-cet_test(test_CompressReplaceService SOURCES test_CompressReplaceService.cxx
-  LIBRARIES CompressReplaceService_service AXService
+cet_test(test_ReplaceCompressService SOURCES test_ReplaceCompressService.cxx
+  LIBRARIES dune_DetSim_Service_ReplaceCompressService_service AXService
 )

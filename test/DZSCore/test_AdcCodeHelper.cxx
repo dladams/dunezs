@@ -5,7 +5,7 @@
 //
 // Test script for Range.
 
-#include "DZSCore/AdcCodeHelper.h"
+#include "dune/DetSim/AdcCodeHelper.h"
 
 #include <string>
 #include <iostream>

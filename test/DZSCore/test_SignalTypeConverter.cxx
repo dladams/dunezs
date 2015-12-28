@@ -5,7 +5,7 @@
 //
 // Test script for Range.
 
-#include "DZSCore/SignalTypeConverter.h"
+#include "dune/DetSim/SignalTypeConverter.h"
 
 #include <string>
 #include <iostream>

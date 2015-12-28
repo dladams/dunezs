@@ -1,4 +1,4 @@
-// test_CompressReplaceService.cxx
+// test_ReplaceCompressService.cxx
 //
 // David Adams
 // September 2015
@@ -6,7 +6,7 @@
 // This test demonstrates how to configure and use the LArSoft DetectorProperties
 // service outside the art framework.
 
-#include "DZSService/CompressReplaceService.h"
+#include "dune/DetSim/Service/ReplaceCompressService.h"
 
 #include <string>
 #include <iostream>
@@ -26,8 +26,8 @@ string line() {
 }
 //**********************************************************************
 
-int test_CompressReplaceService(const CompressReplaceService& cr) {
-  const string myname = "test_CompressReplaceService: ";
+int test_ReplaceCompressService(const ReplaceCompressService& cr) {
+  const string myname = "test_ReplaceCompressService: ";
   cout << myname << line() << endl;
   cout << myname << "Compressing." << endl;
   AdcCountVector indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
@@ -55,8 +55,8 @@ int test_CompressReplaceService(const CompressReplaceService& cr) {
 
 //**********************************************************************
 
-int test_CompressReplaceService_as_service() {
-  const string myname = "test_CompressReplaceService_as_service: ";
+int test_ReplaceCompressService_as_service() {
+  const string myname = "test_ReplaceCompressService_as_service: ";
   cout << myname << "Starting test" << endl;
   string scfg;
   cout << myname << line() << endl;
@@ -64,8 +64,8 @@ int test_CompressReplaceService_as_service() {
   ArtServiceHelper& ash = ArtServiceHelper::instance();
 
   cout << myname << line() << endl;
-  cout << myname << "Add the CompressReplace service." << endl;
-  scfg += "service_provider: \"CompressReplaceService\"";
+  cout << myname << "Add the ReplaceCompress service." << endl;
+  scfg += "service_provider: \"ReplaceCompressService\"";
   scfg += "\n";
   scfg += "Zero: 0";
   cout << myname << "Configuration: " << scfg << endl;
@@ -78,28 +78,28 @@ int test_CompressReplaceService_as_service() {
 
   cout << myname << line() << endl;
   cout << myname << "Get the service." << endl;
-  art::ServiceHandle<CompressReplaceService> pcr;
+  art::ServiceHandle<ReplaceCompressService> pcr;
   pcr->print();
-  return test_CompressReplaceService(*pcr);
+  return test_ReplaceCompressService(*pcr);
 }
 
 //**********************************************************************
 
-int test_CompressReplaceService_as_utility() {
-  const string myname = "test_CompressReplaceService_as_utility: ";
+int test_ReplaceCompressService_as_utility() {
+  const string myname = "test_ReplaceCompressService_as_utility: ";
   cout << myname << "Starting test" << endl;
-  CompressReplaceService cr(0);
-  return test_CompressReplaceService(cr);
+  ReplaceCompressService cr(0);
+  return test_ReplaceCompressService(cr);
 }
 
 //**********************************************************************
 
-int test_CompressReplaceService() {
+int test_ReplaceCompressService() {
   int stat = 0;
   cout << "\nTesting as service." << endl;
-  stat += test_CompressReplaceService_as_service();
+  stat += test_ReplaceCompressService_as_service();
   cout << "\nTesting as utility." << endl;
-  stat += test_CompressReplaceService_as_utility();
+  stat += test_ReplaceCompressService_as_utility();
   return stat;
 }
 
@@ -110,7 +110,7 @@ int main() {
   cout << myname << "NDEBUG must be off." << endl;
   abort();
 #endif
-  return test_CompressReplaceService();
+  return test_ReplaceCompressService();
 }
 
 //**********************************************************************

@@ -4,8 +4,8 @@
 # November 2015
 
 cet_test(test_SignalTypeConverter SOURCES test_SignalTypeConverter.cxx
-  LIBRARIES DZSCore
+  LIBRARIES DetSim
 )
 cet_test(test_AdcCodeHelper SOURCES test_AdcCodeHelper.cxx
-  LIBRARIES DZSCore
+  LIBRARIES DetSim
 )

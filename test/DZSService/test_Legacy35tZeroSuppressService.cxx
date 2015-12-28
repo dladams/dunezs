@@ -1,4 +1,4 @@
-// test_ZeroSuppress35tLegacyService.cxx
+// test_Legacy35tZeroSuppressService.cxx
 //
 // David Adams
 // September 2015
@@ -6,7 +6,7 @@
 // This test demonstrates how to configure and use the LArSoft DetectorProperties
 // service outside the art framework.
 
-#include "DZSService/ZeroSuppress35tLegacyService.h"
+#include "dune/DetSim/Service/Legacy35tZeroSuppressService.h"
 
 #include <string>
 #include <iostream>
@@ -19,8 +19,8 @@ using std::cout;
 using std::endl;
 using std::setw;
 
-int test_ZeroSuppress35tLegacyService() {
-  const string myname = "test_ZeroSuppress35tLegacyService: ";
+int test_Legacy35tZeroSuppressService() {
+  const string myname = "test_Legacy35tZeroSuppressService: ";
   cout << myname << "Starting test" << endl;
 #ifdef NDEBUG
   cout << myname << "NDEBUG must be off." << endl;
@@ -38,7 +38,7 @@ int test_ZeroSuppress35tLegacyService() {
   // along with its parameters in the configuration.
   cout << myname << line << endl;
   cout << myname << "Add the ZeroSuppress35tLegacy service." << endl;
-  scfg = "service_provider: \"ZeroSuppress35tLegacyService\"";
+  scfg = "service_provider: \"Legacy35tZeroSuppressService\"";
   scfg += " AdcThreshold: 5.0";
   scfg += " TickRange: 3";
   scfg += " SuppressStickyBits: true";
@@ -53,7 +53,7 @@ int test_ZeroSuppress35tLegacyService() {
 
   cout << myname << line << endl;
   cout << myname << "Get the service." << endl;
-  art::ServiceHandle<ZeroSuppress35tLegacyService> pzs;
+  art::ServiceHandle<Legacy35tZeroSuppressService> pzs;
   pzs->print();
 
   cout << myname << "Create ADC data." << endl;
@@ -81,6 +81,6 @@ int test_ZeroSuppress35tLegacyService() {
 }
 
 int main() {
-  return test_ZeroSuppress35tLegacyService();
+  return test_Legacy35tZeroSuppressService();
 }
 

@@ -1,4 +1,4 @@
-// test_ZeroSuppress35tService.cxx
+// test_Dune35tZeroSuppressService.cxx
 //
 // David Adams
 // September 2015
@@ -6,7 +6,7 @@
 // This test demonstrates how to configure and use the LArSoft DetectorProperties
 // service outside the art framework.
 
-#include "DZSService/ZeroSuppress35tService.h"
+#include "dune/DetSim/Service/Dune35tZeroSuppressService.h"
 
 #include <string>
 #include <iostream>
@@ -23,8 +23,8 @@ string line = "-----------------------------";
 
 //**********************************************************************
 
-int test_ZeroSuppress35tService(const ZeroSuppress35tService& zs) {
-  const string myname = "test_ZeroSuppress35tService: ";
+int test_Dune35tZeroSuppressService(const Dune35tZeroSuppressService& zs) {
+  const string myname = "test_Dune35tZeroSuppressService: ";
   cout << myname << "Create ADC data." << endl;
   AdcCountVector indata = { 1,  0, -2, -1,  1,  1,  -1,  3, -1,  2,
                             6, 12, 21, 17, 12,  7,   5,  2,  1, -1,
@@ -50,17 +50,17 @@ int test_ZeroSuppress35tService(const ZeroSuppress35tService& zs) {
 
 //**********************************************************************
 
-int test_ZeroSuppress35tService_as_utility() {
-  const string myname = "test_ZeroSuppress35tService_as_utility: ";
+int test_Dune35tZeroSuppressService_as_utility() {
+  const string myname = "test_Dune35tZeroSuppressService_as_utility: ";
   cout << myname << "Starting test" << endl;
-  ZeroSuppress35tService zs(1, 10, 5, 4, 6, 5, 2);
-  return test_ZeroSuppress35tService(zs);
+  Dune35tZeroSuppressService zs(1, 10, 5, 4, 6, 5, 2);
+  return test_Dune35tZeroSuppressService(zs);
 }
 
 //**********************************************************************
 
-int test_ZeroSuppress35tService_as_service() {
-  const string myname = "test_ZeroSuppress35tService_as_service: ";
+int test_Dune35tZeroSuppressService_as_service() {
+  const string myname = "test_Dune35tZeroSuppressService_as_service: ";
   cout << myname << "Starting test" << endl;
 #ifdef NDEBUG
   cout << myname << "NDEBUG must be off." << endl;
@@ -77,7 +77,7 @@ int test_ZeroSuppress35tService_as_service() {
   // along with its parameters in the configuration.
   cout << myname << line << endl;
   cout << myname << "Add the ZeroSuppress35t service." << endl;
-  scfg = "service_provider: \"ZeroSuppress35tService\" TS: 1 TL: 10 TD: 5 NS: 4 NL: 6 ND: 5 NT: 2";
+  scfg = "service_provider: \"Dune35tZeroSuppressService\" TS: 1 TL: 10 TD: 5 NS: 4 NL: 6 ND: 5 NT: 2";
   cout << myname << "Configuration: " << scfg << endl;
   assert( ash.addService("AdcSuppressService", scfg) == 0 );
 
@@ -88,16 +88,16 @@ int test_ZeroSuppress35tService_as_service() {
 
   cout << myname << line << endl;
   cout << myname << "Get the service." << endl;
-  art::ServiceHandle<ZeroSuppress35tService> pzs;
+  art::ServiceHandle<Dune35tZeroSuppressService> pzs;
   pzs->print();
 
-  return test_ZeroSuppress35tService(*pzs);
+  return test_Dune35tZeroSuppressService(*pzs);
 }
 
 //**********************************************************************
 
-int test_ZeroSuppress35tService() {
-  const string myname = "test_ZeroSuppress35tService: ";
+int test_Dune35tZeroSuppressService() {
+  const string myname = "test_Dune35tZeroSuppressService: ";
   cout << myname << "Starting test" << endl;
 #ifdef NDEBUG
   cout << myname << "NDEBUG must be off." << endl;
@@ -106,16 +106,16 @@ int test_ZeroSuppress35tService() {
   int stat = 0;
   cout << line << endl;
   cout << myname << "Testing utility." << endl;
-  stat += test_ZeroSuppress35tService_as_utility();
+  stat += test_Dune35tZeroSuppressService_as_utility();
   cout << myname << "Testing service." << endl;
-  stat += test_ZeroSuppress35tService_as_service();
+  stat += test_Dune35tZeroSuppressService_as_service();
   return stat;
 }
 
 //**********************************************************************
 
 int main() {
-  return test_ZeroSuppress35tService();
+  return test_Dune35tZeroSuppressService();
 }
 
 //**********************************************************************

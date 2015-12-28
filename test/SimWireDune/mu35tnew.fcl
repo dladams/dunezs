@@ -10,7 +10,7 @@
 #include "services_dune.fcl"
 #include "singles_dune.fcl"
 #include "largeantmodules_dune.fcl"
-#include "new_detsimmodules_dune.fcl"
+#include "detsimmodules_dune.fcl"
 
 process_name: SinglesGen
 
@@ -58,7 +58,7 @@ end_paths: [ostream1]
 outputs: {
   out1: {
     module_type: RootOutput
-    fileName:    "mu35told.root" #default file name, can override from command line with -o or --output
+    fileName:    "mu35tnew.root" #default file name, can override from command line with -o or --output
   }
 }
 
@@ -90,7 +90,7 @@ services.SeedService.largeant:  1003
 #services.SeedService.SimWireDUNEStuck:    1009
 
 # SimDet services.
-services.SimChannelExtractService: @local::scxall
+services.SimChannelExtractService: @local::scxgeneric
 services.ChannelNoiseService:      @local::chnoiseold
 services.IDetPedestalService:      @local::pedlegacy
 services.PedestalAdditionService:  @local::padprovided
