@@ -1,7 +1,7 @@
-# mu35tnew.fcl
+# el35tnew.fcl
 #
 # David Adams
-# November 2015
+# January 2016
 #
 # Script to generate reference raw data.
 #
@@ -15,7 +15,7 @@
 process_name: SinglesGen
 
 services: @local::dune35t_simulation_services
-services.TFileService: { fileName: "mu35t_hist.root" }
+services.TFileService: { fileName: "el35t_hist.root" }
 services.TimeTracker:       {}
 services.RandomNumberGenerator: {} #ART native random number generator
 
@@ -40,14 +40,14 @@ physics: {
    rns:       { module_type: "RandomNumberSaver" }
  }
 
-  # Specify the modules (filters and producers) that modify the event. 
-  produce: [generator, largeant, daq, rns] 
-  trigger_paths: [produce] 
+# Specify the modules (filters and producers) that modify the event. 
+produce: [generator, largeant, daq, rns] 
+trigger_paths: [produce] 
 
-  # Specify the modules (analyzers and output streams) that do not modify the event. 
-  # These all run simultaneously.
-  ostream1:  [ out1 ]
-  end_paths: [ostream1]  
+# Specify the modules (analyzers and output streams) that do not modify the event. 
+# These all run simultaneously.
+ostream1:  [ out1 ]
+end_paths: [ostream1]  
 
 }
 
@@ -63,7 +63,7 @@ outputs: {
 }
 
 physics.producers.generator.PadOutVectors: true          # So all arrays don't have to be the same size
-physics.producers.generator.PDG:      [ 13]
+physics.producers.generator.PDG:      [ 11]
 physics.producers.generator.P0:       [4.0]    # Momentum [GeV]
 physics.producers.generator.X0:       [100]    # cm; large TPC are (-1.5, 222.5)
 physics.producers.generator.Z0:       [ 10]    # cm; 35t boundaries are (-2, 51, 103, 157)
@@ -89,7 +89,7 @@ services.SeedService.largeant:  1003
 #services.SeedService.SimWireDUNEPedestal: 1007
 #services.SeedService.SimWireDUNEStuck:    1009
 
-# DetSim services.
+# SimDet services.
 services.SimChannelExtractService: @local::scxgeneric
 services.ChannelNoiseService:      @local::chnoiseold
 services.IDetPedestalService:      @local::pedlegacy
@@ -98,7 +98,7 @@ services.ZeroSuppress:             @local::zsonline
 services.AdcCompressService:       @local::cmpreplace
 services.StuckBitsService:         @local::stuckbits
 
-# DetSim flags.
+# SimDet flags.
 physics.producers.daq.NoiseOn:     true
 physics.producers.daq.PedestalOn:  true
 physics.producers.daq.SuppressOn:  true

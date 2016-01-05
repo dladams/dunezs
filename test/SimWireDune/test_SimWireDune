@@ -39,7 +39,7 @@ fi
 
 if [ -z "$KEEP"]; then
   echo
-  echo Generating test sample.
+  echo Generating test sample: $SAMTEST
   if ! ./run $ARG $SAMTEST; then
     echo Sample generation failed
     exit 1 

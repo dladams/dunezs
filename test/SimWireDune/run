@@ -42,6 +42,7 @@ if [ ! -r ${SAMPLE}_event.root ]; then
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}_event.root ]; then
     echo run: Event generation failed.
+    echo Log is ${SAMPLE}.log
     exit 1
   fi
   fcldump ${SAMPLE}.fcl 10 > ${SAMPLE}.fcldump
@@ -64,6 +65,7 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}perf.root ]; then
     echo run: Histogram generation failed.
+    echo Log is ${SAMPLE}perf.log
     exit 1
   fi
 fi

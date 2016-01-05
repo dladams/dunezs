@@ -1,0 +1,7 @@
+# mu35tlegacyzs.fcl
+#
+# Use legacy 35t zero supression.
+
+#include "mu35tnew.fcl"
+
+services.ZeroSuppress: @local::zslegacy
