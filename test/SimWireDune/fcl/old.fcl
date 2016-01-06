@@ -1,8 +1,6 @@
-# mu35told.fcl
+# old.fcl
 #
-# Use old DetSim module.
-
-#include "mu35tnew.fcl"
+# Use old 35-ton DetSim module.
 
 # Change the module.
 physics.producers.daq:       @local::dune35t_simwire

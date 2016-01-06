@@ -1,8 +1,6 @@
-# mu35thinoise.fcl
+# hinoise.fcl
 #
 # High noise (2X default).
-
-#include "mu35tnew.fcl"
 
 # Double noise factors.
 services.ChannelNoiseService.NoiseFactU: 0.10

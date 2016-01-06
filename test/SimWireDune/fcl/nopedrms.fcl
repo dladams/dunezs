@@ -1,7 +1,5 @@
-# mu35tnopedrms.fcl
+# nopedrms.fcl
 #
 # Drop pedestal noise.
-
-#include "mu35tnew.fcl"
 
 services.IDetPedestalService:      @local::pedlegacynorms

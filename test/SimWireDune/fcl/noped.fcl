@@ -1,8 +1,6 @@
-# mu35tnoped.fcl
+# noped.fcl
 #
 # Drop pedestals.
 # This means that negative signal are lost.
-
-#include "mu35tnew.fcl"
 
 physics.producers.daq.PedestalOn: false

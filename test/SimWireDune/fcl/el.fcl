@@ -1,0 +1,3 @@
+# el.fcl
+#
+physics.producers.generator.PDG:      [ 11]

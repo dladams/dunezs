@@ -1,0 +1,3 @@
+# mu.fcl
+#
+physics.producers.generator.PDG:      [ 13]

@@ -17,7 +17,10 @@ while getopts hcd: OPT; do
   esac
 done
 shift $(( OPTIND-1 ))
-SAMPLE=$1
+SAMGEN=$1
+SAMDET=$2
+SAMSIM=$3
+SAMPLE=${SAMGEN}${SAMDET}${SAMSIM}
 
 if [ -n "$CLEAN" ]; then
   rm -f ${SAMPLE}_hist.root ${SAMPLE}_event.root ${SAMPLE}.log
@@ -25,8 +28,24 @@ if [ -n "$CLEAN" ]; then
 fi
 
 if [ ! -r ${SAMPLE}.fcl ]; then
-  echo Unable to find input file ${SAMPLE}.fcl
-  exit 1
+  FCLGEN=fcl/$SAMGEN.fcl
+  FCLDET=fcl/$SAMDET.fcl
+  FCLSIM=fcl/$SAMSIM.fcl
+  # Create fcl file.
+  if [ ! -r $FCLGEN ]; then
+    echo Unable to find generator fcl: $FCLGEN
+    exit 1
+  fi
+  if [ ! -r $FCLDET ]; then
+    echo Unable to find detector fcl: $FCLDET
+    exit 1
+  fi
+  if [ ! -r $FCLSIM ]; then
+    echo Unable to find simulation fcl: $FCLSIM
+    exit 1
+  fi
+  cat  $FCLDET $FCLGEN $FCLSIM > $SAMPLE.fcl
+  echo Created fcl $SAMPLE.fcl
 fi
 
 # Generate event data.
@@ -53,11 +72,7 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   echo
   echo run: Generating histograms.
   echo " Start: "`date`
-  if echo $SAMPLE | grep old 1>/dev/null; then
-    FCL=perf35told.fcl
-  else
-    FCL=perf35t.fcl
-  fi
+  FCL=fcl/perf35t.fcl
   COM="lar -c $FCL -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root"
   echo $COM
   $COM 2>&1 >${SAMPLE}perf.log

@@ -1,7 +1,5 @@
-# mu35tcombs.fcl
+# combs.fcl
 #
 # Add 35-ton combs to the charge extraction.
-
-#include "mu35tnew.fcl"
 
 services.SimChannelExtractService: @local::scx35t

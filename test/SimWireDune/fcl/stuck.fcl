@@ -1,0 +1,7 @@
+# stuck.fcl
+#
+# Add stuck bits.
+
+#include "mu35tnew.fcl"
+
+physics.producers.daq.StuckBitsOn:  true
