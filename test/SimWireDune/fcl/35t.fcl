@@ -36,7 +36,7 @@ physics: {
  producers: {
    generator: @local::dune35t_singlep	  
    largeant:  @local::dune35t_largeant	  
-   daq:       @local::dune35tnew_simwire       
+   daq:       @local::dune_detsim       
    rns:       { module_type: "RandomNumberSaver" }
  }
 
@@ -47,7 +47,7 @@ physics: {
   # Specify the modules (analyzers and output streams) that do not modify the event. 
   # These all run simultaneously.
   ostream1:  [ out1 ]
-  end_paths: [ostream1]  
+  end_paths: [ostream1]
 
 }
 
