@@ -1,9 +1,9 @@
 # 35t.fcl
 #
 # David Adams
-# November 2015
+# January 2016
 #
-# Script to generate reference raw data.
+# Script to generate raw data with the 35-ton detector.
 #
 # Uses new simulation (SimWireDUNE) with low noise and new ZS.
 
@@ -77,17 +77,12 @@ physics.producers.generator.Theta0XZ: [  0]    # degrees
 services.SeedService.policy:    "preDefinedSeed"       # So random number sequence is always the same
 services.SeedService.generator: 1001
 services.SeedService.largeant:  1003
-#services.SeedService.daq:       1005
-#services.SeedService.daq: {
-#  SimWireDUNENoise:    1005
-#  SimWireDUNEIndex:    1011
-#  SimWireDUNEPedestal: 1007
-#  SimWireDUNEStuck:    1009
-#}
-#services.SeedService.SimWireDUNENoise:    1005
-#services.SeedService.SimWireDUNEIndex:    1011
-#services.SeedService.SimWireDUNEPedestal: 1007
-#services.SeedService.SimWireDUNEStuck:    1009
+# When SeedService allows seeds to be fetched in services, we can set those
+# with simething like:
+#services.SeedService.ExponentialChannelNoiseService:      1005
+#services.SeedService.ExponentialChannelNoiseServiceIndex: 1011
+#services.SeedService.ProvidedPedestalAdditionService:     1007
+#services.StuckBitAdcDistortionService:                    1009
 
 # DetSim services.
 services.SimChannelExtractService: @local::scxgeneric
@@ -102,4 +97,4 @@ services.StuckBitsService:         @local::stuckbits
 physics.producers.daq.NoiseOn:     true
 physics.producers.daq.PedestalOn:  true
 physics.producers.daq.SuppressOn:  true
-physics.producers.daq.StuckBitsOn: false
+physics.producers.daq.DistortOn:   false

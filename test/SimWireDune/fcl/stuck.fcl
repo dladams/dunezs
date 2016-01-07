@@ -4,4 +4,4 @@
 
 #include "mu35tnew.fcl"
 
-physics.producers.daq.StuckBitsOn:  true
+physics.producers.daq.DistortOn:  true

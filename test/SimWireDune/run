@@ -32,6 +32,7 @@ if [ ! -r ${SAMPLE}.fcl ]; then
   FCLDET=fcl/$SAMDET.fcl
   FCLSIM=fcl/$SAMSIM.fcl
   # Create fcl file.
+  rm -f ${SAMPLE}_event.root
   if [ ! -r $FCLGEN ]; then
     echo Unable to find generator fcl: $FCLGEN
     exit 1
