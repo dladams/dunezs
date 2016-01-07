@@ -2,5 +2,6 @@
 *.root
 *.fcldump
 *.png
+*.fcl
 rootlogon.C
 .aclic

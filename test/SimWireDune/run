@@ -8,12 +8,12 @@
 
 HELP=
 CLEAN=
-DBG=
-while getopts hcd: OPT; do
+FCLONLY=
+while getopts hcf OPT; do
   case $OPT in
   h) HELP=true;;
   c) CLEAN=true;;
-  d) DBG=$OPTARG;;
+  f) FCLONLY=true;;
   esac
 done
 shift $(( OPTIND-1 ))
@@ -22,12 +22,27 @@ SAMDET=$2
 SAMSIM=$3
 SAMPLE=${SAMGEN}${SAMDET}${SAMSIM}
 
-if [ -n "$CLEAN" ]; then
-  rm -f ${SAMPLE}_hist.root ${SAMPLE}_event.root ${SAMPLE}.log
-  rm -f ${SAMPLE}perf.root ${SAMPLE}perf.log
+if [ -z "$SAMGEN" ]; then
+  HELP=true
 fi
 
-if [ ! -r ${SAMPLE}.fcl ]; then
+if [ -n "$HELP" ]; then
+  echo Usage: $0 [-c] [-d] SAMPLE
+  echo    or: $0 [-c] [-d] GEN DET SIM
+  echo "  The first uses SAMPLE.fcl to generate the event file."
+  echo "  For the second, the sample name is GENDETSIM and the fcl is"
+  echo "  constructed by merging fcl/DET.fcl, fcl/GEN.fcl and fcl/SIM.fcl."
+  echo "  Option -c forces rerun"
+  echo "  Option -f exits after generating fcl and (if needed) cleaning"
+  exit 0
+fi
+
+echo Sample is $SAMPLE
+
+# If three arguments are given, then combine them to get the
+# sample name and fcl. If this is different from the existing
+# fcl, then remove the old results.
+if [ -n "$SAMDET" -a -n "$SAMSIM" ]; then
   FCLGEN=fcl/$SAMGEN.fcl
   FCLDET=fcl/$SAMDET.fcl
   FCLSIM=fcl/$SAMSIM.fcl
@@ -45,8 +60,37 @@ if [ ! -r ${SAMPLE}.fcl ]; then
     echo Unable to find simulation fcl: $FCLSIM
     exit 1
   fi
-  cat  $FCLDET $FCLGEN $FCLSIM > $SAMPLE.fcl
-  echo Created fcl $SAMPLE.fcl
+  cat $FCLDET $FCLGEN $FCLSIM > tmpSAMPLE.fcl
+  USENEW=
+  if [ ! -r $SAMPLE.fcl ]; then
+    USENEW=true
+  else if ! diff tmpSAMPLE.fcl $SAMPLE.fcl; then
+    USENEW=true
+  fi; fi
+  if [ -n "$USENEW" ]; then
+    mv tmpSAMPLE.fcl $SAMPLE.fcl
+    echo Created fcl: $SAMPLE.fcl
+    CLEAN=true
+  else
+    echo Keeping existing fcl: $SAMPLE.fcl
+  fi
+else
+  if [ ! -r $SAMPLE.fcl ]; then
+    echo Input fcl not found: $SAMPLE.fcl
+    exit 1
+  else
+    echo Using existing fcl: $SAMPLE.fcl
+  fi
+fi
+
+if [ -n "$CLEAN" ]; then
+  echo Cleaning
+  rm -f ${SAMPLE}_hist.root ${SAMPLE}_event.root ${SAMPLE}.log
+  rm -f ${SAMPLE}perf.root ${SAMPLE}perf.log
+fi
+
+if [ -n "$FCLONLY" ]; then
+  exit 0;
 fi
 
 # Generate event data.
@@ -55,10 +99,15 @@ if [ ! -r ${SAMPLE}_event.root ]; then
   echo
   echo run: Generating event data.
   echo " Start: "`date`
+  LOG=${SAMPLE}perf.log
+  echo $COM >$LOG
+  echo Start `date` >>$LOG
   COM="lar -n 5 -c ${SAMPLE}.fcl -T ${SAMPLE}_hist.root -o ${SAMPLE}_event.root"
-  echo $COM >${SAMPLE}.log
+  echo $COM >>$LOG
+  echo Start: `date` >>$LOG
   $COM 2>&1 >> ${SAMPLE}.log
   STAT=$?
+  echo Finish: `date` >>$LOG
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}_event.root ]; then
     echo run: Event generation failed.
@@ -75,9 +124,13 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   echo " Start: "`date`
   FCL=fcl/perf35t.fcl
   COM="lar -c $FCL -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root"
+  LOG=${SAMPLE}perf.log
   echo $COM
-  $COM 2>&1 >${SAMPLE}perf.log
+  echo $COM >$LOG
+  echo Start: `date` >>$LOG
+  $COM 2>&1 >>$LOG
   STAT=$?
+  echo Finish: `date` >>$LOG
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}perf.root ]; then
     echo run: Histogram generation failed.
