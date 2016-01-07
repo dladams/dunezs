@@ -89,9 +89,9 @@ services.SimChannelExtractService: @local::scxgeneric
 services.ChannelNoiseService:      @local::chnoiseold
 services.IDetPedestalService:      @local::pedlegacy
 services.PedestalAdditionService:  @local::padprovided
-services.ZeroSuppress:             @local::zsonline
+services.AdcSuppressService:       @local::zsonline
 services.AdcCompressService:       @local::cmpreplace
-services.StuckBitsService:         @local::stuckbits
+services.AdcDistortService:        @local::stuckbits
 
 # DetSim flags.
 physics.producers.daq.NoiseOn:     true

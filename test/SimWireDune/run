@@ -64,7 +64,7 @@ if [ -n "$SAMDET" -a -n "$SAMSIM" ]; then
   USENEW=
   if [ ! -r $SAMPLE.fcl ]; then
     USENEW=true
-  else if ! diff tmpSAMPLE.fcl $SAMPLE.fcl; then
+  else if ! diff tmpSAMPLE.fcl $SAMPLE.fcl >/dev/null; then
     USENEW=true
   fi; fi
   if [ -n "$USENEW" ]; then
