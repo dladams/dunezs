@@ -1,5 +1,8 @@
 # nopedrms.fcl
 #
-# Drop pedestal noise.
+# Set pedestal RMS to zero if fixed.
+# This is way to drop pedestal noise in DetSim iff
+# the pedestals are fixed.
+# For a more general solution, see nopednoise.fcl.
 
 services.IDetPedestalService:      @local::pedlegacynorms

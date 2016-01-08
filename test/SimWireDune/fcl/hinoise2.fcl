@@ -8,4 +8,4 @@ services.ChannelNoiseService.NoiseFactV: 0.10
 services.ChannelNoiseService.NoiseFactZ: 0.10
 
 # Switch to high-noise zero suppression.
-services.AdcSuppressService:             @local::zsonline_nhi
+services.AdcSuppressService:             @local::zsonline_nhi2

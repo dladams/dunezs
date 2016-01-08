@@ -1,0 +1,5 @@
+# nopednoise.fcl
+#
+# Drop pedestal noise.
+
+services.PedestalAdditionService.NoiseScale:  0.0

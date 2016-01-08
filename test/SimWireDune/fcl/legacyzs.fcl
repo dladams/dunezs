@@ -2,4 +2,4 @@
 #
 # Use legacy 35t zero supression.
 
-services.ZeroSuppress: @local::zslegacy
+services.AdcSuppressService: @local::zslegacy
