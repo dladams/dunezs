@@ -1,0 +1,7 @@
+# nonoise.fcl
+#
+# Turn off electron noise, pedestal noise and ZS.
+
+physics.producers.daq.NoiseOn:    false
+services.PedestalAdditionService.NoiseScale:  0.0
+physics.producers.daq.SuppressOn: false
