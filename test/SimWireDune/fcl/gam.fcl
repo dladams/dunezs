@@ -1,0 +1,3 @@
+# pi0.fcl
+#
+physics.producers.generator.PDG:      [ 22]

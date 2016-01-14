@@ -9,7 +9,7 @@ parent	dunezs  v00_00_04
 defaultqual	e9
 
 product         version
-dunetpc         v04_31_00_01
+dunetpc         v04_32_01
 art             v1_17_05
 gcc             v4_9_3
 cetbuildtools   v4_18_01 - only_for_build

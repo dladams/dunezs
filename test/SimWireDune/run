@@ -20,7 +20,8 @@ shift $(( OPTIND-1 ))
 SAMGEN=$1
 SAMDET=$2
 SAMSIM=$3
-SAMPLE=${SAMGEN}${SAMDET}${SAMSIM}
+SAMEXT=$4
+SAMPLE=${SAMGEN}${SAMDET}${SAMSIM}${SAMEXT}
 
 if [ -z "$SAMGEN" ]; then
   HELP=true
@@ -46,6 +47,7 @@ if [ -n "$SAMDET" -a -n "$SAMSIM" ]; then
   FCLGEN=fcl/$SAMGEN.fcl
   FCLDET=fcl/$SAMDET.fcl
   FCLSIM=fcl/$SAMSIM.fcl
+  FCLEXT=fcl/$SAMEXT.fcl
   # Create fcl file.
   rm -f ${SAMPLE}_event.root
   if [ ! -r $FCLGEN ]; then
@@ -60,7 +62,12 @@ if [ -n "$SAMDET" -a -n "$SAMSIM" ]; then
     echo Unable to find simulation fcl: $FCLSIM
     exit 1
   fi
-  cat $FCLDET $FCLGEN $FCLSIM > tmpSAMPLE.fcl
+  if [ -n "$SAMEXT" ]; then
+    FCLEXT=fcl/$SAMEXT.fcl
+    cat $FCLDET $FCLGEN $FCLSIM $FCLEXT > tmpSAMPLE.fcl
+  else
+    cat $FCLDET $FCLGEN $FCLSIM > tmpSAMPLE.fcl
+  fi
   USENEW=
   if [ ! -r $SAMPLE.fcl ]; then
     USENEW=true
