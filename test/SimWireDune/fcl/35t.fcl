@@ -11,6 +11,7 @@
 #include "singles_dune.fcl"
 #include "largeantmodules_dune.fcl"
 #include "detsimmodules_dune.fcl"
+#include "caldata_dune.fcl"
 
 process_name: SinglesGen
 
@@ -38,10 +39,11 @@ physics: {
    largeant:  @local::dune35t_largeant	  
    daq:       @local::dune_detsim       
    rns:       { module_type: "RandomNumberSaver" }
+   caldata: @local::dune35t_calwire
  }
 
   # Specify the modules (filters and producers) that modify the event. 
-  produce: [generator, largeant, daq, rns] 
+  produce: [generator, largeant, daq, caldata, rns] 
   trigger_paths: [produce] 
 
   # Specify the modules (analyzers and output streams) that do not modify the event. 
