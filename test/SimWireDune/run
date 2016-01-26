@@ -21,7 +21,8 @@ SAMGEN=$1
 SAMDET=$2
 SAMSIM=$3
 SAMEXT=$4
-SAMPLE=${SAMGEN}${SAMDET}${SAMSIM}${SAMEXT}
+SAMEX2=$5
+SAMPLE=${SAMGEN}${SAMDET}${SAMSIM}${SAMEXT}${SAMEX2}
 
 if [ -z "$SAMGEN" ]; then
   HELP=true
@@ -48,6 +49,7 @@ if [ -n "$SAMDET" -a -n "$SAMSIM" ]; then
   FCLDET=fcl/$SAMDET.fcl
   FCLSIM=fcl/$SAMSIM.fcl
   FCLEXT=fcl/$SAMEXT.fcl
+  FCLEXT=fcl/$SAMEX2.fcl
   # Create fcl file.
   rm -f ${SAMPLE}_event.root
   if [ ! -r $FCLGEN ]; then
@@ -64,7 +66,12 @@ if [ -n "$SAMDET" -a -n "$SAMSIM" ]; then
   fi
   if [ -n "$SAMEXT" ]; then
     FCLEXT=fcl/$SAMEXT.fcl
-    cat $FCLDET $FCLGEN $FCLSIM $FCLEXT > tmpSAMPLE.fcl
+    if [ -n "$SAMEX2" ]; then
+      FCLEX2=fcl/$SAMEX2.fcl
+      cat $FCLDET $FCLGEN $FCLSIM $FCLEXT $FCLEX2 > tmpSAMPLE.fcl
+    else
+      cat $FCLDET $FCLGEN $FCLSIM $FCLEXT > tmpSAMPLE.fcl
+    fi
   else
     cat $FCLDET $FCLGEN $FCLSIM > tmpSAMPLE.fcl
   fi
@@ -106,19 +113,19 @@ if [ ! -r ${SAMPLE}_event.root ]; then
   echo
   echo run: Generating event data.
   echo " Start: "`date`
-  LOG=${SAMPLE}perf.log
+  LOG=${SAMPLE}.log
   echo $COM >$LOG
   echo Start `date` >>$LOG
   COM="lar -n 5 -c ${SAMPLE}.fcl -T ${SAMPLE}_hist.root -o ${SAMPLE}_event.root"
   echo $COM >>$LOG
   echo Start: `date` >>$LOG
-  $COM 2>&1 >> ${SAMPLE}.log
+  $COM 2>&1 >> $LOG
   STAT=$?
   echo Finish: `date` >>$LOG
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}_event.root ]; then
     echo run: Event generation failed.
-    echo Log is ${SAMPLE}.log
+    echo Log is $LOG
     exit 1
   fi
   fcldump ${SAMPLE}.fcl 10 > ${SAMPLE}.fcldump
@@ -141,7 +148,7 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   echo Finish: `date`
   if [ $STAT -ne 0 -o ! -r ${SAMPLE}perf.root ]; then
     echo run: Histogram generation failed.
-    echo Log is ${SAMPLE}perf.log
+    echo Log is $LOG
     exit 1
   fi
 fi

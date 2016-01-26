@@ -1,0 +1,7 @@
+services.SignalShapingServiceDUNE35t.ColFilter: "[0]*exp(-0.5*(((x-[1])/[2])^2)^[3])"
+services.SignalShapingServiceDUNE35t.IndUFilter: "gaus*exp(-0.5*pow(x/[3],[4]))"
+services.SignalShapingServiceDUNE35t.IndVFilter: "gaus*exp(-0.5*pow(x/[3],[4]))"
+ColFilterParams: [1.03, 0.08, 0.15, 2.17]
+IndUFilterParams: [1.73, 1.69, 1.55, 0.19, 3.75]
+IndVFilterParams: [1.73, 1.69, 1.55, 0.19, 3.75]
+physics.producers.caldata.DoBaselineSub: "false"

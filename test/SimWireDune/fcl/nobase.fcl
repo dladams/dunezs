@@ -1,0 +1,2 @@
+services.SignalShapingServiceDUNE35t.ColFilter: "[0]*exp(-0.5*(((x-[1])/[2])^2)^[3])"
+physics.producers.caldata.DoBaselineSub: "false"

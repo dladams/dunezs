@@ -1,0 +1,4 @@
+services.SignalShapingServiceDUNE35t.ColFilter: "1"
+services.SignalShapingServiceDUNE35t.IndUFilter: "1"
+services.SignalShapingServiceDUNE35t.IndVFilter: "1"
+physics.producers.caldata.DoBaselineSub: "false"
