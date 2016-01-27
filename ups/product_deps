@@ -1,15 +1,15 @@
 # dunezs/ups/product_deps
 #
 # David Adams
-# November 2015
+# January 2016
 
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	dunezs  v00_00_05
+parent	dunezs  v00_00_06
 defaultqual	e9
 
 product         version
-dunetpc         v04_33_00
+dunetpc         v04_34_00
 art             v1_17_06
 gcc             v4_9_3
 cetbuildtools   v4_18_01 - only_for_build
