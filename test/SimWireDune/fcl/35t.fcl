@@ -101,4 +101,7 @@ physics.producers.daq.PedestalOn:  true
 physics.producers.daq.SuppressOn:  true
 physics.producers.daq.DistortOn:   false
 
+# Disable bad channels.
+services.IChannelStatusService.BadChannels: [ ]
+
 #physics.producers.caldata.LogLevel:  2

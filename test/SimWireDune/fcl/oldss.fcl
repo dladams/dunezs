@@ -1,0 +1,9 @@
+# oldss.fcl
+#
+# Use old (v04_34_00) signal shaping filters.
+
+services.SignalShapingServiceDUNE35t.ColFilter:   "(x>0)*[0]*exp(-0.5*(((x-[1])/[2])^2)^[3])"
+services.SignalShapingServiceDUNE35t.IndUFilter:  "(x>0.0)*gaus*exp(-0.5*pow(x/[3],[4]))"
+services.SignalShapingServiceDUNE35t.IndVFilter:  "(x>0.0)*gaus*exp(-0.5*pow(x/[3],[4]))"
+
+services.SignalShapingServiceDUNE35t.IndVFilterParams: [ 1.74, 1.46, 1.33, 0.23, 4.89 ]

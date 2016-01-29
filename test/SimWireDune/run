@@ -100,7 +100,7 @@ fi
 if [ -n "$CLEAN" ]; then
   echo Cleaning
   rm -f ${SAMPLE}_hist.root ${SAMPLE}_event.root ${SAMPLE}.log
-  rm -f ${SAMPLE}perf.root ${SAMPLE}perf.log
+  rm -f ${SAMPLE}_perf.root ${SAMPLE}perf.log
 fi
 
 if [ -n "$FCLONLY" ]; then
@@ -109,7 +109,7 @@ fi
 
 # Generate event data.
 if [ ! -r ${SAMPLE}_event.root ]; then
-  rm -f ${SAMPLE}perf.root
+  rm -f ${SAMPLE}_perf.root
   echo
   echo run: Generating event data.
   echo " Start: "`date`
@@ -132,13 +132,13 @@ if [ ! -r ${SAMPLE}_event.root ]; then
 fi
 
 # Generate histograms.
-if [ ! -r ${SAMPLE}perf.root ]; then
+if [ ! -r ${SAMPLE}_perf.root ]; then
   echo
   echo run: Generating histograms.
   echo " Start: "`date`
   FCL=fcl/perf35t.fcl
-  COM="lar -c $FCL -s ${SAMPLE}_event.root -T ${SAMPLE}perf.root"
-  LOG=${SAMPLE}perf.log
+  COM="lar -c $FCL -s ${SAMPLE}_event.root -T ${SAMPLE}_perf.root"
+  LOG=${SAMPLE}_perf.log
   echo $COM
   echo $COM >$LOG
   echo Start: `date` >>$LOG
@@ -146,7 +146,7 @@ if [ ! -r ${SAMPLE}perf.root ]; then
   STAT=$?
   echo Finish: `date` >>$LOG
   echo Finish: `date`
-  if [ $STAT -ne 0 -o ! -r ${SAMPLE}perf.root ]; then
+  if [ $STAT -ne 0 -o ! -r ${SAMPLE}_perf.root ]; then
     echo run: Histogram generation failed.
     echo Log is $LOG
     exit 1
