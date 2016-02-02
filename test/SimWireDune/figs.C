@@ -7,13 +7,15 @@
 
 typedef vector<string> NameList;
 
-int figs() {
+int figs(bool allevt =false) {
   NameList evt;
   evt.push_back("1");
-  //evt.push_back("2");
-  //evt.push_back("3");
-  //evt.push_back("4");
-  //evt.push_back("5");
+  if ( allevt ) {
+    evt.push_back("2");
+    evt.push_back("3");
+    evt.push_back("4");
+    evt.push_back("5");
+  }
   NameList apa;
   apa.push_back("2z2");
   apa.push_back("2u");

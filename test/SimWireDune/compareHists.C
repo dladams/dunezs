@@ -4,8 +4,8 @@
 // November 2015
 
 int compareHists(string sam1, string sam2, int comdbg =0) {
-  string file1 = sam1 + "perf.root";
-  string file2 = sam2 + "perf.root";
+  string file1 = sam1 + "_perf.root";
+  string file2 = sam2 + "_perf.root";
   cout << "Comparing hists with debug level " << comdbg << endl;
   cout << "     Test sample: " << sam1 << endl;
   cout << "Reference sample: " << sam2 << endl;

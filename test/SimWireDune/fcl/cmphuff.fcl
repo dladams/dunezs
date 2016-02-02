@@ -1,0 +1,7 @@
+# cmpnone.fcl
+
+services.AdcCompressService: {
+  service_provider: "LarsoftHuffmanCompressService"
+  UseBlock:         "false"
+  UseHuffman:       "true"
+}
