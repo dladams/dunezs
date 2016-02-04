@@ -9,7 +9,7 @@
 
 #include "DXDisplay.fcl"
 
-physics.analyzers.DXDisplay.DebugLevel:            1
+physics.analyzers.DXDisplay.DebugLevel:            5
 #physics.analyzers.DXDisplay.DebugLevel:            5    # dumps every channel
 #physics.analyzers.DXDisplay.DebugLevel:            6    # dumps every tick
 physics.analyzers.DXDisplay.TdcTickMax:         2800    # 1 drift is about 2780 ticks

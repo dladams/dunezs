@@ -92,7 +92,7 @@ services.ChannelNoiseService:      @local::chnoiseold
 services.IDetPedestalService:      @local::pedlegacy
 services.PedestalAdditionService:  @local::padprovided
 services.AdcSuppressService:       @local::zsonline
-services.AdcCompressService:       @local::cmpreplace
+services.AdcCompressService:       @local::cmpblock
 services.AdcDistortService:        @local::stuckbits
 
 # DetSim flags.

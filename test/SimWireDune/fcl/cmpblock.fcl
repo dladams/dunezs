@@ -1,7 +1,3 @@
 # cmpnone.fcl
 
-services.AdcCompressService: {
-  service_provider: "LarsoftHuffmanCompressService"
-  UseBlock:         "true"
-  UseHuffman:       "false"
-}
+services.AdcCompressService: @local::cmpblock
