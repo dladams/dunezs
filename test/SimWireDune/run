@@ -119,7 +119,7 @@ if [ ! -r ${SAMPLE}_event.root ]; then
   COM="lar -n 5 -c ${SAMPLE}.fcl -T ${SAMPLE}_hist.root -o ${SAMPLE}_event.root"
   echo $COM >>$LOG
   echo Start: `date` >>$LOG
-  $COM 2>&1 >> $LOG
+  $COM >> $LOG 2>&1
   STAT=$?
   echo Finish: `date` >>$LOG
   echo Finish: `date`
@@ -140,9 +140,9 @@ if [ ! -r ${SAMPLE}_perf.root ]; then
   COM="lar -c $FCL -s ${SAMPLE}_event.root -T ${SAMPLE}_perf.root"
   LOG=${SAMPLE}_perf.log
   echo $COM
-  echo $COM >$LOG
+  echo $COM 2>&1 >$LOG
   echo Start: `date` >>$LOG
-  $COM 2>&1 >>$LOG
+  $COM >>$LOG 2>&1
   STAT=$?
   echo Finish: `date` >>$LOG
   echo Finish: `date`

@@ -5,11 +5,11 @@
 
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	dunezs  v00_00_07
+parent	dunezs  v00_00_08
 defaultqual	e9
 
 product         version
-dunetpc         v04_35_00
+dunetpc         v04_36_00
 art             v1_17_07
 gcc             v4_9_3
 cetbuildtools   v4_18_01 - only_for_build
